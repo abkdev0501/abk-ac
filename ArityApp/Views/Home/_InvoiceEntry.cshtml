@@ -1,0 +1,176 @@
+﻿@model Arity.Data.Dto.InvoiceEntry
+<form>
+    @Html.HiddenFor(_ => _.InvoiceId)
+    @Html.HiddenFor(_ => _.InvoiceParticularId)
+    @Html.HiddenFor(_ => _.CreatedDate)
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Company<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.CompanyId, ViewBag.company as SelectList, "-- Select Company--", new { @class = "form-control input-sm", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Client<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.ClientId, ViewBag.Client as SelectList, "-- Select Client--", new { @class = "form-control input-sm", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Particular<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.ParticularId, ViewBag.Particular as SelectList, "-- Select Particular--", new { @class = "form-control input-sm", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Amount<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Amount, new { @class = "form-control input-sm", placeholder = "Enter amount", @required = "required", @type = "number" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Year<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Year, new { @class = "form-control input-sm", placeholder = "Enter year", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="width:100%;text-align:center;padding: 25px 0 5px;">
+        <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.InvoiceParticularId > 0 ? "Update" : "Add")</button>
+        <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
+    </div>
+</form>
+@if (Model != null && Model.InvoiceId > 0)
+{
+    <script>$("#ClientId").attr("readonly","readonly")</script>
+}
+<script>
+
+    $("#btnAdd").click(function () {
+        var isValid = true;
+        if ($("#CompanyId").val() == null || $("#CompanyId").val() == "") {
+            Notification('', 'Please select Company', 'danger');
+            isValid = false;
+        }
+        if ($("#ClientId").val() == null || $("#ClientId").val() == "") {
+            Notification('', 'Please select client', 'danger');
+            isValid = false;
+        }
+        else if($("#ParticularId").val() == null || $("#ParticularId").val() == "") {
+            Notification('', 'Please select particular', 'danger');
+            isValid = false;
+        }
+         else if($("#Amount").val() == null || $("#Amount").val() == ""  || $("#Amount").val() <= "0") {
+            Notification('', 'Please enter amount', 'danger');
+            isValid = false;
+        }
+        else if($("#Year").val() == null || $("#Year").val() == "") {
+            Notification('', 'Please enter year', 'danger');
+            isValid = false;
+        }
+
+        var data = JSON.stringify({
+            "invoiceEntry": {
+                "CompanyId": $("#CompanyId").val(),
+                "ClientId": $("#ClientId").val(),
+                "ParticularId": $("#ParticularId").val(),
+                "Amount": $("#Amount").val(),
+                "Year": $("#Year").val(),
+                "InvoiceId": $("#InvoiceId").val(),
+                "CreatedDate": $("#CreatedDate").val(),
+                "InvoiceParticularId": $("#InvoiceParticularId").val()
+            }
+        });
+
+        if (isValid) {
+            $.ajax({
+                url: '@Url.Action("AddInvoiceEntry", "Home")',
+                dataType: "json",
+                type: "POST",
+                data:data,
+                cache: false,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    $("#loading").hide();
+                    if (response) {
+                        if (@Model.InvoiceParticularId <= 0) {
+                            Notification('', 'Invoice entry added successfuly', 'success');
+                        }
+                        else {
+                            Notification('', 'Invoice entry updated successfuly', 'success');
+                        }
+                        table.ajax.reload();
+                        $("#modelInvoiceEntry").modal('toggle');
+                    }
+                    else {
+                         Notification('', 'Something went wrong, Please try again', 'danger');
+                    }
+                },
+                error: function (error) {
+                    $("#loading").hide();
+                    Notification('', 'Something went wrong, Please try again', 'danger');
+                }
+            });
+        }
+    });
+
+     $("#CompanyId").on('change', function () {
+        $.ajax({
+            url: '@Url.Action("GetClientByCompany", "Home")',
+            dataType: "json",
+            type: "GET",
+            data: {companyId:$("#CompanyId").val()},
+            cache: false,
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                $("#ClientId").html("<option value>-- select client --</option>");
+                $.each(response, function (i, client) {
+                    $("#ClientId").append($("<option />").val(client.Id).text(client.FullName));
+                });
+            },
+            error: function () {
+
+            },
+        });
+    });
+</script>

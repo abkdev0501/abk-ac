@@ -1,0 +1,250 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Payment";
+}
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Data Table JS
+        ============================================ -->
+    <link rel="stylesheet" href="/Content/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/Content/css/chosen/chosen.css">
+    <style>
+        td.details-control {
+            background: url('/Content/images/details_open.png') no-repeat center center;
+            cursor: pointer;
+        }
+
+        tr.shown td.details-control {
+            background: url('/Content/images/details_close.png') no-repeat center center;
+        }
+    </style>
+</head>
+
+<div class="breadcomb-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="breadcomb-list">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="breadcomb-wp">
+                                <div class="breadcomb-icon">
+                                    <i class="notika-icon notika-form"></i>
+                                </div>
+                                <div class="breadcomb-ctn">
+                                    <h2>Payment History</h2>
+                                    <p></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+                            <div class="breadcomb-report">
+                                @if (Convert.ToInt32(Session["UserTypeID"]) == (int)Arity.Service.Core.UserType.Admin)
+                                {
+                                    <button id="btnAddInvoiceEntry" onclick="AddUpdatePaymentEntry(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb area End-->
+<div class="modal animated fade" id="modelPaymentEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-large">
+        <div class="modal-content">
+            <div class="modal-header" style="margin-bottom:35px;">
+                <h3>Add/Update Payment entry</h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Table area Start-->
+<div class="data-table-area">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="data-table-list">
+                    <div class="basic-tb-hd">
+                        <h2>Receipt History</h2>
+                        <p>Below are receipt history.</p>
+                    </div>
+
+                    <div class="date-filter">
+
+                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
+                            <label>From</label>
+                            <div class="input-group date nk-int-st">
+                                <span class="input-group-addon"></span>
+                                <input type="text" id="FromDate" class="form-control" value="@(((DateTime)ViewBag.FromDate).ToString("MM/dd/yyyy"))" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
+                            <label>To</label>
+                            <div class="input-group date nk-int-st">
+                                <span class="input-group-addon"></span>
+                                <input type="text" id="ToDate" class="form-control" value="@(((DateTime)ViewBag.ToDate).ToString("MM/dd/yyyy"))" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
+                            <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnFilterGrid">Search</button>
+                        </div>
+
+                    </div>
+                    <div class="table-responsive">
+                        <table id="tblPaymentHistory" class="table table-striped" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th style="width:12%;">Invoice#</th>
+                                    <th style="width:12%;">Receipt#</th>
+                                    <th style="width:10%;">Discount</th>
+                                    <th style="width:10%;">Total Amount</th>
+                                    <th style="width:10%;">Date</th>
+                                    <th style="width:10%;">Bank Name</th>
+                                    <th style="width:10%;">Cheque#</th>
+                                    <th style="width:9%;">Status</th>
+                                    <th style="width:7%;">Download Receipt</th>
+                                    <th style="width:9%;">Update</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+    $(document).ready(function () {
+
+       table =  $('#tblPaymentHistory').DataTable({
+            "ajax": function (data, callback, settings) {
+                $.ajax({
+                    url: '@Url.Action("LoadPaymentHistory","Home")',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        from: $("#FromDate").val(),
+                        to: $("#ToDate").val()
+                    },
+                    beforeSend: function (xhrObj) {
+                        $("#loading").show();
+                    }
+                    })
+                    .done(function (data, textStatus, jqXHR) {
+                        callback(data);
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        Notification('Error! ', ''+errorThrown+'', 'danger');
+                    })
+                    .always(function (data, textStatus, jqXHR) {
+                        $("#loading").hide();
+                    });
+            },
+            "language": {
+                "emptyTable": "No receipts found"
+            },
+           "columns": [
+                { "data": "InvoiceNumbers" },
+                { "data": "RecieptNo" },
+                { "data": "Discount" },
+                { "data": "TotalAmount" },
+                { "data": "CreatedDateString" },
+                { "data": "BankName" },
+                { "data": "ChequeNumber" },
+                { "data": "Status" },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                            return '<button class="btn waves-effect" onclick="downloadReceipt(' + data.ReceiptId + ')"><i class="fa fa-download" aria-hidden="true"></i></button>';
+                    }
+               }
+                ,
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                            return '<button class="btn waves-effect" onclick="AddUpdatePaymentEntry(' + data.ReceiptId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                    }
+                }
+            ],
+            "order": [[5, "desc"]]
+       });
+
+       @if (Convert.ToInt32(Session["UserTypeID"]) != (int)Arity.Service.Core.UserType.Admin)
+{
+           @:table.column(9).visible(false)
+       }
+         $("#btnFilterGrid").click(function () {
+    table.ajax.reload();
+});
+       });
+
+        function RemvoeParticulars(id) {
+            if (confirm("Are you sure you want to delete this particular?")) {
+                $("#loading").show();
+            $.ajax({
+                url: '@Url.Action("RemoveInvoiceEntry", "Home")',
+                dataType: "json",
+                type: "GET",
+                data: { id: id },
+                success: function (response) {
+                    $("#loading").hide();
+                     Notification('', 'Particular deleted successfuly', 'success');
+                    table.ajax.reload();
+                },
+                error: function (error) {
+                    $("#loading").hide();
+                    Notification('', 'Something went wrong, Please try again', 'danger');
+                }
+            });
+            }
+        }
+
+        function AddUpdatePaymentEntry(id) {
+              $("#loading").show();
+            $.ajax({
+                url: '@Url.Action("AddPaymentEntry", "Home")',
+                dataType: "html",
+                type: "GET",
+                data: { id: id },
+                cache: false,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    $("#loading").hide();
+                    $("#modelPaymentEntry .modal-body").html(response);
+                  $("#modelPaymentEntry").modal('toggle');
+                },
+                error: function (error) {
+                    $("#loading").hide();
+                    Notification('', 'Something went wrong, Please try again', 'danger');
+                }
+            });
+        }
+
+        function downloadPayment(id) {
+            window.open("/home/downloadreciept/"+id);
+        }
+    </script>
+}

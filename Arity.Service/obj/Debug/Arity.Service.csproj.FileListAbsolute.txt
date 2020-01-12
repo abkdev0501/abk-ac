@@ -1,0 +1,35 @@
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\Arity.Service.dll
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\Arity.Service.pdb
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\obj\Debug\Arity.Service.csprojAssemblyReference.cache
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\obj\Debug\Arity.Service.csproj.CoreCompileInputs.cache
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\obj\Debug\Arity.Service.dll
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\obj\Debug\Arity.Service.pdb
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\Arity.Service.dll.config
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\Arity.Data.dll
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\AutoMapper.dll
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\EntityFramework.dll
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\Arity.Data.pdb
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\Arity.Data.dll.config
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\AutoMapper.pdb
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\AutoMapper.xml
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\EntityFramework.xml
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Service\obj\Debug\Arity.Service.csproj.CopyComplete
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\Arity.Service.dll.config
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\Arity.Service.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\Arity.Service.pdb
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\Arity.Data.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\AutoMapper.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\EntityFramework.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\EntityFramework.SqlServer.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\Arity.Data.pdb
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\Arity.Data.dll.config
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\AutoMapper.pdb
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\AutoMapper.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\EntityFramework.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\bin\Debug\EntityFramework.SqlServer.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\obj\Debug\Arity.Service.csprojAssemblyReference.cache
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\obj\Debug\Arity.Service.csproj.CopyComplete
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\obj\Debug\Arity.Service.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Service\obj\Debug\Arity.Service.pdb

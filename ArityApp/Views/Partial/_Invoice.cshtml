@@ -1,0 +1,136 @@
+﻿@using System.Globalization;
+@model Arity.Service.Infrastructure.DocumentViewDownload
+@{
+    Layout = null;
+}
+<html>
+<head>
+    <title>Invoice PDF </title>
+    <style>
+        .box-item {
+            width: 100%;
+            z-index: 1000
+        }
+
+        .table {
+            border: 1px solid #ccc;
+            float: left;
+            font-size: 16px;
+            background-color: cornsilk;
+            margin-top: 50px
+        }
+
+        .line {
+            border: 0;
+            background-color: #000;
+            height: 3px;
+            cursor: pointer;
+        }
+
+        .panel-body {
+            /* padding: 15px; */
+        }
+
+        .container-fluid {
+            padding-right: 155px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+            margin-top: 10px;
+        }
+
+        .borderless td, .borderless th {
+            border: none;
+        }
+
+        h3 {
+            text-decoration: underline;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+</head>
+<body>
+    @if (Model != null && Model.InvoiceEntry != null)
+    {
+
+        <div class="container-fluid">
+            <div class="col-md-10 col-md-offset-1">
+                <div class="panel panel-default">
+                    <div id="container1" class="panel-body box-container">
+                        <table class="table borderless"
+                               width='550' border='1' align='center'
+                               cellpadding='4' cellspacing='0' style="background-color:#fff;">
+                            <tr>
+                                <td colspan="7" align="center"> <h3 class="panel-title">R. M. Narshana</h3></td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" align="center"> <span> 1, Prerana Apartment, 2, Talav Street, Junagadh.</span></td>
+                            </tr>
+                            <tr>
+                                <td> <span>Bill No. </span></td>
+                                <td> <span>@Model.InvoiceEntry.InvoiceNumber</span></td>
+                                <td> &nbsp;</td>
+                                <td class="text-center"> <span class="fa-underline fa-bold">INVOICE</span></td>
+                                <td> &nbsp;</td>
+                                <td> <span class="">Date :</span></td>
+                                <td> <span class="">@Model.InvoiceEntry.CreatedDate.Value.ToString("MM/dd/yyyy")</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="text-center"> &nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td class="fa-bold"> <span> Name :</span></td>
+                                <td colspan="6"> <span> @Model.InvoiceEntry.FullName</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fa-bold"> <span> Address :</span></td>
+                                <td colspan="6"> <span> @Model.InvoiceEntry.Address</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="text-center"> &nbsp;</td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="5" class="text-center"> <span> Particulars</span></td>
+                                <td colspan="2" class="text-center"> <span> Amount</span></td>
+                            </tr>
+                            @foreach (var item in Model.Particulars)
+                            {
+                                <tr>
+                                    <td colspan="5"> <span> @item.FFParticulars Fees For F.Y. @item.Year</span></td>
+                                    <td colspan="2" class="text-right"> <span> @item.Amount</span></td>
+                                </tr>
+                            }
+                            <tr>
+                                <td colspan="4" class="text-left"> <span> Amount Chargeable (in words)</span></td>
+                                <td colspan="1" class="text-right"> <span> Total</span></td>
+                                <td colspan="2" class="text-right"> <span> @Model.Particulars.Sum(_ => _.Amount)</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="1" class="text-left" style="background-color:#eeee;"> <span> For F.Y.</span></td>
+                                <td colspan="6" class="text-left" style="background-color:#eeee;"> <span> @Model.Particulars.FirstOrDefault().Year</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="text-center"> &nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="text-center"> &nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" align="right"> Authorised Signatory</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</body>
+</html>

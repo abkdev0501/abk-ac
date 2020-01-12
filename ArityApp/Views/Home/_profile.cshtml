@@ -1,0 +1,120 @@
+﻿@model Arity.Data.Vendor_User
+<div class="profileForm">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="form-example-wrap">
+                <div id="vallidationError" style="margin-bottom:25px;text-align: center;">
+                    <span style="color:red" id="lblvalidationError"> </span>
+                </div>
+
+                <div id="successMsg" style="margin-bottom:25px;text-align: center;">
+                    <span style="color:green;align-content :center" id="lblsuccessMsg"> </span>
+                </div>
+                <div class="form-example-int form-horizental">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                <label class="hrzn-fm">First Name<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                            </div>
+                            <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                                <div class="nk-int-st">
+                                    @Html.TextBoxFor(_ => _.FirstName, new { @class = "form-control input-sm", placeholder = "First Name" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-example-int form-horizental mg-t-15">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                <label class="hrzn-fm">Last Name<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                            </div>
+                            <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                                <div class="nk-int-st">
+                                    @Html.TextBoxFor(_ => _.LastName, new { @class = "form-control input-sm", placeholder = "Last Name" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-example-int form-horizental mg-t-15">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                <label class="hrzn-fm">Email Address<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                            </div>
+                            <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                                <div class="nk-int-st">
+                                    @Html.TextBoxFor(_ => _.Email, new { @class = "form-control input-sm", placeholder = "Email Address" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-example-int form-horizental mg-t-15">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                <label class="hrzn-fm">I would like to get email notifications</label>
+                            </div>
+                            <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                                <div class="nk-int-st">
+                                    @Html.CheckBoxFor(_ => _.EmailNotification)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-example-int mg-t-15 text-center">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 15px;">
+                            <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnUpdateProfile">Update</button>
+                            <button id="btnChangePassword" type="button" class="btn btn-info notika-btn-info waves-effect" style="margin-left:10px;">Change Password</button>
+                            <button id="btnProfileCancel" type="button" class="btn btn-default notika-btn-default waves-effect" style="margin-left:10px;">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var regeX = /^[a-zA-Z0-9_.-]+@@[a-zA-Z0-9]+[a-zA-Z0-9.-]+[a-zA-Z0-9]+.[a-z]{0,4}$/;
+       $('#btnProfileCancel').click(function () {
+           $('#modelUpdateProfile').trigger("click");
+    });
+
+       $('#btnUpdateProfile').on('click', function () {
+        var isValid = true;
+           if ($('#FirstName').val() == "" || $('#LastName').val() == "" || $('#Email').val() == "") {
+               Notification('Error! ', 'Field should not be null', 'danger');
+            isValid = false;
+           } else if (!regeX.test($('#Email').val())) {
+               Notification('Error! ', 'Please enter vaild email address', 'danger');
+            isValid = false;
+           }
+           if (isValid) {
+               $("#loading").show();
+            $.ajax({
+                url: '@Url.Action("UpdateProfile", "Home")',
+                dataType: "json",
+                type: "POST",
+                data: { FirstName: $('#FirstName').val(), LastName: $('#LastName').val(), Email: $('#Email').val(), EmailNotification: $("#EmailNotification").is(":checked") },
+                cache: false,
+                success: function (response) {
+                    $("#loading").hide();
+                    Notification('', 'Profile updated successfullly.', 'success');
+                        $("#modelUpdateProfile").modal('toggle');
+                },
+                error: function (error) {
+                    $("#loading").hide();
+                    Notification('', 'Internal error occured, Please try again', 'danger');
+                }
+            });
+        }
+    });
+    });
+</script>

@@ -1,0 +1,341 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+}
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Data Table JS
+        ============================================ -->
+    <link rel="stylesheet" href="/Content/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/Content/css/chosen/chosen.css">
+    <style>
+        td.details-control {
+            background: url('/Content/images/details_open.png') no-repeat center center;
+            cursor: pointer;
+        }
+
+        tr.shown td.details-control {
+            background: url('/Content/images/details_close.png') no-repeat center center;
+        }
+    </style>
+</head>
+
+<div class="breadcomb-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="breadcomb-list">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="breadcomb-wp">
+                                <div class="breadcomb-icon">
+                                    <i class="notika-icon notika-form"></i>
+                                </div>
+                                <div class="breadcomb-ctn">
+                                    <h2>Invoice History</h2>
+                                    <p></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+                            <div class="breadcomb-report">
+                                @if (Convert.ToInt32(Session["UserTypeID"]) == (int)Arity.Service.Core.UserType.Admin)
+                                {
+                                    <button id="btnAddInvoiceEntry" onclick="AddUpdateInvoiceEntry(0,0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb area End-->
+<div class="modal animated fade" id="modelInvoiceEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-large">
+        <div class="modal-content">
+            <div class="modal-header" style="margin-bottom:35px;">
+                <h3>Add/Update Invoice entry</h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+<!--Drag and Drop end-->
+<!--profile update start-->
+<div class="modal animated fade" id="modelUpdateProfile" role="dialog">
+    <div class="modal-dialog modals-default">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><span><i class="notika-icon notika-support"></i></span> &nbsp; Update Profile </h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--profile update end-->
+<!--Change password start-->
+<div class="modal animated fade" id="modalChangePassword" role="dialog">
+    <div class="modal-dialog modals-default">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Change Password</h3>
+                <button type="button" class="close" data-dismiss="modal" id="btnCloseChangePassword">&times;</button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+<!--Change password End-->
+<!-- Data Table area Start-->
+<div class="data-table-area">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="data-table-list">
+                    <div class="basic-tb-hd">
+                        <h2>Invoice History</h2>
+                        <p>Below are invoice history.</p>
+                    </div>
+
+                    <div class="date-filter">
+                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
+                            <label>From</label>
+                            <div class="input-group date nk-int-st">
+                                <span class="input-group-addon"></span>
+                                <input type="text" id="FromDate" class="form-control" value="@(((DateTime)ViewBag.FromDate).ToString("MM/dd/yyyy"))" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
+                            <label>To</label>
+                            <div class="input-group date nk-int-st">
+                                <span class="input-group-addon"></span>
+                                <input type="text" id="ToDate" class="form-control" value="@(((DateTime)ViewBag.ToDate).ToString("MM/dd/yyyy"))" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
+                            <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnFilterGrid">Search</button>
+                        </div>
+
+                    </div>
+                    <div class="table-responsive">
+                        <table id="tblInvoiceHistory" class="table table-striped" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th style="width:5%;"></th>
+                                    <th style="width:10%;">Invoice#</th>
+                                    <th style="width:20%;">Name</th>
+                                    <th style="width:25%;">Address</th>
+                                    <th style="width:10%;">Total Amount</th>
+                                    <th style="width:10%;">Date</th>
+                                    <th style="width:7%;">Download Invoice</th>
+                                    <th style="width:5%;">Add Particular</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+    $(document).ready(function () {
+
+       table =  $('#tblInvoiceHistory').DataTable({
+            "ajax": function (data, callback, settings) {
+                $.ajax({
+                    url: '@Url.Action("LoadInvoiceHistory","Home")',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        from: $("#FromDate").val(),
+                        to: $("#ToDate").val()
+                    },
+                    beforeSend: function (xhrObj) {
+                        $("#loading").show();
+                    }
+                    })
+                    .done(function (data, textStatus, jqXHR) {
+                        callback(data);
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        Notification('Error! ', ''+errorThrown+'', 'danger');
+                    })
+                    .always(function (data, textStatus, jqXHR) {
+                        $("#loading").hide();
+                    });
+            },
+            "language": {
+                "emptyTable": "No invoice found"
+            },
+           "columns": [
+                {
+                "className":      'details-control',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": ''
+            },
+                { "data": "InvoiceNumber" },
+                { "data": "FullName" },
+                { "data": "Address" },
+                { "data": "Amount" },
+                { "data": "CreatedDateString" },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                        return '<button class="btn  waves-effect" data-toggle="tooltip" data-placement="left" title="add payment entry" onclick="downloadInvoice(' + data.InvoiceId + ')"><i class="fa fa-download" aria-hidden="true"></i></button>';
+                    }
+                },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                            return '<button class="btn waves-effect" onclick="AddUpdateInvoiceEntry(0,' + data.InvoiceId + ')"><i class="fa fa-plus" aria-hidden="true"></i></button>';
+                    }
+                }
+            ],
+            "order": [[5, "desc"]]
+       });
+
+         @if (Convert.ToInt32(Session["UserTypeID"]) != (int)Arity.Service.Core.UserType.Admin)
+{
+           @:table.column(7).visible(false)
+       }
+       $('#tblInvoiceHistory tbody').on('click', 'td.details-control', function () {
+        var tr = $(this).closest('tr');
+        var row = table.row(tr);
+
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child( format(row.data()) ).show();
+            tr.addClass('shown');
+        }
+    });
+
+        $("#btnFilterGrid").click(function () {
+             table.ajax.reload();
+        });
+    });
+
+        function format(invoice) {
+          var html = '<div class="child-heading">All particulars information</div><table cellpadding="5" cellspacing="0" border="0" style="margin-left:5%;width:90%;    border: 1px solid #eee;margin-bottom: 2%;"><tr><th>Name</th><th>Ammount</th><th>Year</th><th>Date</th><th></th><th></th></tr>';
+             $.ajax({
+                        url: "@Url.Action("GetInvoiceParticulars", "Home")",
+                        method: "GET",
+                        data: { invoiceId: invoice.InvoiceId },
+                        async:false,
+                        dataType: "json"
+                    }).done(function (response) {
+                        if (response != null) {
+                            if (response.length <= 0) {
+                                html += '<tr>' +
+                                    '<td colspan="4" align="center">No particulars found</td>' +
+                                    '</tr>';
+                            }
+                            else {
+                                $(response).each(function (i, data) {
+                                    html += '<tr>' +
+                                        '<td>' + data.SFParticulars + '</td>' +
+                                        '<td>' + data.Amount + '</td>' +
+                                        '<td>' + data.Year + '</td>';
+
+                                    @if (Convert.ToInt32(Session["UserTypeID"]) == (int)Arity.Service.Core.UserType.Admin)
+                                    {
+                                          @:html += '<td>' + data.CreatedDateString + '</td><td><i style="cursor:pointer;" class="fa fa-edit" onclick="AddUpdateInvoiceEntry(' + data.InvoiceParticularId + ',' + data.InvoiceId + ')"></i></td><td><i style="cursor:pointer;" class="fa fa-remove" onclick="RemvoeParticulars(' + data.InvoiceParticularId + ')"></i></td>';
+                                        }
+                                    else {
+                                         @:html += '<td colspan="3">' + data.CreatedDateString + '</td>';
+                                    }
+                                    html +='</tr>';
+                                    });
+                            }
+
+                        }
+                    }).fail(function (jqXHR, textStatus) {
+                        console.log("Request failed: " + textStatus);
+                });
+            html += '</table>';
+            return html;
+        }
+
+        function RemvoeParticulars(id) {
+            if (confirm("Are you sure you want to delete this particular?")) {
+                $("#loading").show();
+            $.ajax({
+                url: '@Url.Action("RemoveInvoiceEntry", "Home")',
+                dataType: "json",
+                type: "GET",
+                data: { id: id },
+                success: function (response) {
+                    $("#loading").hide();
+                     Notification('', 'Particular deleted successfuly', 'success');
+                    table.ajax.reload();
+                },
+                error: function (error) {
+                    $("#loading").hide();
+                    Notification('', 'Something went wrong, Please try again', 'danger');
+                }
+            });
+            }
+        }
+
+        function AddUpdateInvoiceEntry(id,invoiceId) {
+              $("#loading").show();
+            $.ajax({
+                url: '@Url.Action("AddInvoiceEntry", "Home")',
+                dataType: "html",
+                type: "GET",
+                data: { id: id,invoiceId:invoiceId },
+                cache: false,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    $("#loading").hide();
+                    $("#modelInvoiceEntry .modal-body").html(response);
+                  $("#modelInvoiceEntry").modal('toggle');
+                },
+                error: function (error) {
+                    $("#loading").hide();
+                    Notification('', 'Internal error occured, Please try again', 'danger');
+                }
+            });
+        }
+
+        function downloadInvoice(id) {
+            window.open("/home/downloadinvoice/"+id);
+        }
+    </script>
+}
+
+

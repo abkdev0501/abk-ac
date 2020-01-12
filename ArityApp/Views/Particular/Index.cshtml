@@ -1,0 +1,137 @@
+﻿@{ 
+     Layout = "~/Views/Shared/_Layout.cshtml";
+     ViewBag.Title = "Index";
+
+}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Data Table JS
+        ============================================ -->
+    <link rel="stylesheet" href="/Content/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/Content/css/chosen/chosen.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+<div class="breadcomb-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="breadcomb-list">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="breadcomb-wp">
+                                <div class="breadcomb-icon">
+                                    <i class="notika-icon notika-form"></i>
+                                </div>
+                                <div class="breadcomb-ctn">
+                                    <h2>Particulars</h2>
+                                    <p></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+                            <div class="breadcomb-report">
+                                @if (Convert.ToInt32(Session["UserTypeID"]) == (int)Arity.Service.Core.UserType.Admin)
+                                {
+                                    <button onclick="AddEditParticular(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Table area Start-->
+<div class="data-table-area" style="margin-top:25px;height:100%">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="data-table-list">
+                    <div class="basic-tb-hd">
+                        <h2>Particular List</h2>
+                        <p>Below are List of Particular.</p>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="tblParticular" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Particular Short form</th>
+                                    <th>Particular</th>
+                                    <th>Edit</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id='ModalParticular' class='modal' role='dialog' data-url='@Url.Action("AddParticular","Particular")'>
+    </div>
+</div>
+<script>
+
+    $(document).ready(function () {
+       $('#tblParticular').DataTable({
+            "filter": true, // this is for disable filter (search box)
+            "orderMulti": false, // for disable multiple column at once
+            "pageLength": 5,
+
+            "ajax": {
+                "url": "/Particular/LoadParticulars",
+                "type": "GET",
+                "datatype": "json"
+            },
+            "language": {
+                "emptyTable": "No data found"
+            },
+
+            "columns": [
+
+                { "data": "ParticularSF", "autoWidth": true },
+                { "data": "ParticularFF", "autoWidth": true },
+                {
+                    "render": function (data, type, full, meta) {
+                        return '<button class="btn waves-effect" onclick="AddEditParticular(' + full.Id + ')" title="Edit"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                    }
+                },
+
+            ]
+
+
+        });
+    });
+
+</script>
+
+
+<script>
+
+    function AddEditParticular(Id) {
+
+        $.ajax({
+            url: '@Url.Action("AddParticular","Particular")',
+            data: { id: Id},
+            type: 'GET',
+            dataType: 'Html',
+            success: function (response) {
+                $('#ModalParticular').html(response);
+                $('#ModalParticular').modal('show');
+            },
+            failure: function () {
+                alert('error in loading Data');
+            },
+        });
+    }
+</script>

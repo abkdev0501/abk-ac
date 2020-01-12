@@ -1,0 +1,23 @@
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\obj\Debug\Arity.Data.csprojAssemblyReference.cache
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\obj\Debug\Arity.Data.csproj.CoreCompileInputs.cache
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\bin\Debug\Arity.Data.dll.config
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\bin\Debug\Arity.Data.dll
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\bin\Debug\Arity.Data.pdb
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\bin\Debug\EntityFramework.dll
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\bin\Debug\EntityFramework.xml
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\obj\Debug\Arity.Data.csproj.CopyComplete
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\obj\Debug\Arity.Data.dll
+C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\obj\Debug\Arity.Data.pdb
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\bin\Debug\Arity.Data.dll.config
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\bin\Debug\Arity.Data.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\bin\Debug\Arity.Data.pdb
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\bin\Debug\EntityFramework.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\bin\Debug\EntityFramework.SqlServer.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\bin\Debug\EntityFramework.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\bin\Debug\EntityFramework.SqlServer.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\obj\Debug\Arity.Data.csprojAssemblyReference.cache
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\obj\Debug\Arity.Data.csproj.CopyComplete
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\obj\Debug\Arity.Data.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\obj\Debug\Arity.Data.pdb

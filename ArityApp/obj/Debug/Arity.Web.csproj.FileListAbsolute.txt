@@ -1,0 +1,195 @@
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\obj\Debug\Arity.Web.csprojAssemblyReference.cache
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\obj\Debug\Arity.Web.csproj.CoreCompileInputs.cache
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\ArityApp.dll.config
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\ArityApp.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\ArityApp.pdb
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\csc.exe
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\csc.exe.config
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\csc.rsp
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\csi.exe
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\csi.exe.config
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\csi.rsp
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\Microsoft.CodeAnalysis.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\Microsoft.CSharp.Core.targets
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\Microsoft.Managed.Core.targets
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\Microsoft.VisualBasic.Core.targets
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.AppContext.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Collections.Immutable.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Console.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Diagnostics.StackTrace.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.IO.Compression.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.IO.FileSystem.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.IO.FileSystem.Primitives.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.IO.Pipes.AccessControl.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.IO.Pipes.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Reflection.Metadata.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Security.AccessControl.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Security.Claims.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Security.Cryptography.Encoding.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Security.Cryptography.Primitives.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Security.Principal.Windows.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Text.Encoding.CodePages.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.ValueTuple.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Xml.ReaderWriter.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Xml.XmlDocument.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Xml.XPath.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\System.Xml.XPath.XDocument.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\vbc.exe
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\vbc.exe.config
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\vbc.rsp
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\VBCSCompiler.exe
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\roslyn\VBCSCompiler.exe.config
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Antlr3.Runtime.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Arity.Data.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Arity.Service.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\EntityFramework.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\EntityFramework.SqlServer.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\itextsharp.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\itextsharp.xmlworker.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Newtonsoft.Json.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Select.HtmlToPdf.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Select.Pdf.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.Helpers.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.Mvc.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.Optimization.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.Razor.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.WebPages.Deployment.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.WebPages.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.WebPages.Razor.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\WebGrease.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\AutoMapper.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Arity.Data.pdb
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Arity.Data.dll.config
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Arity.Service.pdb
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Arity.Service.dll.config
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\EntityFramework.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\EntityFramework.SqlServer.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\itextsharp.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Select.HtmlToPdf.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Select.Pdf.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.Helpers.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.Mvc.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.Optimization.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.Razor.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.WebPages.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.WebPages.Deployment.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\System.Web.WebPages.Razor.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Newtonsoft.Json.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Antlr3.Runtime.pdb
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\AutoMapper.pdb
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\AutoMapper.xml
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Select.Html.dep
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\bin\Select.Tools.dep
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\obj\Debug\Arity.Web.csproj.CopyComplete
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\obj\Debug\ArityApp.dll
+C:\Users\LENOVO\source\repos\ArityApp\ArityApp\obj\Debug\ArityApp.pdb
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\ArityApp.dll.config
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\ArityApp.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\ArityApp.pdb
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\csc.exe
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\csc.exe.config
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\csc.rsp
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\csi.exe
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\csi.exe.config
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\csi.rsp
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\Microsoft.CodeAnalysis.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\Microsoft.CSharp.Core.targets
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\Microsoft.Managed.Core.targets
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\Microsoft.VisualBasic.Core.targets
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.AppContext.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Collections.Immutable.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Console.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Diagnostics.StackTrace.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.IO.Compression.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.IO.FileSystem.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.IO.FileSystem.Primitives.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.IO.Pipes.AccessControl.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.IO.Pipes.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Reflection.Metadata.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Security.AccessControl.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Security.Claims.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Security.Cryptography.Encoding.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Security.Cryptography.Primitives.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Security.Principal.Windows.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Text.Encoding.CodePages.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.ValueTuple.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Xml.ReaderWriter.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Xml.XmlDocument.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Xml.XPath.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\System.Xml.XPath.XDocument.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\vbc.exe
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\vbc.exe.config
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\vbc.rsp
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\VBCSCompiler.exe
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\roslyn\VBCSCompiler.exe.config
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Antlr3.Runtime.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Arity.Data.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Arity.Service.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\EntityFramework.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\EntityFramework.SqlServer.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\itextsharp.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\itextsharp.xmlworker.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Microsoft.Web.Infrastructure.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Newtonsoft.Json.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Select.HtmlToPdf.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Select.Pdf.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.Helpers.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.Mvc.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.Optimization.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.Razor.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.WebPages.Deployment.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.WebPages.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.WebPages.Razor.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\WebGrease.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\AutoMapper.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Arity.Data.pdb
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Arity.Data.dll.config
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Arity.Service.pdb
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Arity.Service.dll.config
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\EntityFramework.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\EntityFramework.SqlServer.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\itextsharp.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Select.HtmlToPdf.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Select.Pdf.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.Helpers.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.Mvc.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.Optimization.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.Razor.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.WebPages.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.WebPages.Deployment.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\System.Web.WebPages.Razor.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Newtonsoft.Json.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Antlr3.Runtime.pdb
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\AutoMapper.pdb
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\AutoMapper.xml
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Select.Html.dep
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\bin\Select.Tools.dep
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\obj\Debug\Arity.Web.csprojAssemblyReference.cache
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\obj\Debug\Arity.Web.csproj.CopyComplete
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\obj\Debug\ArityApp.dll
+D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\ArityApp\obj\Debug\ArityApp.pdb

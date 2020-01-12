@@ -1,0 +1,162 @@
+﻿@model Arity.Data.Dto.ReceiptDto
+<form>
+    @Html.HiddenFor(_ => _.ReceiptId)
+    @Html.HiddenFor(_ => _.CreatedDate)
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Invoice<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st bootstrap-select">
+                        @Html.DropDownListFor(_ => _.InvoiceIds, ViewBag.Invoice as MultiSelectList, "-- Select Invoice--", new { @class = "form-control input-sm selectpicker", @required = "required", multiple = "multiple" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Discount<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Discount, new { @class = "form-control input-sm", placeholder = "Enter discount amount", @required = "required", @type = "number" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Total Amount<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.TotalAmount, new { @class = "form-control input-sm", placeholder = "Enter total amount", @required = "required", @type = "number" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Bank Name<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.BankName, new { @class = "form-control input-sm", placeholder = "Enter bank name", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Cheque Number<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.ChequeNumber, new { @class = "form-control input-sm", placeholder = "Enter cheque number" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Status</label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.CheckBoxFor(_ => _.Status)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="width:100%;text-align:center;padding: 25px 0 5px;">
+        <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.ReceiptId > 0 ? "Update" : "Add")</button>
+        <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
+    </div>
+</form>
+<script>
+
+    $("#btnAdd").click(function () {
+        var isValid = true;
+        if ($("#InvoiceIds").val() == null || $("#InvoiceIds").val() == "") {
+            Notification('', 'Please select invoice', 'danger');
+            isValid = false;
+        }
+        else if($("#Discount").val() == null || $("#Discount").val() == "") {
+            Notification('', 'Please enter discount amount', 'danger');
+            isValid = false;
+        }
+         else if($("#TotalAmount").val() == null || $("#TotalAmount").val() == ""  || $("#TotalAmount").val() <= "0") {
+            Notification('', 'Please enter total amount', 'danger');
+            isValid = false;
+        }
+        else if($("#BankName").val() == null || $("#BankName").val() == "") {
+            Notification('', 'Please enter bank name', 'danger');
+            isValid = false;
+        } else if($("#ChequeNumber").val() == null || $("#ChequeNumber").val() == "") {
+            Notification('', 'Please enter cheque number', 'danger');
+            isValid = false;
+        }
+
+        var data = JSON.stringify({
+            "receiptEntry": {
+                "InvoiceIds": $("#InvoiceIds").val(),
+                "Discount": $("#Discount").val(),
+                "TotalAmount": $("#TotalAmount").val(),
+                "BankName": $("#BankName").val(),
+                "ChequeNumber": $("#ChequeNumber").val(),
+                "Status": $("#Status").is(":checked"),
+                "CreatedDate": $("#CreatedDate").val(),
+                "ReceiptId": $("#ReceiptId").val()
+            }
+        });
+
+        if (isValid) {
+            $.ajax({
+                url: '@Url.Action("AddPaymentEntry", "Home")',
+                dataType: "json",
+                type: "POST",
+                data:data,
+                cache: false,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    $("#loading").hide();
+                    if (response) {
+                        if (@Model.ReceiptId <= 0) {
+                            Notification('', 'Receipt entry added successfuly', 'success');
+                        }
+                        else {
+                            Notification('', 'Receipt entry updated successfuly', 'success');
+                        }
+                        table.ajax.reload();
+                        $("#modelPaymentEntry").modal('toggle');
+                    }
+                    else {
+                         Notification('', 'Something went wrong, Please try again', 'danger');
+                    }
+                },
+                error: function (error) {
+                    $("#loading").hide();
+                    Notification('', 'Something went wrong, Please try again', 'danger');
+                }
+            });
+        }
+    });
+</script>
