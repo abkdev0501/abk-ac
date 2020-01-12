@@ -1,0 +1,61 @@
+﻿@using Arity.Data.DTO
+@model ParticularDto
+
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" id="closeParticular">X</button>
+        </div>
+        <div class="modal-body">
+
+            @Html.HiddenFor(_ => _.Id)
+            <div class="input-group">
+                <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-edit"></i></span>
+                <div class="nk-int-st">
+                    @Html.TextBoxFor(_ => _.ParticularFF, new { @class = "form-control", placeholder = "Particular" })
+                </div>
+                <span style="color:red"> @Html.ValidationMessageFor(_ => _.ParticularFF)</span>
+            </div>
+            <div class="input-group mg-t-15">
+                <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-edit"></i></span>
+                <div class="nk-int-st">
+                    @Html.TextBoxFor(_ => _.ParticularSF, new { @class = "form-control", placeholder = "short name " })
+                </div>
+                <span style="color:red"> @Html.ValidationMessageFor(_ => _.ParticularSF)</span>
+            </div>
+            @*<button type="submit" id="btnResetPassword" class="btn btn-login btn-success btn-float" style="margin-top: -26px;"><i class="notika-icon notika-right-arrow right-arrow-ant"></i></button>*@
+        </div>
+
+        <div class="modal-footer">
+            <button type="submit" class="notika-btn-success" id="btnOkParticular">Ok</button>
+            <button type="button" class="notika-btn-primary" id="btnCancleParticular">Cancle</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $('#closeParticular').click(
+        function () {
+            $('#ModalParticular').modal('hide');
+        })
+    $('#btnOkParticular').on('click', function () {
+        $('#loading').show();
+        $.ajax({
+            url: '@Url.Action("AddParticularToDB", "Particular")',
+            type: 'post',
+            data: { ID: $('#Id').val(), ParticularFF: $('#ParticularFF').val(), ParticularSF: $('#ParticularSF').val() },
+            success:function(){
+                alert('data saved successfully')
+                $('#ModalParticular').modal('hide');
+                $('#tblParticular').DataTable().ajax.reload();
+                $('#loading').hide();
+            },
+            failure: function () {
+                alert('error accured to save data')
+            }
+
+        })
+    })
+</script>
