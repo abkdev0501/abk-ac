@@ -36,10 +36,10 @@ namespace Arity.Service
 
         public async Task<List<User>> GetClient(int id)
         {
-            return await (from c in _dbContext.Users
-                          join m in _dbContext.Company_Client_Mapping on c.Id equals m.UserId
+            return await (from cd in _dbContext.Users
+                          join m in _dbContext.Company_Client_Mapping on cd.Id equals (m.UserId ?? 0)
                           where m.CompanyId == id
-                          select c).ToListAsync();
+                          select cd).ToListAsync();
         }
         public async Task<List<Particular>> GetParticular()
         {
@@ -143,7 +143,7 @@ namespace Arity.Service
         {
             return (from invoiceParticular in _dbContext.InvoiceParticulars.ToList()
                     join particular in _dbContext.Particulars.ToList() on invoiceParticular.ParticularId equals particular.Id
-                    where invoiceParticular.InvoiceId == invoiceId
+                    where invoiceParticular.InvoiceId == invoiceId && particular.IsExclude == false
                     select new InvoiceEntry()
                     {
                         Amount = invoiceParticular.Amount,
@@ -240,16 +240,16 @@ namespace Arity.Service
         #region Private Method
         private string GenerateInvoiceNumber(int companyId)
         {
-            var count = GetCompnyCount(companyId);
-            var CompName = _dbContext.Company_master.Where(_ => _.Id == companyId).Select(_ => _.CompanyName).FirstOrDefault();
+            var genericNumber = _dbContext.InvoiceDetails.OrderByDescending(_ => _.Id).Select(_ => _.Invoice_Number).FirstOrDefault();
+            var compName = _dbContext.Company_master.Where(_ => _.Id == companyId).Select(_ => _.CompanyName).FirstOrDefault();
+            if (!string.IsNullOrEmpty(genericNumber) && genericNumber.Split('-').Count() > 1)
+            {
+                genericNumber = (Convert.ToInt32(genericNumber.Split('-')[1].Substring(1, (genericNumber.Split('-')[1].Length - 1))) + 1).ToString();
+            }
+            else
+                genericNumber = "1";
 
-            return (CompName.Substring(0, 3) + "_" + count);
-        }
-        private int GetCompnyCount(int comId)
-        {
-            var count = _dbContext.InvoiceDetails.Where(_ => _.CompanyId == comId).ToList().Count();
-
-            return count;
+            return (compName.ToUpper().Substring(0, 3) + "-I" + genericNumber);
         }
 
         public async Task<List<TrackingInformation>> GetTrackingInformation(int invoiceId)
@@ -323,7 +323,7 @@ namespace Arity.Service
         {
             return await (from pm in _dbContext.InvoiceParticulars
                           join p in _dbContext.Particulars on pm.ParticularId equals p.Id
-                          where /*Particular.IsExcluded == false*/ invoices.Contains(pm.InvoiceId)
+                          where (p.IsExclude ?? true) == false && invoices.Contains(pm.InvoiceId)
                           select pm).SumAsync(_ => _.Amount);
         }
 

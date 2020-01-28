@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Schema Namespace="RMNContext.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+<Schema Namespace="RMNDBContext.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
   <EntityType Name="Client_Particular_Mapping">
     <Key>
       <PropertyRef Name="Id" />
@@ -25,6 +25,8 @@
     <Property Name="CompanyBanner" Type="varchar" MaxLength="1000" />
     <Property Name="Address" Type="varchar" MaxLength="1000" />
     <Property Name="IsActive" Type="bit" />
+    <Property Name="Type" Type="varchar" MaxLength="1000" />
+    <Property Name="PreferedColor" Type="int" />
   </EntityType>
   <EntityType Name="InvoiceDetails">
     <Key>
@@ -49,13 +51,23 @@
     <Property Name="CreatedDate" Type="datetime" Nullable="false" />
     <Property Name="UpdatedDate" Type="datetime" Nullable="false" />
   </EntityType>
-  <EntityType Name="InvoiceRecieptMapping">
+  <EntityType Name="InvoiceReciepts">
     <Key>
       <PropertyRef Name="id" />
     </Key>
     <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="InvoiceId" Type="bigint" />
     <Property Name="RecieptId" Type="bigint" />
+  </EntityType>
+  <EntityType Name="InvoiceTrackings">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="InvoiceId" Type="int" Nullable="false" />
+    <Property Name="UserId" Type="int" />
+    <Property Name="Comment" Type="nvarchar(max)" />
+    <Property Name="CreatedAt" Type="datetime" />
   </EntityType>
   <EntityType Name="Particulars">
     <Key>
@@ -66,6 +78,7 @@
     <Property Name="ParticularFF" Type="nvarchar" MaxLength="350" Nullable="false" />
     <Property Name="CreatedDate" Type="datetime" Nullable="false" />
     <Property Name="UpdatedDate" Type="datetime" Nullable="false" />
+    <Property Name="IsExclude" Type="bit" />
   </EntityType>
   <EntityType Name="RecieptDetails">
     <Key>
@@ -74,7 +87,6 @@
     <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="CreatedDate" Type="datetime" Nullable="false" />
     <Property Name="RecieptNo" Type="nvarchar" MaxLength="50" Nullable="false" />
-    <Property Name="InvoiceId" Type="bigint" Nullable="false" />
     <Property Name="TotalAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
     <Property Name="Discount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
     <Property Name="BankName" Type="nvarchar" MaxLength="100" Nullable="false" />
@@ -160,39 +172,27 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_InvoiceRecieptMapping_InvoiceRecieptMapping">
-    <End Role="InvoiceRecieptMapping" Type="Self.InvoiceRecieptMapping" Multiplicity="1" />
-    <End Role="InvoiceRecieptMapping1" Type="Self.InvoiceRecieptMapping" Multiplicity="0..1" />
+  <Association Name="FK_InvoiceReciept_InvoiceDetails">
+    <End Role="InvoiceDetails" Type="Self.InvoiceDetails" Multiplicity="0..1" />
+    <End Role="InvoiceReciepts" Type="Self.InvoiceReciepts" Multiplicity="*" />
     <ReferentialConstraint>
-      <Principal Role="InvoiceRecieptMapping">
-        <PropertyRef Name="id" />
+      <Principal Role="InvoiceDetails">
+        <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="InvoiceRecieptMapping1">
-        <PropertyRef Name="id" />
+      <Dependent Role="InvoiceReciepts">
+        <PropertyRef Name="InvoiceId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
   <Association Name="FK_InvoiceRecieptMapping_RecieptDetails">
     <End Role="RecieptDetails" Type="Self.RecieptDetails" Multiplicity="0..1" />
-    <End Role="InvoiceRecieptMapping" Type="Self.InvoiceRecieptMapping" Multiplicity="*" />
+    <End Role="InvoiceReciepts" Type="Self.InvoiceReciepts" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="RecieptDetails">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="InvoiceRecieptMapping">
+      <Dependent Role="InvoiceReciepts">
         <PropertyRef Name="RecieptId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK_RecieptDetails_InvoiceDetails">
-    <End Role="InvoiceDetails" Type="Self.InvoiceDetails" Multiplicity="1" />
-    <End Role="RecieptDetails" Type="Self.RecieptDetails" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="InvoiceDetails">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="RecieptDetails">
-        <PropertyRef Name="InvoiceId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -232,13 +232,14 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <EntityContainer Name="RMNContextStoreContainer">
+  <EntityContainer Name="RMNDBContextStoreContainer">
     <EntitySet Name="Client_Particular_Mapping" EntityType="Self.Client_Particular_Mapping" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Company_Client_Mapping" EntityType="Self.Company_Client_Mapping" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Company_master" EntityType="Self.Company_master" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="InvoiceDetails" EntityType="Self.InvoiceDetails" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="InvoiceParticulars" EntityType="Self.InvoiceParticulars" Schema="dbo" store:Type="Tables" />
-    <EntitySet Name="InvoiceRecieptMapping" EntityType="Self.InvoiceRecieptMapping" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="InvoiceReciepts" EntityType="Self.InvoiceReciepts" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="InvoiceTrackings" EntityType="Self.InvoiceTrackings" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Particulars" EntityType="Self.Particulars" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="RecieptDetails" EntityType="Self.RecieptDetails" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
@@ -257,17 +258,13 @@
       <End Role="Particulars" EntitySet="Particulars" />
       <End Role="InvoiceParticulars" EntitySet="InvoiceParticulars" />
     </AssociationSet>
-    <AssociationSet Name="FK_InvoiceRecieptMapping_InvoiceRecieptMapping" Association="Self.FK_InvoiceRecieptMapping_InvoiceRecieptMapping">
-      <End Role="InvoiceRecieptMapping" EntitySet="InvoiceRecieptMapping" />
-      <End Role="InvoiceRecieptMapping1" EntitySet="InvoiceRecieptMapping" />
+    <AssociationSet Name="FK_InvoiceReciept_InvoiceDetails" Association="Self.FK_InvoiceReciept_InvoiceDetails">
+      <End Role="InvoiceDetails" EntitySet="InvoiceDetails" />
+      <End Role="InvoiceReciepts" EntitySet="InvoiceReciepts" />
     </AssociationSet>
     <AssociationSet Name="FK_InvoiceRecieptMapping_RecieptDetails" Association="Self.FK_InvoiceRecieptMapping_RecieptDetails">
       <End Role="RecieptDetails" EntitySet="RecieptDetails" />
-      <End Role="InvoiceRecieptMapping" EntitySet="InvoiceRecieptMapping" />
-    </AssociationSet>
-    <AssociationSet Name="FK_RecieptDetails_InvoiceDetails" Association="Self.FK_RecieptDetails_InvoiceDetails">
-      <End Role="InvoiceDetails" EntitySet="InvoiceDetails" />
-      <End Role="RecieptDetails" EntitySet="RecieptDetails" />
+      <End Role="InvoiceReciepts" EntitySet="InvoiceReciepts" />
     </AssociationSet>
     <AssociationSet Name="FK_User_Role_Roles" Association="Self.FK_User_Role_Roles">
       <End Role="Roles" EntitySet="Roles" />

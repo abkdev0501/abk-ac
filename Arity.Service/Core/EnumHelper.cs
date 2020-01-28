@@ -8,7 +8,8 @@ namespace Arity.Service.Core
 {
     public enum UserType
     {
-        Admin = 1,
-        User = 2
+        MasterAdmin = 1,
+        Admin = 2,
+        User = 3
     }
 }

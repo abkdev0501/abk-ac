@@ -10,7 +10,7 @@
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                     <label class="hrzn-fm">Company<span style="color:red;vertical-align:text-bottom;">*</span></label>
                 </div>
-                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(Model.InvoiceId>0?"onlyviewmode":"")">
                     <div class="nk-int-st">
                         @Html.DropDownListFor(_ => _.CompanyId, ViewBag.company as SelectList, "-- Select Company--", new { @class = "form-control input-sm", @required = "required" })
                     </div>
@@ -25,7 +25,7 @@
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                     <label class="hrzn-fm">Client<span style="color:red;vertical-align:text-bottom;">*</span></label>
                 </div>
-                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(Model.InvoiceId>0?"onlyviewmode":"")">
                     <div class="nk-int-st">
                         @Html.DropDownListFor(_ => _.ClientId, ViewBag.Client as SelectList, "-- Select Client--", new { @class = "form-control input-sm", @required = "required" })
                     </div>

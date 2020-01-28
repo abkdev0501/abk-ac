@@ -19,5 +19,6 @@ namespace Arity.Data
         public string ParticularFF { get; set; }
         public System.DateTime CreatedDate { get; set; }
         public System.DateTime UpdatedDate { get; set; }
+        public Nullable<bool> IsExclude { get; set; }
     }
 }

@@ -9,8 +9,10 @@
 
 namespace Arity.Data
 {
+    using System;
     using System.Data.Entity;
-
+    using System.Data.Entity.Infrastructure;
+    
     public partial class RMNEntities : DbContext
     {
         public RMNEntities()
@@ -29,11 +31,11 @@ namespace Arity.Data
         public virtual DbSet<InvoiceParticular> InvoiceParticulars { get; set; }
         public virtual DbSet<InvoiceReciept> InvoiceReciepts { get; set; }
         public virtual DbSet<InvoiceTracking> InvoiceTrackings { get; set; }
-        public virtual DbSet<Particular> Particulars { get; set; }
         public virtual DbSet<RecieptDetail> RecieptDetails { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<User_Role> User_Role { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserType> UserTypes { get; set; }
+        public virtual DbSet<Particular> Particulars { get; set; }
     }
 }

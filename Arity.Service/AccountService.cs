@@ -30,6 +30,7 @@ namespace Arity.Service
                 existingUser.PhoneNumber = user.PhoneNumber;
                 existingUser.Pincode = user.Pincode;
                 existingUser.UpdatedDated = DateTime.Now;
+                existingUser.UserTypeId = user.UserTypeId;
 
                 if (existingUser.Username != user.Username)
                 {
@@ -69,6 +70,7 @@ namespace Arity.Service
                 userModel.Username = user.Username;
                 userModel.Password = Functions.Encrypt_QueryString(user.Password);
                 userModel.CreatedDate = DateTime.Now;
+                userModel.UserTypeId = user.UserTypeId;
                 _dbContext.Users.Add(userModel);
                 await _dbContext.SaveChangesAsync();
 

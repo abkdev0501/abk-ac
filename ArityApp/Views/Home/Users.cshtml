@@ -36,7 +36,7 @@
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
                             <div class="breadcomb-report">
-                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin)
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.Admin)
                                 {
                                     <button id="btnAddInvoiceEntry" onclick="AddUpdateUser(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
                                 }
@@ -175,35 +175,10 @@
             "order": [[1, "desc"]]
        });
 
-       @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.Admin)
-{
-           @:table.column(9).visible(false)
-       }
          $("#btnFilterGrid").click(function () {
     table.ajax.reload();
 });
        });
-
-        function RemvoeParticulars(id) {
-            if (confirm("Are you sure you want to delete this particular?")) {
-                $("#loading").show();
-            $.ajax({
-                url: '@Url.Action("RemoveInvoiceEntry", "Home")',
-                dataType: "json",
-                type: "GET",
-                data: { id: id },
-                success: function (response) {
-                    $("#loading").hide();
-                     Notification('', 'Particular deleted successfuly', 'success');
-                    table.ajax.reload();
-                },
-                error: function (error) {
-                    $("#loading").hide();
-                    Notification('', 'Something went wrong, Please try again', 'danger');
-                }
-            });
-            }
-        }
 
         function AddUpdateUser(id) {
               $("#loading").show();

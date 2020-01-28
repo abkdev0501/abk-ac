@@ -1,20 +1,15 @@
 ﻿using Arity.Data.Dto;
 using Arity.Service;
 using Arity.Service.Contract;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
-using iTextSharp.tool.xml;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using OfficeOpenXml;
 using Arity.Data.Helpers;
 using Arity.Data;
-using ArityApp.App_Start;
 
 namespace ArityApp.Controllers
 {
@@ -235,24 +230,6 @@ namespace ArityApp.Controllers
             }
         }
 
-        public async Task<JsonResult> GetInvoiceByClientAndCompany(int companyId, int clientId)
-        {
-            try
-            {
-                _invoiceService = new InvoiceService();
-                return Json(await _invoiceService.GetInvoiceByClientandCompany(companyId, clientId), JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
-
-        public async Task<JsonResult> GetTotalOfInvoice(List<long> invoices)
-        {
-            _invoiceService = new InvoiceService(); 
-            return Json(await _invoiceService.GetInvoiceAmountTotal(invoices),JsonRequestBehavior.AllowGet);
-        }
         #endregion
 
         #region Payment
@@ -283,7 +260,6 @@ namespace ArityApp.Controllers
             }
             catch (Exception ex)
             {
-                var tt = ex.InnerException;
                 return Json(new { data = new List<ReceiptDto>() }, JsonRequestBehavior.AllowGet);
             }
         }
@@ -305,12 +281,38 @@ namespace ArityApp.Controllers
                 ViewBag.Company = new SelectList(await _invoiceService.GetCompany(), "Id", "CompanyName", receiptDto.CompanyId);
                 ViewBag.Client = new SelectList(await _invoiceService.GetClient(Convert.ToInt32(receiptDto.CompanyId)), "Id", "FullName", receiptDto.ClientId);
 
-                ViewBag.Invoice = new MultiSelectList(await _invoiceService.GetAllInvoice(), "InvoiceId", "InvoiceNumber", receiptDto.InvoiceIds);
+                ViewBag.Invoice = new MultiSelectList(await _invoiceService.GetInvoiceByClientandCompany(Convert.ToInt32(receiptDto.CompanyId), Convert.ToInt32(receiptDto.ClientId)), "InvoiceId", "InvoiceNumber", receiptDto.InvoiceIds);
                 return PartialView("_ReceiptEntry", receiptDto);
             }
             catch (Exception ex)
             {
-                var tt = ex.InnerException;
+                throw;
+            }
+        }
+
+
+        public async Task<JsonResult> GetInvoiceByClientAndCompany(int companyId, int clientId)
+        {
+            try
+            {
+                _invoiceService = new InvoiceService();
+                return Json(await _invoiceService.GetInvoiceByClientandCompany(companyId, clientId), JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<JsonResult> GetTotalOfInvoice(List<long> invoices)
+        {
+            try
+            {
+                _invoiceService = new InvoiceService();
+                return Json(await _invoiceService.GetInvoiceAmountTotal(invoices), JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
                 throw;
             }
         }
@@ -728,6 +730,7 @@ namespace ArityApp.Controllers
         }
         #endregion
 
+        #region User
         public async Task<ActionResult> Users()
         {
             ViewBag.FromDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01));
@@ -794,7 +797,8 @@ namespace ArityApp.Controllers
                 var tt = ex.InnerException;
                 throw;
             }
-        }
+        } 
+        #endregion
 
         /// <summary>
         /// 404 page 

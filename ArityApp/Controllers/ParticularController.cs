@@ -19,12 +19,16 @@ namespace ArityApp.Controllers
         //Listing page for Particulars 
         public ActionResult Index()
         {
+            ViewBag.FromDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01));
+            ViewBag.ToDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month)));
             return View();
         }
 
-        public async Task<JsonResult> LoadParticulars()
+        public async Task<JsonResult> LoadParticulars(DateTime from, DateTime to)
         {
-            var List = await _particularServices.FetchParticular();
+            to = to + new TimeSpan(23, 59, 59);
+            from = from + new TimeSpan(00, 00, 1);
+            var List = await _particularServices.FetchParticular(to, from);
             return Json(new { data = List }, JsonRequestBehavior.AllowGet);
 
         }
@@ -37,10 +41,8 @@ namespace ArityApp.Controllers
         public ActionResult AddParticular(int? id)
         {
             ParticularDto particularDetail = new ParticularDto();
-            if (id > 0 && id != null)
-            {
+            if (id != null && id > 0)
                 particularDetail = _particularServices.FetchParticularById(id ?? 0);
-            }
             return PartialView("_AddParticular", particularDetail);
         }
         /// <summary>

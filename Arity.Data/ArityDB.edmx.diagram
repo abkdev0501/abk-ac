@@ -12,7 +12,6 @@
         <EntityTypeShape EntityType="RMNDBContext.InvoiceParticular" Width="1.5" PointX="7.5" PointY="4.875" IsExpanded="true" />
         <EntityTypeShape EntityType="RMNDBContext.InvoiceReciept" Width="1.5" PointX="10.5" PointY="5.25" IsExpanded="true" />
         <EntityTypeShape EntityType="RMNDBContext.InvoiceTracking" Width="1.5" PointX="10.75" PointY="1.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="RMNDBContext.Particular" Width="1.5" PointX="5.25" PointY="9.125" IsExpanded="true" />
         <EntityTypeShape EntityType="RMNDBContext.RecieptDetail" Width="1.5" PointX="8.25" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="RMNDBContext.Role" Width="1.5" PointX="3" PointY="1.375" IsExpanded="true" />
         <EntityTypeShape EntityType="RMNDBContext.User_Role" Width="1.5" PointX="5.25" PointY="1" IsExpanded="true" />
@@ -21,11 +20,12 @@
         <AssociationConnector Association="RMNDBContext.FK_InvoiceDetails_Client" ManuallyRouted="false" />
         <AssociationConnector Association="RMNDBContext.FK_InvoiceParticulars_InvoiceDetails" ManuallyRouted="false" />
         <AssociationConnector Association="RMNDBContext.FK_InvoiceReciept_InvoiceDetails" ManuallyRouted="false" />
-        <AssociationConnector Association="RMNDBContext.FK_InvoiceParticulars_Particulars" ManuallyRouted="false" />
         <AssociationConnector Association="RMNDBContext.FK_InvoiceRecieptMapping_RecieptDetails" ManuallyRouted="false" />
         <AssociationConnector Association="RMNDBContext.FK_User_Role_Roles" ManuallyRouted="false" />
         <AssociationConnector Association="RMNDBContext.FK_User_Role_Users" ManuallyRouted="false" />
         <AssociationConnector Association="RMNDBContext.FK_Users_UserTypes" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="RMNDBContext.Particular" Width="1.5" PointX="3.375" PointY="10" />
+        <AssociationConnector Association="RMNDBContext.FK_InvoiceParticulars_Particulars" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

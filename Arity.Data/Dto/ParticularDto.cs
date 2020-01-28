@@ -18,5 +18,6 @@ namespace Arity.Data.Dto
         public string CreatedDateString { get; set; }
 
         public DateTime UpdatedDate { get; set; }
+        public bool IsExclude { get; set; }
     }
 }

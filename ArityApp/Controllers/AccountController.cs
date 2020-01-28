@@ -40,7 +40,7 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> Login(User user)
         {
-            if (ModelState.IsValid)
+            if (!string.IsNullOrEmpty(user.Password) && !string.IsNullOrEmpty(user.Username))
             {
                 _accountService = new AccountService();
                 var validUser = await _accountService.Login(user.Username, Functions.Encrypt_QueryString(user.Password));
@@ -53,6 +53,7 @@ namespace ArityApp.Controllers
                 }
                 ViewBag.Message = "Invalid Credential";
             }
+            ViewBag.Message = "Please enter username & password";
             return View(user);
         }
 
@@ -89,7 +90,7 @@ namespace ArityApp.Controllers
             }
         }
 
-        
+
 
         /// <summary>
         /// Logout method from where loggedin user can logged out
@@ -98,7 +99,7 @@ namespace ArityApp.Controllers
         public async Task<ActionResult> Logout()
         {
             FormsAuthentication.SignOut(); // it will clear the session at the end of request
-            return Json(JsonRequestBehavior.AllowGet);
+            return Json(true, JsonRequestBehavior.AllowGet);
         }
     }
 }

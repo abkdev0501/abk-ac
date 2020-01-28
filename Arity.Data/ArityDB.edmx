@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="RMNDBContext.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="RMNDBContext.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Client_Particular_Mapping">
           <Key>
             <PropertyRef Name="Id" />
@@ -83,6 +83,7 @@
           <Property Name="ParticularFF" Type="nvarchar" MaxLength="350" Nullable="false" />
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
           <Property Name="UpdatedDate" Type="datetime" Nullable="false" />
+          <Property Name="IsExclude" Type="bit" />
         </EntityType>
         <EntityType Name="RecieptDetails">
           <Key>
@@ -283,8 +284,7 @@
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="RMNDBContext" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -342,7 +342,7 @@
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UpdatedDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="InvoiceDetail" Relationship="Self.FK_InvoiceParticulars_InvoiceDetails" FromRole="InvoiceParticulars" ToRole="InvoiceDetails" />
-          <NavigationProperty Name="Particular" Relationship="Self.FK_InvoiceParticulars_Particulars" FromRole="InvoiceParticulars" ToRole="Particulars" />
+          <NavigationProperty Name="Particular" Relationship="RMNDBContext.FK_InvoiceParticulars_Particulars" FromRole="InvoiceParticular" ToRole="Particular" />
         </EntityType>
         <EntityType Name="InvoiceReciept">
           <Key>
@@ -363,17 +363,6 @@
           <Property Name="UserId" Type="Int32" />
           <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
-        </EntityType>
-        <EntityType Name="Particular">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ParticularSF" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="ParticularFF" Type="String" MaxLength="350" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdatedDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="InvoiceParticulars" Relationship="Self.FK_InvoiceParticulars_Particulars" FromRole="Particulars" ToRole="InvoiceParticulars" />
         </EntityType>
         <EntityType Name="RecieptDetail">
           <Key>
@@ -475,18 +464,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_InvoiceParticulars_Particulars">
-          <End Role="Particulars" Type="Self.Particular" Multiplicity="1" />
-          <End Role="InvoiceParticulars" Type="Self.InvoiceParticular" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Particulars">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="InvoiceParticulars">
-              <PropertyRef Name="ParticularId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_InvoiceRecieptMapping_RecieptDetails">
           <End Role="RecieptDetails" Type="Self.RecieptDetail" Multiplicity="0..1" />
           <End Role="InvoiceReciepts" Type="Self.InvoiceReciept" Multiplicity="*" />
@@ -543,7 +520,6 @@
           <EntitySet Name="InvoiceParticulars" EntityType="Self.InvoiceParticular" />
           <EntitySet Name="InvoiceReciepts" EntityType="Self.InvoiceReciept" />
           <EntitySet Name="InvoiceTrackings" EntityType="Self.InvoiceTracking" />
-          <EntitySet Name="Particulars" EntityType="Self.Particular" />
           <EntitySet Name="RecieptDetails" EntityType="Self.RecieptDetail" />
           <EntitySet Name="Roles" EntityType="Self.Role" />
           <EntitySet Name="User_Role" EntityType="Self.User_Role" />
@@ -561,10 +537,6 @@
             <End Role="InvoiceDetails" EntitySet="InvoiceDetails" />
             <End Role="InvoiceReciepts" EntitySet="InvoiceReciepts" />
           </AssociationSet>
-          <AssociationSet Name="FK_InvoiceParticulars_Particulars" Association="Self.FK_InvoiceParticulars_Particulars">
-            <End Role="Particulars" EntitySet="Particulars" />
-            <End Role="InvoiceParticulars" EntitySet="InvoiceParticulars" />
-          </AssociationSet>
           <AssociationSet Name="FK_InvoiceRecieptMapping_RecieptDetails" Association="Self.FK_InvoiceRecieptMapping_RecieptDetails">
             <End Role="RecieptDetails" EntitySet="RecieptDetails" />
             <End Role="InvoiceReciepts" EntitySet="InvoiceReciepts" />
@@ -581,7 +553,36 @@
             <End Role="UserTypes" EntitySet="UserTypes" />
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
+          <EntitySet Name="Particulars" EntityType="RMNDBContext.Particular" />
+          <AssociationSet Name="FK_InvoiceParticulars_Particulars" Association="RMNDBContext.FK_InvoiceParticulars_Particulars">
+            <End Role="Particular" EntitySet="Particulars" />
+            <End Role="InvoiceParticular" EntitySet="InvoiceParticulars" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Particular">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ParticularSF" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ParticularFF" Type="String" Nullable="false" MaxLength="350" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IsExclude" Type="Boolean" />
+          <NavigationProperty Name="InvoiceParticulars" Relationship="RMNDBContext.FK_InvoiceParticulars_Particulars" FromRole="Particular" ToRole="InvoiceParticular" />
+        </EntityType>
+        <Association Name="FK_InvoiceParticulars_Particulars">
+          <End Type="RMNDBContext.Particular" Role="Particular" Multiplicity="1" />
+          <End Type="RMNDBContext.InvoiceParticular" Role="InvoiceParticular" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Particular">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InvoiceParticular">
+              <PropertyRef Name="ParticularId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -664,17 +665,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Particulars">
-            <EntityTypeMapping TypeName="RMNDBContext.Particular">
-              <MappingFragment StoreEntitySet="Particulars">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="ParticularSF" ColumnName="ParticularSF" />
-                <ScalarProperty Name="ParticularFF" ColumnName="ParticularFF" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="RecieptDetails">
             <EntityTypeMapping TypeName="RMNDBContext.RecieptDetail">
               <MappingFragment StoreEntitySet="RecieptDetails">
@@ -733,6 +723,18 @@
                 <ScalarProperty Name="UserTypeName" ColumnName="UserTypeName" />
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
                 <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Particulars">
+            <EntityTypeMapping TypeName="RMNDBContext.Particular">
+              <MappingFragment StoreEntitySet="Particulars">
+                <ScalarProperty Name="IsExclude" ColumnName="IsExclude" />
+                <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="ParticularFF" ColumnName="ParticularFF" />
+                <ScalarProperty Name="ParticularSF" ColumnName="ParticularSF" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

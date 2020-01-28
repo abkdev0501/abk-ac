@@ -10,7 +10,7 @@ namespace Arity.Service.Contract
     public interface IParticularServices
     {
         void AddParticular(ParticularDto particular);
-        Task<List<ParticularDto>> FetchParticular();
+        Task<List<ParticularDto>> FetchParticular(DateTime toDate, DateTime fromDate);
         ParticularDto FetchParticularById(int id);
     }
 }

@@ -21,3 +21,14 @@ D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\obj\Debug\Arity.D
 D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\obj\Debug\Arity.Data.csproj.CopyComplete
 D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\obj\Debug\Arity.Data.dll
 D:\D drive\Personal\Work\Project\Niravbhai\ArityApp\Arity.Data\obj\Debug\Arity.Data.pdb
+D:\D drive\Personal\Work\abk-ac\Arity.Data\bin\Debug\Arity.Data.dll.config
+D:\D drive\Personal\Work\abk-ac\Arity.Data\bin\Debug\Arity.Data.dll
+D:\D drive\Personal\Work\abk-ac\Arity.Data\bin\Debug\Arity.Data.pdb
+D:\D drive\Personal\Work\abk-ac\Arity.Data\bin\Debug\EntityFramework.dll
+D:\D drive\Personal\Work\abk-ac\Arity.Data\bin\Debug\EntityFramework.SqlServer.dll
+D:\D drive\Personal\Work\abk-ac\Arity.Data\bin\Debug\EntityFramework.xml
+D:\D drive\Personal\Work\abk-ac\Arity.Data\bin\Debug\EntityFramework.SqlServer.xml
+D:\D drive\Personal\Work\abk-ac\Arity.Data\obj\Debug\Arity.Data.csproj.CopyComplete
+D:\D drive\Personal\Work\abk-ac\Arity.Data\obj\Debug\Arity.Data.dll
+D:\D drive\Personal\Work\abk-ac\Arity.Data\obj\Debug\Arity.Data.pdb
+D:\D drive\Personal\Work\abk-ac\Arity.Data\obj\Debug\Arity.Data.csprojAssemblyReference.cache

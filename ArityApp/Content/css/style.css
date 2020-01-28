@@ -59,6 +59,9 @@ html, body {
     font-weight: 400;
 }
 
+.onlyviewmode {
+    pointer-events: none;
+}
 body {
     background: #F6F8FA;
 }

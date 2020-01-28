@@ -21,12 +21,13 @@ namespace Arity.Service
 
         public async Task AddUpdateReceiptEntry(ReceiptDto receiptEntry)
         {
+            IInvoiceService invoiceService = new InvoiceService();
             long ReceiptId = 0;
             if (receiptEntry.ReceiptId > 0)
             {
                 var exitingReceipt = await _dbContext.RecieptDetails.FirstOrDefaultAsync(_ => _.Id == receiptEntry.ReceiptId);
                 exitingReceipt.Status = receiptEntry.Status;
-                exitingReceipt.TotalAmount = receiptEntry.TotalAmount;
+                exitingReceipt.TotalAmount = await invoiceService.GetInvoiceAmountTotal(receiptEntry.InvoiceIds);
                 exitingReceipt.UpdatedDate = DateTime.Now;
                 exitingReceipt.Discount = receiptEntry.Discount;
                 exitingReceipt.ChequeNumber = receiptEntry.ChequeNumber;
@@ -40,9 +41,9 @@ namespace Arity.Service
             {
                 var receiptDetail = new RecieptDetail
                 {
-                    RecieptNo = "R1",
+                    RecieptNo = GenerateNextRecieptNumber(Convert.ToInt32(receiptEntry.CompanyId)),
                     Status = receiptEntry.Status,
-                    TotalAmount = receiptEntry.TotalAmount,
+                    TotalAmount = await invoiceService.GetInvoiceAmountTotal(receiptEntry.InvoiceIds),
                     UpdatedDate = DateTime.Now,
                     CreatedDate = DateTime.Now,
                     Discount = receiptEntry.Discount,
@@ -68,7 +69,7 @@ namespace Arity.Service
             await _dbContext.SaveChangesAsync();
         }
 
-        
+
 
         public async Task<List<ReceiptDto>> GetAllReceipts(DateTime fromDate, DateTime toDate)
         {
@@ -102,7 +103,13 @@ namespace Arity.Service
                                TotalAmount = receipt.TotalAmount,
                                Status = receipt.Status ?? false,
                                CreatedDate = receipt.CreatedDate,
-                               InvoiceIds = _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList(),
+                               CompanyId = _dbContext.InvoiceDetails.Where(i => _dbContext.InvoiceReciepts
+                               .Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id))
+                               .Select(i => i.CompanyId).FirstOrDefault(),
+                               ClientId = _dbContext.InvoiceDetails.Where(i => _dbContext.InvoiceReciepts
+                               .Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id))
+                               .Select(i => i.ClientId).FirstOrDefault(),
+                               InvoiceIds = _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => (_.InvoiceId ?? 0)).ToList(),
                                Invoices = _dbContext.InvoiceDetails.Where(i => _dbContext.InvoiceReciepts
                                .Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id))
                                .Select(i => new InvoiceEntry
@@ -121,5 +128,20 @@ namespace Arity.Service
             }
             return reciept;
         }
+
+        private string GenerateNextRecieptNumber(int companyId)
+        {
+            var genericNumber = _dbContext.RecieptDetails.OrderByDescending(_ => _.Id).Select(_ => _.RecieptNo).FirstOrDefault();
+            var compName = _dbContext.Company_master.Where(_ => _.Id == companyId).Select(_ => _.CompanyName).FirstOrDefault();
+            if (!string.IsNullOrEmpty(genericNumber) && genericNumber.Split('-').Count() > 1)
+            {
+                genericNumber = (Convert.ToInt32(genericNumber.Split('-')[1].Substring(1, (genericNumber.Split('-')[1].Length - 1))) + 1).ToString();
+            }
+            else
+                genericNumber = "1";
+
+            return (compName.ToUpper().Substring(0, 3) + "-R" + genericNumber);
+        }
+
     }
 }

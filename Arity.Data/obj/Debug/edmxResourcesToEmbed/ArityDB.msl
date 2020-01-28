@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-  <EntityContainerMapping StorageEntityContainer="RMNContextStoreContainer" CdmEntityContainer="RMNEntities">
+  <EntityContainerMapping StorageEntityContainer="RMNDBContextStoreContainer" CdmEntityContainer="RMNEntities">
     <EntitySetMapping Name="Client_Particular_Mapping">
-      <EntityTypeMapping TypeName="RMNContext.Client_Particular_Mapping">
+      <EntityTypeMapping TypeName="RMNDBContext.Client_Particular_Mapping">
         <MappingFragment StoreEntitySet="Client_Particular_Mapping">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
@@ -11,7 +11,7 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="Company_Client_Mapping">
-      <EntityTypeMapping TypeName="RMNContext.Company_Client_Mapping">
+      <EntityTypeMapping TypeName="RMNDBContext.Company_Client_Mapping">
         <MappingFragment StoreEntitySet="Company_Client_Mapping">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
@@ -20,18 +20,20 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="Company_master">
-      <EntityTypeMapping TypeName="RMNContext.Company_master">
+      <EntityTypeMapping TypeName="RMNDBContext.Company_master">
         <MappingFragment StoreEntitySet="Company_master">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
           <ScalarProperty Name="CompanyBanner" ColumnName="CompanyBanner" />
           <ScalarProperty Name="Address" ColumnName="Address" />
           <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+          <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="PreferedColor" ColumnName="PreferedColor" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="InvoiceDetails">
-      <EntityTypeMapping TypeName="RMNContext.InvoiceDetail">
+      <EntityTypeMapping TypeName="RMNDBContext.InvoiceDetail">
         <MappingFragment StoreEntitySet="InvoiceDetails">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Invoice_Number" ColumnName="Invoice_Number" />
@@ -43,7 +45,7 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="InvoiceParticulars">
-      <EntityTypeMapping TypeName="RMNContext.InvoiceParticular">
+      <EntityTypeMapping TypeName="RMNDBContext.InvoiceParticular">
         <MappingFragment StoreEntitySet="InvoiceParticulars">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="InvoiceId" ColumnName="InvoiceId" />
@@ -55,33 +57,32 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <EntitySetMapping Name="InvoiceRecieptMappings">
-      <EntityTypeMapping TypeName="RMNContext.InvoiceRecieptMapping">
-        <MappingFragment StoreEntitySet="InvoiceRecieptMapping">
+    <EntitySetMapping Name="InvoiceReciepts">
+      <EntityTypeMapping TypeName="RMNDBContext.InvoiceReciept">
+        <MappingFragment StoreEntitySet="InvoiceReciepts">
           <ScalarProperty Name="id" ColumnName="id" />
           <ScalarProperty Name="InvoiceId" ColumnName="InvoiceId" />
           <ScalarProperty Name="RecieptId" ColumnName="RecieptId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <EntitySetMapping Name="Particulars">
-      <EntityTypeMapping TypeName="RMNContext.Particular">
-        <MappingFragment StoreEntitySet="Particulars">
-          <ScalarProperty Name="Id" ColumnName="Id" />
-          <ScalarProperty Name="ParticularSF" ColumnName="ParticularSF" />
-          <ScalarProperty Name="ParticularFF" ColumnName="ParticularFF" />
-          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-          <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+    <EntitySetMapping Name="InvoiceTrackings">
+      <EntityTypeMapping TypeName="RMNDBContext.InvoiceTracking">
+        <MappingFragment StoreEntitySet="InvoiceTrackings">
+          <ScalarProperty Name="id" ColumnName="id" />
+          <ScalarProperty Name="InvoiceId" ColumnName="InvoiceId" />
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
+          <ScalarProperty Name="Comment" ColumnName="Comment" />
+          <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="RecieptDetails">
-      <EntityTypeMapping TypeName="RMNContext.RecieptDetail">
+      <EntityTypeMapping TypeName="RMNDBContext.RecieptDetail">
         <MappingFragment StoreEntitySet="RecieptDetails">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
           <ScalarProperty Name="RecieptNo" ColumnName="RecieptNo" />
-          <ScalarProperty Name="InvoiceId" ColumnName="InvoiceId" />
           <ScalarProperty Name="TotalAmount" ColumnName="TotalAmount" />
           <ScalarProperty Name="Discount" ColumnName="Discount" />
           <ScalarProperty Name="BankName" ColumnName="BankName" />
@@ -92,7 +93,7 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="Roles">
-      <EntityTypeMapping TypeName="RMNContext.Role">
+      <EntityTypeMapping TypeName="RMNDBContext.Role">
         <MappingFragment StoreEntitySet="Roles">
           <ScalarProperty Name="RoleName" ColumnName="RoleName" />
           <ScalarProperty Name="Id" ColumnName="Id" />
@@ -100,7 +101,7 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="User_Role">
-      <EntityTypeMapping TypeName="RMNContext.User_Role">
+      <EntityTypeMapping TypeName="RMNDBContext.User_Role">
         <MappingFragment StoreEntitySet="User_Role">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="UserId" ColumnName="UserId" />
@@ -111,7 +112,7 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="Users">
-      <EntityTypeMapping TypeName="RMNContext.User">
+      <EntityTypeMapping TypeName="RMNDBContext.User">
         <MappingFragment StoreEntitySet="Users">
           <ScalarProperty Name="Username" ColumnName="Username" />
           <ScalarProperty Name="Password" ColumnName="Password" />
@@ -128,12 +129,24 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="UserTypes">
-      <EntityTypeMapping TypeName="RMNContext.UserType">
+      <EntityTypeMapping TypeName="RMNDBContext.UserType">
         <MappingFragment StoreEntitySet="UserTypes">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="UserTypeName" ColumnName="UserTypeName" />
           <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
           <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Particulars">
+      <EntityTypeMapping TypeName="RMNDBContext.Particular">
+        <MappingFragment StoreEntitySet="Particulars">
+          <ScalarProperty Name="IsExclude" ColumnName="IsExclude" />
+          <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+          <ScalarProperty Name="ParticularFF" ColumnName="ParticularFF" />
+          <ScalarProperty Name="ParticularSF" ColumnName="ParticularSF" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

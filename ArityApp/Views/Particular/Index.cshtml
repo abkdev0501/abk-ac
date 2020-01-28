@@ -1,7 +1,7 @@
 ﻿@using Arity.Data.Helpers;
-@{ 
-     Layout = "~/Views/Shared/_Layout.cshtml";
-     ViewBag.Title = "Index";
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
 
 }
 <head>
@@ -11,10 +11,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Data Table JS
-        ============================================ -->
+    ============================================ -->
     <link rel="stylesheet" href="/Content/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="/Content/css/chosen/chosen.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
 
 <div class="breadcomb-area">
@@ -30,13 +29,13 @@
                                 </div>
                                 <div class="breadcomb-ctn">
                                     <h2>Particulars</h2>
-                                    <p></p>
+                                    <p>List of particulars</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
                             <div class="breadcomb-report">
-                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin)
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                 {
                                     <button onclick="AddEditParticular(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
                                 }
@@ -60,14 +59,36 @@
                         <h2>Particular List</h2>
                         <p>Below are List of Particular.</p>
                     </div>
+                    <div class="date-filter">
 
+                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
+                            <label>From</label>
+                            <div class="input-group date nk-int-st">
+                                <span class="input-group-addon"></span>
+                                <input type="text" id="FromDate" class="form-control" value="@(((DateTime)ViewBag.FromDate).ToString("MM/dd/yyyy"))" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
+                            <label>To</label>
+                            <div class="input-group date nk-int-st">
+                                <span class="input-group-addon"></span>
+                                <input type="text" id="ToDate" class="form-control" value="@(((DateTime)ViewBag.ToDate).ToString("MM/dd/yyyy"))" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
+                            <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnFilterGrid">Search</button>
+                        </div>
+
+                    </div>
                     <div class="table-responsive">
                         <table id="tblParticular" class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Particular Short form</th>
-                                    <th>Particular</th>
-                                    <th>Edit</th>
+                                    <th style="width:10%;">Short form</th>
+                                    <th style="width:60%;">Full Form</th>
+                                    <th style="width:10%;">Created At</th>
+                                    <th style="width:10%;">Exclude from Invoice</th>
+                                    <th style="width:10%;">Update</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -78,61 +99,100 @@
         </div>
     </div>
 
-    <div id='ModalParticular' class='modal' role='dialog' data-url='@Url.Action("AddParticular","Particular")'>
+    @*<div id='ModalParticular' class='modal' role='dialog' data-url='@Url.Action("AddParticular","Particular")'>
+        </div>*@
+    <div class="modal animated fade" id="modalParticular" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-large">
+            <div class="modal-content">
+                <div class="modal-header" style="margin-bottom:35px;">
+                    <h3>Add/Update Particular</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-<script>
+@section Scripts {
+    <script>
 
     $(document).ready(function () {
-       $('#tblParticular').DataTable({
-            "filter": true, // this is for disable filter (search box)
-            "orderMulti": false, // for disable multiple column at once
-            "pageLength": 5,
-
-            "ajax": {
-                "url": "/Particular/LoadParticulars",
-                "type": "GET",
-                "datatype": "json"
+      
+        table =  $('#tblParticular').DataTable({
+            "ajax": function (data, callback, settings) {
+                $.ajax({
+                    url: '@Url.Action("LoadParticulars","Particular")',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        from: $("#FromDate").val(),
+                        to: $("#ToDate").val()
+                    },
+                    beforeSend: function (xhrObj) {
+                        $("#loading").show();
+                    }
+                    })
+                    .done(function (data, textStatus, jqXHR) {
+                        callback(data);
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        Notification('Error! ', ''+errorThrown+'', 'danger');
+                    })
+                    .always(function (data, textStatus, jqXHR) {
+                        $("#loading").hide();
+                    });
             },
             "language": {
-                "emptyTable": "No data found"
+                "emptyTable": "No particular found"
             },
-
-            "columns": [
-
-                { "data": "ParticularSF", "autoWidth": true },
-                { "data": "ParticularFF", "autoWidth": true },
+           "columns": [
+                { "data": "ParticularSF" },
+                { "data": "ParticularFF" },
+                { "data": "CreatedDateString" },
+                { "data": "IsExclude" },
                 {
-                    "render": function (data, type, full, meta) {
-                        return '<button class="btn waves-effect" onclick="AddEditParticular(' + full.Id + ')" title="Edit"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                            return '<button class="btn waves-effect" onclick="AddEditParticular(' + data.Id + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
                     }
-                },
+                }
+            ],
+            "order": [[2, "desc"]]
+        });
 
-            ]
-
-
+         $("#btnFilterGrid").click(function () {
+                 table.ajax.reload();
         });
     });
 
-</script>
+    </script>
 
 
-<script>
+    <script>
 
     function AddEditParticular(Id) {
-
+          $("#loading").show();
         $.ajax({
             url: '@Url.Action("AddParticular","Particular")',
             data: { id: Id},
             type: 'GET',
             dataType: 'Html',
             success: function (response) {
-                $('#ModalParticular').html(response);
-                $('#ModalParticular').modal('show');
+                $('#modalParticular .modal-body').html(response);
+                $('#modalParticular').modal('show');
+                 $("#loading").hide();
             },
             failure: function () {
-                alert('error in loading Data');
+                 $("#loading").hide();
+                    Notification('', 'Something went wrong, Please try again', 'danger');
             },
         });
     }
-</script>
+    </script>
+}

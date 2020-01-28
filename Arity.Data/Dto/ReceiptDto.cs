@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Arity.Data.Dto
 {
-   public class ReceiptDto
+    public class ReceiptDto
     {
         public long ReceiptId { get; set; }
         public System.DateTime CreatedDate { get; set; }
@@ -17,7 +17,7 @@ namespace Arity.Data.Dto
         public string ChequeNumber { get; set; }
         public bool Status { get; set; }
         public System.DateTime UpdatedDate { get; set; }
-        public List<long?> InvoiceIds { get; set; }
+        public List<long> InvoiceIds { get; set; }
         public long InvoiceId { get; set; }
         public long ReceiptMappingId { get; set; }
         public string CreatedDateString { get; set; }
@@ -25,7 +25,7 @@ namespace Arity.Data.Dto
         public string Year { get; set; }
 
         public List<InvoiceEntry> Invoices { get; set; }
-        public int CompanyId { get; set; }
-        public int ClientId { get; set; }
+        public long CompanyId { get; set; }
+        public long ClientId { get; set; }
     }
 }
