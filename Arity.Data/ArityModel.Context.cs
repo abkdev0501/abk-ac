@@ -22,11 +22,9 @@ namespace Arity.Data
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            //throw new UnintentionalCodeFirstException();
         }
     
         public virtual DbSet<Client_Particular_Mapping> Client_Particular_Mapping { get; set; }
-        public virtual DbSet<Company_Client_Mapping> Company_Client_Mapping { get; set; }
         public virtual DbSet<Company_master> Company_master { get; set; }
         public virtual DbSet<InvoiceDetail> InvoiceDetails { get; set; }
         public virtual DbSet<InvoiceParticular> InvoiceParticulars { get; set; }
@@ -37,5 +35,6 @@ namespace Arity.Data
         public virtual DbSet<User_Role> User_Role { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserType> UserTypes { get; set; }
+        public virtual DbSet<Company_Client_Mapping> Company_Client_Mapping { get; set; }
     }
 }

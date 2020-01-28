@@ -15,11 +15,14 @@ namespace Arity.Service.Contract
         Task<List<User>> GetClient(int companyId);
         Task<List<Particular>> GetParticular();
         Task AddUpdateInvoiceEntry(int CompanyId, InvoiceEntry invoiceEntry);
+        Task<List<InvoiceEntry>> GetAllInvoice();
         Task<Data.Dto.InvoiceEntry> GetInvoice(int id);
         Task<List<InvoiceEntry>> GetAllInvoice(DateTime from, DateTime to);
         Task<List<InvoiceEntry>> GetAllInvoiceParticulars(int invoiceId);
+        Task<List<InvoiceEntry>> GetInvoiceByClientandCompany(int companyId, int clientId);
         Task DeleteInvoiceParticularEntry(int id);
         Task<DocumentViewDownload> DownloadInvoice(int id);
         Task<InvoiceEntry> GetInvoiceSingle(int invoiceId);
+        Task<decimal> GetInvoiceAmountTotal(List<long> invoices);
     }
 }

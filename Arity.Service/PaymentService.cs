@@ -68,15 +68,7 @@ namespace Arity.Service
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<List<InvoiceEntry>> GetAllInvoice()
-        {
-            return await (from invoice in _dbContext.InvoiceDetails
-                          select new InvoiceEntry()
-                          {
-                              InvoiceId = invoice.Id,
-                              InvoiceNumber = invoice.Invoice_Number
-                          }).ToListAsync();
-        }
+        
 
         public async Task<List<ReceiptDto>> GetAllReceipts(DateTime fromDate, DateTime toDate)
         {

@@ -34,15 +34,13 @@ namespace Arity.Service
             }
         }
 
-        public async Task<List<User>> GetClient(int CompanyId)
+        public async Task<List<User>> GetClient(int id)
         {
-            return await (from client in _dbContext.Users
-                          join companyMapp in _dbContext.Company_Client_Mapping on client.Id equals (companyMapp.UserId ?? 0)
-                          where companyMapp.CompanyId == CompanyId
-                          select client)
-                    .ToListAsync();
+            return await (from c in _dbContext.Users
+                          join m in _dbContext.Company_Client_Mapping on c.Id equals m.UserId
+                          where m.CompanyId == id
+                          select c).ToListAsync();
         }
-
         public async Task<List<Particular>> GetParticular()
         {
             return await _dbContext.Particulars.ToListAsync();
@@ -157,6 +155,7 @@ namespace Arity.Service
                         InvoiceId = invoiceParticular.InvoiceId
                     }).ToList();
         }
+
 
         public async Task DeleteInvoiceParticularEntry(int id)
         {
@@ -382,6 +381,36 @@ namespace Arity.Service
             return documentViewDownload;
         }
 
+        public async Task<List<InvoiceEntry>> GetAllInvoice()
+        {
+            return await (from invoice in _dbContext.InvoiceDetails
+                          select new InvoiceEntry()
+                          {
+                              InvoiceId = invoice.Id,
+                              InvoiceNumber = invoice.Invoice_Number
+                          }).ToListAsync();
+        }
+
+        public async Task<List<InvoiceEntry>> GetInvoiceByClientandCompany(int companyId, int clientId)
+        {
+            return await (from invoice in _dbContext.InvoiceDetails
+                          join invoiceParti in _dbContext.InvoiceParticulars
+                          on invoice.Id equals invoiceParti.InvoiceId
+                          join parti in _dbContext.Particulars
+                          on invoiceParti.ParticularId equals parti.Id
+                          where (invoice.ClientId == clientId && invoice.CompanyId == companyId /*&& parti.isExcluded ==false*/)
+                          select new InvoiceEntry()
+                          {
+                              CompanyId = invoice.CompanyId,
+                              ClientId = invoice.ClientId,
+                              InvoiceId = invoice.Id,
+                              InvoiceNumber = invoice.Invoice_Number,
+                              ParticularId = invoiceParti.ParticularId,
+                              Amount = invoiceParti.Amount
+
+                          }).ToListAsync();
+        }
+
         #region company
 
         public async Task<CompanyDto> GetCompanyDetailById(int comId)
@@ -424,6 +453,14 @@ namespace Arity.Service
             var count = _dbContext.InvoiceDetails.Where(_ => _.CompanyId == comId).ToList().Count();
 
             return count;
+        }
+
+        public async Task<decimal> GetInvoiceAmountTotal(List<long> invoices)
+        {
+            return await (from pm in _dbContext.InvoiceParticulars
+                          join p in _dbContext.Particulars on pm.ParticularId equals p.Id
+                          where /*Particular.IsExcluded == false*/ invoices.Contains(pm.InvoiceId)
+                          select pm).SumAsync(_ => _.Amount);
         }
 
         #endregion

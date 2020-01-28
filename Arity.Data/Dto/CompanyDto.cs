@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Arity.Data.Dto
 {
-   public class CompanyDto
+    public class CompanyDto
     {
         public int Id { get; set; }
         public string CompanyName { get; set; }

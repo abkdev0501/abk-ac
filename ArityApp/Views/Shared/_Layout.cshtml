@@ -81,19 +81,20 @@
 
                 <ul class="nav navbar-nav notika-top-nav">
                     <li class="nav-item dropdown">
-                        <a href="/home/payment" style="font-size:15px;" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span>Payment</span></a>
+                        <a href="#" onclick=window.location.href="/Home/Payment" style="font-size:15px;" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnPayment"><span>Payment</span></a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a href="#" style="font-size:15px;" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnParticular"><span>Particular</span></a>
+                        <a href="#" onclick=window.location.href="/Particular/Index" style="font-size:15px;" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnParticular"><span>Particular</span></a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a href="#" style="font-size:15px;" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnHome"><span>Invoice</span></a>
+                        <a href="#" onclick=window.location.href="/Home/Index" style="font-size:15px;" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnHome"><span>Invoice</span></a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnProfile"><span><i class="notika-icon notika-support"></i></span></a>
+                        <a href="#" @*onclick=window.location='@Url.Action("Index","Home")';*@ data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnProfile"><span><i class="notika-icon notika-support"></i></span></a>
                     </li>
-                    <li><a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnLogout"><span><i class="fa fa-sign-in" aria-hidden="true"></i></span></a></li>
+                    <li><a href="#" onclick=window.location.href="/Account/Logout" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnLogout"><span><i class="fa fa-sign-in" aria-hidden="true"></i></span></a></li>
                 </ul>
+
                 <div>
                 </div>
 
@@ -193,7 +194,7 @@
     <script src="/Content/js/data-table/jquery.dataTables.min.js"></script>
     <script src="/Content/js/data-table/data-table-act.js"></script>
     <script>
-        $( '#btnLogout').on("click",function () {
+        @*$( '#btnLogout').on("click",function () {
         $.ajax({
             url: '@Url.Action("Logout", "Account")',
             dataType: "html",
@@ -228,7 +229,7 @@
                     window.location.href = '@Url.Action("Index", "Home")';
                 }
             })
-        });
+        });*@
 
     </script>
     @RenderSection("scripts", required: false)

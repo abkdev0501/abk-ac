@@ -190,6 +190,24 @@ namespace ArityApp.Controllers
             }
         }
 
+        public async Task<JsonResult> GetInvoiceByClientAndCompany(int companyId, int clientId)
+        {
+            try
+            {
+                _invoiceService = new InvoiceService();
+                return Json(await _invoiceService.GetInvoiceByClientandCompany(companyId, clientId), JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<JsonResult> GetTotalOfInvoice(List<long> invoices)
+        {
+            _invoiceService = new InvoiceService(); 
+            return Json(await _invoiceService.GetInvoiceAmountTotal(invoices),JsonRequestBehavior.AllowGet);
+        }
         #endregion
 
         #region Payment
@@ -232,12 +250,16 @@ namespace ArityApp.Controllers
             try
             {
                 _paymentService = new PaymentService();
+                _invoiceService = new InvoiceService();
                 var receiptDto = new ReceiptDto();
                 if (id != null)
                     receiptDto = await _paymentService.GetReceipt(id ?? 0);
                 receiptDto = receiptDto ?? new ReceiptDto();
 
-                ViewBag.Invoice = new MultiSelectList(await _paymentService.GetAllInvoice(), "InvoiceId", "InvoiceNumber", receiptDto.InvoiceIds);
+                ViewBag.Company = new SelectList(await _invoiceService.GetCompany(), "Id", "CompanyName", receiptDto.CompanyId);
+                ViewBag.Client = new SelectList(await _invoiceService.GetClient(Convert.ToInt32(receiptDto.CompanyId)), "Id", "FullName", receiptDto.ClientId);
+
+                ViewBag.Invoice = new MultiSelectList(await _invoiceService.GetAllInvoice(), "InvoiceId", "InvoiceNumber", receiptDto.InvoiceIds);
                 return PartialView("_ReceiptEntry", receiptDto);
             }
             catch (Exception ex)

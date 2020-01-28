@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'C:\Users\LENOVO\source\repos\ArityApp\Arity.Data\ArityModel.edmx'. 
+﻿// T4 code generation is enabled for model 'C:\Users\hp\Documents\GitHub\abk-ac\Arity.Data\ArityModel.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.

@@ -22,5 +22,7 @@ namespace Arity.Data.Dto
         public long ReceiptMappingId { get; set; }
         public string CreatedDateString { get; set; }
         public string InvoiceNumbers { get; set; }
+        public int CompanyId { get; set; }
+        public int ClientId { get; set; }
     }
 }

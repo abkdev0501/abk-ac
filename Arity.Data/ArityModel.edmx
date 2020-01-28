@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="RMNContext.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="RMNContext.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Client_Particular_Mapping">
           <Key>
             <PropertyRef Name="Id" />
@@ -18,8 +18,8 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="CompanyId" Type="int" />
-          <Property Name="UserId" Type="int" />
+          <Property Name="CompanyId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="Company_master">
           <Key>
@@ -287,8 +287,7 @@
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="RMNContext" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -299,14 +298,6 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="CompanyId" Type="Int32" />
           <Property Name="particularId" Type="Int32" />
-        </EntityType>
-        <EntityType Name="Company_Client_Mapping">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CompanyId" Type="Int32" />
-          <Property Name="UserId" Type="Int32" />
         </EntityType>
         <EntityType Name="Company_master">
           <Key>
@@ -544,7 +535,6 @@
         </Association>
         <EntityContainer Name="RMNEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Client_Particular_Mapping" EntityType="Self.Client_Particular_Mapping" />
-          <EntitySet Name="Company_Client_Mapping" EntityType="Self.Company_Client_Mapping" />
           <EntitySet Name="Company_master" EntityType="Self.Company_master" />
           <EntitySet Name="InvoiceDetails" EntityType="Self.InvoiceDetail" />
           <EntitySet Name="InvoiceParticulars" EntityType="Self.InvoiceParticular" />
@@ -591,7 +581,16 @@
             <End Role="UserTypes" EntitySet="UserTypes" />
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
+          <EntitySet Name="Company_Client_Mapping" EntityType="RMNContext.Company_Client_Mapping" />
         </EntityContainer>
+        <EntityType Name="Company_Client_Mapping">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CompanyId" Type="Int32" Nullable="false" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -604,15 +603,6 @@
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
                 <ScalarProperty Name="particularId" ColumnName="particularId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Company_Client_Mapping">
-            <EntityTypeMapping TypeName="RMNContext.Company_Client_Mapping">
-              <MappingFragment StoreEntitySet="Company_Client_Mapping">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -731,6 +721,15 @@
                 <ScalarProperty Name="UserTypeName" ColumnName="UserTypeName" />
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
                 <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Company_Client_Mapping">
+            <EntityTypeMapping TypeName="RMNContext.Company_Client_Mapping">
+              <MappingFragment StoreEntitySet="Company_Client_Mapping">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

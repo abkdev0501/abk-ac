@@ -206,7 +206,7 @@
                 $("#loading").show();
             $.ajax({
                 url: '@Url.Action("RemoveInvoiceEntry", "Home")',
-                dataType: "json",
+                dataType: "json",   
                 type: "GET",
                 data: { id: id },
                 success: function (response) {
