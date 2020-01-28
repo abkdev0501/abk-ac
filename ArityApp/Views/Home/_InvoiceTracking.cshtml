@@ -1,0 +1,75 @@
+﻿@model Arity.Data.Dto.TrackingInformation
+
+<form style="padding-top:30px;">
+    @Html.HiddenFor(_ => _.TrackingId)
+    @Html.HiddenFor(_ => _.InvoiceId)
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Comment<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextAreaFor(_ => _.Comment, new { @class = "form-control input-sm",@rows="5", placeholder = "Enter comment" , @required = "required"})
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="width:100%;text-align:center;padding: 25px 0 5px;">
+        <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.TrackingId > 0 ? "Update" : "Add")</button>
+        <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
+    </div>
+</form>
+<script>
+
+    $("#btnAdd").click(function () {
+        var isValid = true;
+        if ($("#Comment").val() == null || $("#Comment").val() == "") {
+            Notification('', 'Please enter comment', 'danger');
+            isValid = false;
+        }
+
+        var data = JSON.stringify({
+            "trackingInformation": {
+                "TrackingId": $("#TrackingId").val(),
+                "Comment": $("#Comment").val(),
+                "InvoiceId": $("#InvoiceId").val()
+            }
+        });
+
+        if (isValid) {
+            $.ajax({
+                url: '@Url.Action("AddInvoiceTrackingInformation", "Home")',
+                dataType: "json",
+                type: "POST",
+                data:data,
+                cache: false,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    $("#loading").hide();
+                    if (response) {
+                        if (@Model.TrackingId <= 0) {
+                            Notification('', 'Tracking added successfuly', 'success');
+                        }
+                        else {
+                            Notification('', 'Tracking updated successfuly', 'success');
+                        }
+                        table.ajax.reload();
+                        $("#modalTracking").modal('toggle');
+                    }
+                    else {
+                         Notification('', 'Something went wrong, Please try again', 'danger');
+                    }
+                },
+                error: function (error) {
+                    $("#loading").hide();
+                    Notification('', 'Something went wrong, Please try again', 'danger');
+                }
+            });
+        }
+    });
+</script>
+

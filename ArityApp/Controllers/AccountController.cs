@@ -1,4 +1,5 @@
 ﻿using Arity.Data;
+using Arity.Data.Helpers;
 using Arity.Service;
 using Arity.Service.Contract;
 using Arity.Service.Core;
@@ -15,7 +16,6 @@ namespace ArityApp.Controllers
 {
     public class AccountController : Controller
     {
-        private MailMessage mail;
         IAccountService _accountService;
         public AccountController()
         {
@@ -43,12 +43,12 @@ namespace ArityApp.Controllers
             if (ModelState.IsValid)
             {
                 _accountService = new AccountService();
-                var validUser = await _accountService.Login(user.Username, "n7vz+EGHIZw=" /*Functions.Encrypt_QueryString(user.Password)*/);
+                var validUser = await _accountService.Login(user.Username, Functions.Encrypt_QueryString(user.Password));
                 if (validUser != null)
                 {
                     FormsAuthentication.SetAuthCookie(validUser.Username, false);
-                    Session["UserID"] = validUser.Id.ToString();
-                    Session["UserTypeID"] = validUser.UserTypeId.ToString();
+                    SessionHelper.UserId = validUser.Id;
+                    SessionHelper.UserTypeId = validUser.UserTypeId;
                     return RedirectToAction("Index", "Home");
                 }
                 ViewBag.Message = "Invalid Credential";
@@ -89,46 +89,7 @@ namespace ArityApp.Controllers
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ID"></param>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult> ResetPassword(string id)
-        {
-            try
-            {
-                Vendor_User user = new Vendor_User();
-                user.UserId = Convert.ToInt32(Function.Decrypt_QueryString(id));
-                return View(user);
-            }
-            catch (Exception)
-            {
-                return RedirectToAction("NotFound", "Home");
-            }
-        }
-
-        /// <summary>
-        /// Reset password method   
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult> ResetPassword(Vendor_User user)
-        {
-            try
-            {
-                //_vendorServices = new VendorServices();
-                //await _vendorServices.ResetPassword(user);
-                TempData["PasswordChanged"] = "Your password changed successfully.";
-                return RedirectToAction("Login");
-            }
-            catch (Exception ex)
-            {
-                return View(user);
-            }
-        }
+        
 
         /// <summary>
         /// Logout method from where loggedin user can logged out

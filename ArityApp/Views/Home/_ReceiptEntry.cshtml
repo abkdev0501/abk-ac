@@ -9,8 +9,8 @@
                     <label class="hrzn-fm">Invoice<span style="color:red;vertical-align:text-bottom;">*</span></label>
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
-                    <div class="nk-int-st bootstrap-select">
-                        @Html.DropDownListFor(_ => _.InvoiceIds, ViewBag.Invoice as MultiSelectList, "-- Select Invoice--", new { @class = "form-control input-sm selectpicker", @required = "required", multiple = "multiple" })
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.InvoiceIds, ViewBag.Invoice as MultiSelectList, "-- Select Invoice--", new { @class = "form-control input-sm", @required = "required", multiple = "multiple" })
                     </div>
                 </div>
             </div>

@@ -17,13 +17,11 @@ namespace Arity.Data
         public long Id { get; set; }
         public System.DateTime CreatedDate { get; set; }
         public string RecieptNo { get; set; }
-        public long InvoiceId { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal Discount { get; set; }
         public string BankName { get; set; }
         public string ChequeNumber { get; set; }
         public Nullable<bool> Status { get; set; }
         public System.DateTime UpdatedDate { get; set; }
-    
     }
 }

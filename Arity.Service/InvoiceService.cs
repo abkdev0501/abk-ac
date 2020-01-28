@@ -179,206 +179,11 @@ namespace Arity.Service
                                                      InvoiceId = invoice.Id,
                                                      Address = user.Address,
                                                      City = user.City,
-                                                     FullName = user.FullName
+                                                     FullName = user.FullName,
+                                                     CompanyId = invoice.CompanyId
                                                  }).FirstOrDefault();
 
             documentViewDownload.Particulars = await GetAllInvoiceParticulars(id);
-
-            //Document document = new Document(PageSize.A4, 94f, 94f, 10f, 10f);
-            //Font NormalFont = FontFactory.GetFont("Arial", 12, Font.NORMAL);
-
-            //using (System.IO.MemoryStream memoryStream = new System.IO.MemoryStream())
-            //{
-            //    PdfWriter writer = PdfWriter.GetInstance(document, memoryStream);
-            //    Phrase phrase = null;
-            //    PdfPCell cell = null;
-            //    PdfPTable table = null;
-
-            //    document.Open();
-
-            //    //Header Table
-            //    table = new PdfPTable(5);
-            //    table.HorizontalAlignment = Element.ALIGN_CENTER;
-            //    //table.SetWidths(new float[] { 0.3f, 1f });
-            //    table.SpacingBefore = 20f;
-
-            //    // Header
-            //    cell = PhraseCell(new Phrase("Nilesh Narshana & Associates", FontFactory.GetFont("Arial", 12, Font.BOLD)), PdfPCell.ALIGN_CENTER);
-            //    cell.Colspan = 5;
-            //    cell.BorderWidth = 0;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-
-            //    // Address
-            //    cell = PhraseCell(new Phrase(invoiceDetails.Address, FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_CENTER);
-            //    cell.Colspan = 5;
-            //    cell.BorderWidth = 0;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-
-            //    // breka line 
-            //    cell = PhraseCell(new Phrase("", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.Colspan = 5;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-
-            //    // Bill no
-            //    cell = PhraseCell(new Phrase("Bill No.", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-            //    cell = PhraseCell(new Phrase(invoiceDetails.InvoiceNumber, FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-
-            //    // Bill no
-            //    cell = PhraseCell(new Phrase("INVOICE", FontFactory.GetFont("Arial", 10, Font.BOLD)), PdfPCell.ALIGN_CENTER);
-            //    cell.BorderWidth = 0;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-
-
-            //    // Date 
-            //    cell = PhraseCell(new Phrase("Date :", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-            //    cell = PhraseCell(new Phrase(invoiceDetails.CreatedDate.Value.ToString("MM/dd/yyyy"), FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.RIGHT_BORDER);
-            //    cell.BorderWidth = 0;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-
-            //    // breka line 
-            //    cell = PhraseCell(new Phrase("", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.Colspan = 5;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-
-            //    // Name 
-            //    cell = PhraseCell(new Phrase("Name :", FontFactory.GetFont("Arial", 10, Font.BOLD)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.PaddingBottom = 10f;
-            //    cell.Colspan = 1;
-            //    table.AddCell(cell);
-            //    cell = PhraseCell(new Phrase(invoiceDetails.FullName, FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.Colspan = 4;
-            //    cell.PaddingBottom = 10f;
-            //    table.AddCell(cell);
-
-            //    // address 
-            //    cell = PhraseCell(new Phrase("Address :", FontFactory.GetFont("Arial", 10, Font.BOLD)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.PaddingBottom = 30f;
-            //    cell.Colspan = 1;
-            //    table.AddCell(cell);
-            //    cell = PhraseCell(new Phrase(invoiceDetails.Address, FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.Colspan = 4;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-
-
-            //    // Particular & Amount 
-            //    cell = PhraseCell(new Phrase("Particulars", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_CENTER);
-            //    cell.BorderWidth = 1;
-            //    cell.PaddingBottom = 10f;
-            //    cell.Colspan = 3;
-            //    table.AddCell(cell);
-            //    cell = PhraseCell(new Phrase("Amount", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_CENTER);
-            //    cell.BorderWidth = 1;
-            //    cell.Colspan = 2;
-            //    cell.PaddingBottom = 10f;
-            //    table.AddCell(cell);
-
-            //    foreach (var particular in particulars)
-            //    {
-            //        cell = PhraseCell(new Phrase(particular.FFParticulars + " Fees For F.Y." + particular.Year, FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //        cell.BorderWidth = 1;
-            //        cell.PaddingBottom = 10f;
-            //        cell.Colspan = 3;
-            //        table.AddCell(cell);
-            //        cell = PhraseCell(new Phrase(particular.Amount.ToString(), FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_RIGHT);
-            //        cell.BorderWidth = 1;
-            //        cell.Colspan = 2;
-            //        cell.PaddingBottom = 10f;
-            //        table.AddCell(cell);
-
-            //    }
-
-            //    // breka line 
-            //    cell = PhraseCell(new Phrase("", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.Colspan = 5;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-
-            //    // total
-            //    cell = PhraseCell(new Phrase("Amount Chargable (in words)", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 1;
-            //    cell.PaddingBottom = 10f;
-            //    cell.Colspan = 3;
-            //    table.AddCell(cell);
-            //    cell = PhraseCell(new Phrase("Total", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_RIGHT);
-            //    cell.BorderWidth = 0;
-            //    cell.Colspan = 1;
-            //    cell.PaddingBottom = 10f;
-            //    table.AddCell(cell);
-            //    cell = PhraseCell(new Phrase(particulars.Sum(_ => _.Amount).ToString(), FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_RIGHT);
-            //    cell.BorderWidth = 1;
-            //    cell.Colspan = 1;
-            //    cell.PaddingBottom = 10f;
-            //    table.AddCell(cell);
-
-            //    cell = PhraseCell(new Phrase("Rupees One Thousand  Only ", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.PaddingBottom = 10f;
-            //    cell.Colspan = 4;
-            //    table.AddCell(cell);
-            //    cell = PhraseCell(new Phrase("", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 1;
-            //    cell.Colspan = 1;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-
-            //    cell = PhraseCell(new Phrase("For F.Y.", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 1;
-            //    cell.Colspan = 1;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-            //    cell = PhraseCell(new Phrase(particulars.FirstOrDefault().Year, FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 1;
-            //    cell.Colspan = 4;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-
-            //    cell = PhraseCell(new Phrase("", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.Colspan = 5;
-            //    cell.PaddingBottom = 60f;
-            //    table.AddCell(cell);
-
-            //    cell = PhraseCell(new Phrase("", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_LEFT);
-            //    cell.BorderWidth = 0;
-            //    cell.Colspan = 3;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-
-            //    cell = PhraseCell(new Phrase("Authorised Signatory", FontFactory.GetFont("Arial", 10, Font.NORMAL)), PdfPCell.ALIGN_CENTER);
-            //    cell.BorderWidth = 0;
-            //    cell.Colspan = 2;
-            //    cell.PaddingBottom = 30f;
-            //    table.AddCell(cell);
-            //    document.Add(table);
-            //    document.Close();
-            //    memoryStream.Close();
-            //    DocumentViewDownload documentViewDownload = new DocumentViewDownload();
-            //    documentViewDownload.ContentType = "pdf";
-            //    documentViewDownload.ByteArray = memoryStream.ToArray();
-            //    documentViewDownload.DocumentName = invoiceDetails.InvoiceNumber + ".pdf";
             return documentViewDownload;
         }
 
@@ -386,32 +191,24 @@ namespace Arity.Service
 
         public async Task<CompanyDto> GetCompanyDetailById(int comId)
         {
-            var CompanyDetail = (from Company in _dbContext.Company_master
-                                 where Company.Id == comId
-                                 select new Company_master()
-                                 {
-                                     Id = Company.Id,
-                                     CompanyName = Company.CompanyName,
-                                     CompanyBanner = Company.CompanyBanner,
-                                     Address = Company.Address
-                                 }).FirstOrDefault();
-            return AutoMapper.Mapper.Map<CompanyDto>(CompanyDetail);
+            return (from company in _dbContext.Company_master
+                    where company.Id == comId
+                    select new CompanyDto
+                    {
+                        Address = company.Address,
+                        CompanyBanner = company.CompanyBanner,
+                        CompanyName = company.CompanyName,
+                        IsActive = company.IsActive,
+                        Id = company.Id,
+                        PreferedColor = company.PreferedColor,
+                        Type = company.Type
+                    }).FirstOrDefault();
         }
-
 
         #endregion
 
 
         #region Private Method
-        //private static PdfPCell PhraseCell(Phrase phrase, int align)
-        //{
-        //    PdfPCell cell = new PdfPCell(phrase);
-        //    cell.HorizontalAlignment = align;
-        //    cell.PaddingBottom = 2f;
-        //    cell.PaddingTop = 0f;
-        //    return cell;
-        //}
-
         private string GenerateInvoiceNumber(int companyId)
         {
             var count = GetCompnyCount(companyId);
@@ -424,6 +221,73 @@ namespace Arity.Service
             var count = _dbContext.InvoiceDetails.Where(_ => _.CompanyId == comId).ToList().Count();
 
             return count;
+        }
+
+        public async Task<List<TrackingInformation>> GetTrackingInformation(int invoiceId)
+        {
+            return (from tracking in _dbContext.InvoiceTrackings.ToList()
+                    where tracking.InvoiceId == invoiceId
+                    select new TrackingInformation()
+                    {
+                        TrackingId = tracking.id,
+                        InvoiceId = tracking.InvoiceId,
+                        Comment = tracking.Comment,
+                        CreatedAt = tracking.CreatedAt.Value.ToString("MM/dd/yyyy")
+                    }).ToList();
+        }
+
+        public async Task<bool> AddTrackingInformation(TrackingInformation trackingInformation)
+        {
+            try
+            {
+                if (trackingInformation.TrackingId > 0)
+                {
+                    var trackingDetails = await _dbContext.InvoiceTrackings.FirstOrDefaultAsync(_ => _.id == trackingInformation.TrackingId);
+                    trackingDetails.Comment = trackingInformation.Comment;
+                }
+                else
+                    _dbContext.InvoiceTrackings.Add(new InvoiceTracking
+                    {
+                        Comment = trackingInformation.Comment,
+                        CreatedAt = DateTime.Now,
+                        InvoiceId = trackingInformation.InvoiceId
+                    });
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public async Task<TrackingInformation> GetTrackingInformationById(int invoiceTrackingId)
+        {
+
+            var trackingDetails = await _dbContext.InvoiceTrackings.FirstOrDefaultAsync(_ => _.id == invoiceTrackingId);
+            if (trackingDetails == null) return null;
+
+            return new TrackingInformation
+            {
+                TrackingId = trackingDetails.id,
+                Comment = trackingDetails.Comment,
+                InvoiceId = trackingDetails.InvoiceId
+            };
+        }
+
+        public async Task<bool> RemoveInvoiceTracking(int invoiceTrackingId)
+        {
+            try
+            {
+                _dbContext.InvoiceTrackings.Remove(await _dbContext.InvoiceTrackings.FirstOrDefaultAsync(_ => _.id == invoiceTrackingId));
+                await _dbContext.SaveChangesAsync();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
 
         #endregion

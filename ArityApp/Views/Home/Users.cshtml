@@ -1,7 +1,7 @@
 ﻿@using Arity.Data.Helpers;
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Payment";
+    ViewBag.Title = "Users";
 }
 
 <head>
@@ -14,16 +14,7 @@
         ============================================ -->
     <link rel="stylesheet" href="/Content/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="/Content/css/chosen/chosen.css">
-    <style>
-        td.details-control {
-            background: url('/Content/images/details_open.png') no-repeat center center;
-            cursor: pointer;
-        }
 
-        tr.shown td.details-control {
-            background: url('/Content/images/details_close.png') no-repeat center center;
-        }
-    </style>
 </head>
 
 <div class="breadcomb-area">
@@ -38,16 +29,16 @@
                                     <i class="notika-icon notika-form"></i>
                                 </div>
                                 <div class="breadcomb-ctn">
-                                    <h2>Payment History</h2>
-                                    <p></p>
+                                    <h2>Users</h2>
+                                    <p>List of Users</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
                             <div class="breadcomb-report">
-                                @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin)
                                 {
-                                    <button id="btnAddInvoiceEntry" onclick="AddUpdatePaymentEntry(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
+                                    <button id="btnAddInvoiceEntry" onclick="AddUpdateUser(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
                                 }
                             </div>
                         </div>
@@ -59,11 +50,11 @@
     </div>
 </div>
 <!-- Breadcrumb area End-->
-<div class="modal animated fade" id="modelPaymentEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
+<div class="modal animated fade" id="modelUser" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-large">
         <div class="modal-content">
             <div class="modal-header" style="margin-bottom:35px;">
-                <h3>Add/Update Payment entry</h3>
+                <h3>Add/Update User</h3>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
@@ -84,8 +75,8 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="data-table-list">
                     <div class="basic-tb-hd">
-                        <h2>Receipt History</h2>
-                        <p>Below are receipt history.</p>
+                        <h2>Users</h2>
+                        <p>Below are list of users.</p>
                     </div>
 
                     <div class="date-filter">
@@ -110,23 +101,19 @@
 
                     </div>
                     <div class="table-responsive">
-                        <table id="tblPaymentHistory" class="table table-striped" style="width:100%;">
+                        <table id="tblUsers" class="table table-striped" style="width:100%;">
                             <thead>
                                 <tr>
-                                    <th style="width:12%;">Invoice#</th>
-                                    <th style="width:12%;">Receipt#</th>
-                                    <th style="width:10%;">Discount</th>
-                                    <th style="width:10%;">Total Amount</th>
-                                    <th style="width:10%;">Date</th>
-                                    <th style="width:10%;">Bank Name</th>
-                                    <th style="width:10%;">Cheque#</th>
-                                    <th style="width:9%;">Status</th>
-                                    <th style="width:7%;">Download</th>
-                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
-                                    {
-                                        <th style="width:9%;">Update</th>
-                                    }
-                                    </tr>
+                                    <th style="width:12%;">Name</th>
+                                    <th style="width:12%;">Username</th>
+                                    <th style="width:12%;">Address</th>
+                                    <th style="width:10%;">City</th>
+                                    <th style="width:10%;">Phone</th>
+                                    <th style="width:10%;">Pincode</th>
+                                    <th style="width:10%;">Role</th>
+                                    <th style="width:10%;">Status</th>
+                                    <th style="width:9%;">Update</th>
+                                </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -141,10 +128,10 @@
     <script>
     $(document).ready(function () {
 
-        table = $('#tblPaymentHistory').DataTable({
+       table =  $('#tblUsers').DataTable({
             "ajax": function (data, callback, settings) {
                 $.ajax({
-                    url: '@Url.Action("LoadPaymentHistory","Home")',
+                    url: '@Url.Action("LoadUsers","Home")',
                     type: "GET",
                     dataType: "json",
                     data: {
@@ -154,65 +141,50 @@
                     beforeSend: function (xhrObj) {
                         $("#loading").show();
                     }
-                })
+                    })
                     .done(function (data, textStatus, jqXHR) {
                         callback(data);
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        Notification('Error! ', '' + errorThrown + '', 'danger');
+                        Notification('Error! ', ''+errorThrown+'', 'danger');
                     })
                     .always(function (data, textStatus, jqXHR) {
                         $("#loading").hide();
                     });
             },
             "language": {
-                "emptyTable": "No receipts found"
+                "emptyTable": "No users found"
             },
-            "columns": [
-                { "data": "InvoiceNumbers" },
-                { "data": "RecieptNo" },
-                { "data": "Discount" },
-                { "data": "TotalAmount" },
-                { "data": "CreatedDateString" },
-                { "data": "BankName" },
-                { "data": "ChequeNumber" },
-                { "data": "Status" },
+           "columns": [
+                { "data": "FullName" },
+                { "data": "Username" },
+                { "data": "Address" },
+                { "data": "City" },
+                { "data": "PhoneNumber" },
+                { "data": "Pincode" },
+                { "data": "UserType" },
+                { "data": "UserType" },
                 {
                     "orderable": false,
                     "data": null,
                     "render": function (data, type, full) {
-                        return '<button class="btn waves-effect" onclick="downloadPayment(' + data.ReceiptId + ')"><i class="fa fa-download" aria-hidden="true"></i></button>';
+                            return '<button class="btn waves-effect" onclick="AddUpdateUser(' + data.Id + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
                     }
-                },
-                @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
-                {
-                    @:{
-                    @:    "orderable": false,
-                    @:    "data": null,
-                    @:    "render": function (data, type, full) {
-                    @:            return '<button class="btn waves-effect" onclick="AddUpdatePaymentEntry(' + data.ReceiptId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
-                    @:    }
-                    @:}
-                    }
+                }
             ],
-            "order": [[5, "desc"]]
+            "order": [[1, "desc"]]
        });
 
-         $("#btnFilterGrid").click(function () {
-                table.ajax.reload();
-        });
-       });
-
-        function downloadPayment(id) {
-            window.open("/home/GenerateReciept/"+id);
-        }
-    </script>
-}
-
-@if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+       @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.Admin)
 {
-    <script>
-         function RemvoeParticulars(id) {
+           @:table.column(9).visible(false)
+       }
+         $("#btnFilterGrid").click(function () {
+    table.ajax.reload();
+});
+       });
+
+        function RemvoeParticulars(id) {
             if (confirm("Are you sure you want to delete this particular?")) {
                 $("#loading").show();
             $.ajax({
@@ -233,10 +205,10 @@
             }
         }
 
-        function AddUpdatePaymentEntry(id) {
+        function AddUpdateUser(id) {
               $("#loading").show();
             $.ajax({
-                url: '@Url.Action("AddPaymentEntry", "Home")',
+                url: '@Url.Action("AddUpdateUser", "Home")',
                 dataType: "html",
                 type: "GET",
                 data: { id: id },
@@ -244,14 +216,18 @@
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
                     $("#loading").hide();
-                    $("#modelPaymentEntry .modal-body").html(response);
-                  $("#modelPaymentEntry").modal('toggle');
+                    $("#modelUser .modal-body").html(response);
+                    $("#modelUser").modal('toggle');
                 },
                 error: function (error) {
                     $("#loading").hide();
                     Notification('', 'Something went wrong, Please try again', 'danger');
                 }
             });
+        }
+
+        function downloadPayment(id) {
+            window.open("/home/GenerateReciept/"+id);
         }
     </script>
 }

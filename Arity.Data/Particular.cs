@@ -14,7 +14,6 @@ namespace Arity.Data
     
     public partial class Particular
     {
-    
         public long Id { get; set; }
         public string ParticularSF { get; set; }
         public string ParticularFF { get; set; }

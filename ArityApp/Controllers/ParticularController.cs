@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace ArityApp.Controllers
 {
+    [Authorize]
     public class ParticularController : Controller
     {
         ParticularServices _particularServices = new ParticularServices();

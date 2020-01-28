@@ -14,6 +14,7 @@ namespace Arity.Data
     
     public partial class InvoiceDetail
     {
+    
         public long Id { get; set; }
         public string Invoice_Number { get; set; }
         public System.DateTime CreatedDate { get; set; }
@@ -21,5 +22,6 @@ namespace Arity.Data
         public long ClientId { get; set; }
         public long CompanyId { get; set; }
     
+        
     }
 }

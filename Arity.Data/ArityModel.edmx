@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="RMNContext.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="RMNContext.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Client_Particular_Mapping">
           <Key>
             <PropertyRef Name="Id" />
@@ -30,6 +30,8 @@
           <Property Name="CompanyBanner" Type="varchar" MaxLength="1000" />
           <Property Name="Address" Type="varchar" MaxLength="1000" />
           <Property Name="IsActive" Type="bit" />
+          <Property Name="Type" Type="varchar" MaxLength="1000" />
+          <Property Name="PreferedColor" Type="int" />
         </EntityType>
         <EntityType Name="InvoiceDetails">
           <Key>
@@ -54,13 +56,23 @@
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
           <Property Name="UpdatedDate" Type="datetime" Nullable="false" />
         </EntityType>
-        <EntityType Name="InvoiceRecieptMapping">
+        <EntityType Name="InvoiceReciepts">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="InvoiceId" Type="bigint" />
           <Property Name="RecieptId" Type="bigint" />
+        </EntityType>
+        <EntityType Name="InvoiceTrackings">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="InvoiceId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" />
+          <Property Name="Comment" Type="nvarchar(max)" />
+          <Property Name="CreatedAt" Type="datetime" />
         </EntityType>
         <EntityType Name="Particulars">
           <Key>
@@ -79,7 +91,6 @@
           <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
           <Property Name="RecieptNo" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="InvoiceId" Type="bigint" Nullable="false" />
           <Property Name="TotalAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
           <Property Name="Discount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
           <Property Name="BankName" Type="nvarchar" MaxLength="100" Nullable="false" />
@@ -165,39 +176,27 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_InvoiceRecieptMapping_InvoiceRecieptMapping">
-          <End Role="InvoiceRecieptMapping" Type="Self.InvoiceRecieptMapping" Multiplicity="1" />
-          <End Role="InvoiceRecieptMapping1" Type="Self.InvoiceRecieptMapping" Multiplicity="0..1" />
+        <Association Name="FK_InvoiceReciept_InvoiceDetails">
+          <End Role="InvoiceDetails" Type="Self.InvoiceDetails" Multiplicity="0..1" />
+          <End Role="InvoiceReciepts" Type="Self.InvoiceReciepts" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="InvoiceRecieptMapping">
-              <PropertyRef Name="id" />
+            <Principal Role="InvoiceDetails">
+              <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="InvoiceRecieptMapping1">
-              <PropertyRef Name="id" />
+            <Dependent Role="InvoiceReciepts">
+              <PropertyRef Name="InvoiceId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_InvoiceRecieptMapping_RecieptDetails">
           <End Role="RecieptDetails" Type="Self.RecieptDetails" Multiplicity="0..1" />
-          <End Role="InvoiceRecieptMapping" Type="Self.InvoiceRecieptMapping" Multiplicity="*" />
+          <End Role="InvoiceReciepts" Type="Self.InvoiceReciepts" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="RecieptDetails">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="InvoiceRecieptMapping">
+            <Dependent Role="InvoiceReciepts">
               <PropertyRef Name="RecieptId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_RecieptDetails_InvoiceDetails">
-          <End Role="InvoiceDetails" Type="Self.InvoiceDetails" Multiplicity="1" />
-          <End Role="RecieptDetails" Type="Self.RecieptDetails" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="InvoiceDetails">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="RecieptDetails">
-              <PropertyRef Name="InvoiceId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -243,7 +242,8 @@
           <EntitySet Name="Company_master" EntityType="Self.Company_master" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="InvoiceDetails" EntityType="Self.InvoiceDetails" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="InvoiceParticulars" EntityType="Self.InvoiceParticulars" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="InvoiceRecieptMapping" EntityType="Self.InvoiceRecieptMapping" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="InvoiceReciepts" EntityType="Self.InvoiceReciepts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="InvoiceTrackings" EntityType="Self.InvoiceTrackings" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Particulars" EntityType="Self.Particulars" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="RecieptDetails" EntityType="Self.RecieptDetails" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
@@ -262,17 +262,13 @@
             <End Role="Particulars" EntitySet="Particulars" />
             <End Role="InvoiceParticulars" EntitySet="InvoiceParticulars" />
           </AssociationSet>
-          <AssociationSet Name="FK_InvoiceRecieptMapping_InvoiceRecieptMapping" Association="Self.FK_InvoiceRecieptMapping_InvoiceRecieptMapping">
-            <End Role="InvoiceRecieptMapping" EntitySet="InvoiceRecieptMapping" />
-            <End Role="InvoiceRecieptMapping1" EntitySet="InvoiceRecieptMapping" />
+          <AssociationSet Name="FK_InvoiceReciept_InvoiceDetails" Association="Self.FK_InvoiceReciept_InvoiceDetails">
+            <End Role="InvoiceDetails" EntitySet="InvoiceDetails" />
+            <End Role="InvoiceReciepts" EntitySet="InvoiceReciepts" />
           </AssociationSet>
           <AssociationSet Name="FK_InvoiceRecieptMapping_RecieptDetails" Association="Self.FK_InvoiceRecieptMapping_RecieptDetails">
             <End Role="RecieptDetails" EntitySet="RecieptDetails" />
-            <End Role="InvoiceRecieptMapping" EntitySet="InvoiceRecieptMapping" />
-          </AssociationSet>
-          <AssociationSet Name="FK_RecieptDetails_InvoiceDetails" Association="Self.FK_RecieptDetails_InvoiceDetails">
-            <End Role="InvoiceDetails" EntitySet="InvoiceDetails" />
-            <End Role="RecieptDetails" EntitySet="RecieptDetails" />
+            <End Role="InvoiceReciepts" EntitySet="InvoiceReciepts" />
           </AssociationSet>
           <AssociationSet Name="FK_User_Role_Roles" Association="Self.FK_User_Role_Roles">
             <End Role="Roles" EntitySet="Roles" />
@@ -287,8 +283,7 @@
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="RMNContext" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -308,16 +303,6 @@
           <Property Name="CompanyId" Type="Int32" />
           <Property Name="UserId" Type="Int32" />
         </EntityType>
-        <EntityType Name="Company_master">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CompanyName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="CompanyBanner" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
-          <Property Name="Address" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
-          <Property Name="IsActive" Type="Boolean" />
-        </EntityType>
         <EntityType Name="InvoiceDetail">
           <Key>
             <PropertyRef Name="Id" />
@@ -330,7 +315,8 @@
           <Property Name="CompanyId" Type="Int64" Nullable="false" />
           <NavigationProperty Name="User" Relationship="Self.FK_InvoiceDetails_Client" FromRole="InvoiceDetails" ToRole="Users" />
           <NavigationProperty Name="InvoiceParticulars" Relationship="Self.FK_InvoiceParticulars_InvoiceDetails" FromRole="InvoiceDetails" ToRole="InvoiceParticulars" />
-          <NavigationProperty Name="RecieptDetails" Relationship="Self.FK_RecieptDetails_InvoiceDetails" FromRole="InvoiceDetails" ToRole="RecieptDetails" />
+          <NavigationProperty Name="RecieptDetails" Relationship="RMNContext.FK_RecieptDetails_InvoiceDetails" FromRole="InvoiceDetail" ToRole="RecieptDetail" />
+          <NavigationProperty Name="InvoiceReciepts" Relationship="RMNContext.FK_InvoiceReciept_InvoiceDetails" FromRole="InvoiceDetail" ToRole="InvoiceReciept" />
         </EntityType>
         <EntityType Name="InvoiceParticular">
           <Key>
@@ -346,17 +332,6 @@
           <NavigationProperty Name="InvoiceDetail" Relationship="Self.FK_InvoiceParticulars_InvoiceDetails" FromRole="InvoiceParticulars" ToRole="InvoiceDetails" />
           <NavigationProperty Name="Particular" Relationship="Self.FK_InvoiceParticulars_Particulars" FromRole="InvoiceParticulars" ToRole="Particulars" />
         </EntityType>
-        <EntityType Name="InvoiceRecieptMapping">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="InvoiceId" Type="Int64" />
-          <Property Name="RecieptId" Type="Int64" />
-          <NavigationProperty Name="InvoiceRecieptMapping1" Relationship="Self.FK_InvoiceRecieptMapping_InvoiceRecieptMapping" FromRole="InvoiceRecieptMapping" ToRole="InvoiceRecieptMapping1" />
-          <NavigationProperty Name="InvoiceRecieptMapping2" Relationship="Self.FK_InvoiceRecieptMapping_InvoiceRecieptMapping" FromRole="InvoiceRecieptMapping1" ToRole="InvoiceRecieptMapping" />
-          <NavigationProperty Name="RecieptDetail" Relationship="Self.FK_InvoiceRecieptMapping_RecieptDetails" FromRole="InvoiceRecieptMapping" ToRole="RecieptDetails" />
-        </EntityType>
         <EntityType Name="Particular">
           <Key>
             <PropertyRef Name="Id" />
@@ -367,23 +342,6 @@
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UpdatedDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="InvoiceParticulars" Relationship="Self.FK_InvoiceParticulars_Particulars" FromRole="Particulars" ToRole="InvoiceParticulars" />
-        </EntityType>
-        <EntityType Name="RecieptDetail">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="RecieptNo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="InvoiceId" Type="Int64" Nullable="false" />
-          <Property Name="TotalAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
-          <Property Name="Discount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
-          <Property Name="BankName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="ChequeNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Status" Type="Boolean" />
-          <Property Name="UpdatedDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="InvoiceDetail" Relationship="Self.FK_RecieptDetails_InvoiceDetails" FromRole="RecieptDetails" ToRole="InvoiceDetails" />
-          <NavigationProperty Name="InvoiceRecieptMappings" Relationship="Self.FK_InvoiceRecieptMapping_RecieptDetails" FromRole="RecieptDetails" ToRole="InvoiceRecieptMapping" />
         </EntityType>
         <EntityType Name="Role">
           <Key>
@@ -458,18 +416,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_RecieptDetails_InvoiceDetails">
-          <End Role="InvoiceDetails" Type="Self.InvoiceDetail" Multiplicity="1" />
-          <End Role="RecieptDetails" Type="Self.RecieptDetail" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="InvoiceDetails">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="RecieptDetails">
-              <PropertyRef Name="InvoiceId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_InvoiceParticulars_Particulars">
           <End Role="Particulars" Type="Self.Particular" Multiplicity="1" />
           <End Role="InvoiceParticulars" Type="Self.InvoiceParticular" Multiplicity="*" />
@@ -479,30 +425,6 @@
             </Principal>
             <Dependent Role="InvoiceParticulars">
               <PropertyRef Name="ParticularId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_InvoiceRecieptMapping_InvoiceRecieptMapping">
-          <End Role="InvoiceRecieptMapping" Type="Self.InvoiceRecieptMapping" Multiplicity="1" />
-          <End Role="InvoiceRecieptMapping1" Type="Self.InvoiceRecieptMapping" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="InvoiceRecieptMapping">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="InvoiceRecieptMapping1">
-              <PropertyRef Name="id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_InvoiceRecieptMapping_RecieptDetails">
-          <End Role="RecieptDetails" Type="Self.RecieptDetail" Multiplicity="0..1" />
-          <End Role="InvoiceRecieptMapping" Type="Self.InvoiceRecieptMapping" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="RecieptDetails">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="InvoiceRecieptMapping">
-              <PropertyRef Name="RecieptId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -545,12 +467,9 @@
         <EntityContainer Name="RMNEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Client_Particular_Mapping" EntityType="Self.Client_Particular_Mapping" />
           <EntitySet Name="Company_Client_Mapping" EntityType="Self.Company_Client_Mapping" />
-          <EntitySet Name="Company_master" EntityType="Self.Company_master" />
           <EntitySet Name="InvoiceDetails" EntityType="Self.InvoiceDetail" />
           <EntitySet Name="InvoiceParticulars" EntityType="Self.InvoiceParticular" />
-          <EntitySet Name="InvoiceRecieptMappings" EntityType="Self.InvoiceRecieptMapping" />
           <EntitySet Name="Particulars" EntityType="Self.Particular" />
-          <EntitySet Name="RecieptDetails" EntityType="Self.RecieptDetail" />
           <EntitySet Name="Roles" EntityType="Self.Role" />
           <EntitySet Name="User_Role" EntityType="Self.User_Role" />
           <EntitySet Name="Users" EntityType="Self.User" />
@@ -563,21 +482,9 @@
             <End Role="InvoiceDetails" EntitySet="InvoiceDetails" />
             <End Role="InvoiceParticulars" EntitySet="InvoiceParticulars" />
           </AssociationSet>
-          <AssociationSet Name="FK_RecieptDetails_InvoiceDetails" Association="Self.FK_RecieptDetails_InvoiceDetails">
-            <End Role="InvoiceDetails" EntitySet="InvoiceDetails" />
-            <End Role="RecieptDetails" EntitySet="RecieptDetails" />
-          </AssociationSet>
           <AssociationSet Name="FK_InvoiceParticulars_Particulars" Association="Self.FK_InvoiceParticulars_Particulars">
             <End Role="Particulars" EntitySet="Particulars" />
             <End Role="InvoiceParticulars" EntitySet="InvoiceParticulars" />
-          </AssociationSet>
-          <AssociationSet Name="FK_InvoiceRecieptMapping_InvoiceRecieptMapping" Association="Self.FK_InvoiceRecieptMapping_InvoiceRecieptMapping">
-            <End Role="InvoiceRecieptMapping" EntitySet="InvoiceRecieptMappings" />
-            <End Role="InvoiceRecieptMapping1" EntitySet="InvoiceRecieptMappings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_InvoiceRecieptMapping_RecieptDetails" Association="Self.FK_InvoiceRecieptMapping_RecieptDetails">
-            <End Role="RecieptDetails" EntitySet="RecieptDetails" />
-            <End Role="InvoiceRecieptMapping" EntitySet="InvoiceRecieptMappings" />
           </AssociationSet>
           <AssociationSet Name="FK_User_Role_Roles" Association="Self.FK_User_Role_Roles">
             <End Role="Roles" EntitySet="Roles" />
@@ -591,8 +498,109 @@
             <End Role="UserTypes" EntitySet="UserTypes" />
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
-        </EntityContainer>
-      </Schema>
+          <EntitySet Name="InvoiceTrackings" EntityType="RMNContext.InvoiceTracking" />
+          <EntitySet Name="Company_master" EntityType="RMNContext.Company_master" />
+          <EntitySet Name="RecieptDetails" EntityType="RMNContext.RecieptDetail" />
+          <AssociationSet Name="FK_RecieptDetails_InvoiceDetails" Association="RMNContext.FK_RecieptDetails_InvoiceDetails">
+            <End Role="InvoiceDetail" EntitySet="InvoiceDetails" />
+            <End Role="RecieptDetail" EntitySet="RecieptDetails" />
+          </AssociationSet>
+          <EntitySet Name="InvoiceReciepts" EntityType="RMNContext.InvoiceReciept" />
+          <AssociationSet Name="FK_InvoiceReciept_InvoiceDetails" Association="RMNContext.FK_InvoiceReciept_InvoiceDetails">
+            <End Role="InvoiceDetail" EntitySet="InvoiceDetails" />
+            <End Role="InvoiceReciept" EntitySet="InvoiceReciepts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InvoiceRecieptMapping_RecieptDetails" Association="RMNContext.FK_InvoiceRecieptMapping_RecieptDetails">
+            <End Role="RecieptDetail" EntitySet="RecieptDetails" />
+            <End Role="InvoiceReciept" EntitySet="InvoiceReciepts" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="InvoiceTracking">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="InvoiceId" Type="Int32" Nullable="false" />
+          <Property Name="UserId" Type="Int32" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="Company_master">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CompanyName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyBanner" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="Address" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="IsActive" Type="Boolean" />
+          <Property Name="Type" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="PreferedColor" Type="Int32" />
+        </EntityType>
+        <EntityType Name="RecieptDetail">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="RecieptNo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="InvoiceId" Type="Int64" Nullable="false" />
+          <Property Name="TotalAmount" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+          <Property Name="Discount" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+          <Property Name="BankName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="ChequeNumber" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="Boolean" />
+          <Property Name="UpdatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="InvoiceDetail" Relationship="RMNContext.FK_RecieptDetails_InvoiceDetails" FromRole="RecieptDetail" ToRole="InvoiceDetail" />
+          <NavigationProperty Name="InvoiceReciepts" Relationship="RMNContext.FK_InvoiceRecieptMapping_RecieptDetails" FromRole="RecieptDetail" ToRole="InvoiceReciept" />
+        </EntityType>
+        <Association Name="FK_RecieptDetails_InvoiceDetails">
+          <End Type="RMNContext.InvoiceDetail" Role="InvoiceDetail" Multiplicity="1" />
+          <End Type="RMNContext.RecieptDetail" Role="RecieptDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="InvoiceDetail">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="RecieptDetail">
+              <PropertyRef Name="InvoiceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="InvoiceReciept">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="InvoiceId" Type="Int64" />
+          <Property Name="RecieptId" Type="Int64" />
+          <NavigationProperty Name="InvoiceDetail" Relationship="RMNContext.FK_InvoiceReciept_InvoiceDetails" FromRole="InvoiceReciept" ToRole="InvoiceDetail" />
+          <NavigationProperty Name="RecieptDetail" Relationship="RMNContext.FK_InvoiceRecieptMapping_RecieptDetails" FromRole="InvoiceReciept" ToRole="RecieptDetail" />
+        </EntityType>
+        <Association Name="FK_InvoiceReciept_InvoiceDetails">
+          <End Type="RMNContext.InvoiceDetail" Role="InvoiceDetail" Multiplicity="0..1" />
+          <End Type="RMNContext.InvoiceReciept" Role="InvoiceReciept" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="InvoiceDetail">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InvoiceReciept">
+              <PropertyRef Name="InvoiceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InvoiceRecieptMapping_RecieptDetails">
+          <End Type="RMNContext.RecieptDetail" Role="RecieptDetail" Multiplicity="0..1" />
+          <End Type="RMNContext.InvoiceReciept" Role="InvoiceReciept" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RecieptDetail">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InvoiceReciept">
+              <PropertyRef Name="RecieptId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -613,17 +621,6 @@
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Company_master">
-            <EntityTypeMapping TypeName="RMNContext.Company_master">
-              <MappingFragment StoreEntitySet="Company_master">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
-                <ScalarProperty Name="CompanyBanner" ColumnName="CompanyBanner" />
-                <ScalarProperty Name="Address" ColumnName="Address" />
-                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -652,15 +649,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="InvoiceRecieptMappings">
-            <EntityTypeMapping TypeName="RMNContext.InvoiceRecieptMapping">
-              <MappingFragment StoreEntitySet="InvoiceRecieptMapping">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="InvoiceId" ColumnName="InvoiceId" />
-                <ScalarProperty Name="RecieptId" ColumnName="RecieptId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Particulars">
             <EntityTypeMapping TypeName="RMNContext.Particular">
               <MappingFragment StoreEntitySet="Particulars">
@@ -668,22 +656,6 @@
                 <ScalarProperty Name="ParticularSF" ColumnName="ParticularSF" />
                 <ScalarProperty Name="ParticularFF" ColumnName="ParticularFF" />
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="RecieptDetails">
-            <EntityTypeMapping TypeName="RMNContext.RecieptDetail">
-              <MappingFragment StoreEntitySet="RecieptDetails">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="RecieptNo" ColumnName="RecieptNo" />
-                <ScalarProperty Name="InvoiceId" ColumnName="InvoiceId" />
-                <ScalarProperty Name="TotalAmount" ColumnName="TotalAmount" />
-                <ScalarProperty Name="Discount" ColumnName="Discount" />
-                <ScalarProperty Name="BankName" ColumnName="BankName" />
-                <ScalarProperty Name="ChequeNumber" ColumnName="ChequeNumber" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -731,6 +703,54 @@
                 <ScalarProperty Name="UserTypeName" ColumnName="UserTypeName" />
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
                 <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="InvoiceTrackings">
+            <EntityTypeMapping TypeName="RMNContext.InvoiceTracking">
+              <MappingFragment StoreEntitySet="InvoiceTrackings">
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="InvoiceId" ColumnName="InvoiceId" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Company_master">
+            <EntityTypeMapping TypeName="RMNContext.Company_master">
+              <MappingFragment StoreEntitySet="Company_master">
+                <ScalarProperty Name="PreferedColor" ColumnName="PreferedColor" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="CompanyBanner" ColumnName="CompanyBanner" />
+                <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RecieptDetails">
+            <EntityTypeMapping TypeName="RMNContext.RecieptDetail">
+              <MappingFragment StoreEntitySet="RecieptDetails">
+                <ScalarProperty Name="UpdatedDate" ColumnName="UpdatedDate" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ChequeNumber" ColumnName="ChequeNumber" />
+                <ScalarProperty Name="BankName" ColumnName="BankName" />
+                <ScalarProperty Name="Discount" ColumnName="Discount" />
+                <ScalarProperty Name="TotalAmount" ColumnName="TotalAmount" />
+                <ScalarProperty Name="RecieptNo" ColumnName="RecieptNo" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="InvoiceReciepts">
+            <EntityTypeMapping TypeName="RMNContext.InvoiceReciept">
+              <MappingFragment StoreEntitySet="InvoiceReciepts">
+                <ScalarProperty Name="RecieptId" ColumnName="RecieptId" />
+                <ScalarProperty Name="InvoiceId" ColumnName="InvoiceId" />
+                <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

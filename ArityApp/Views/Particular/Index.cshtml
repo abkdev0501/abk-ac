@@ -1,4 +1,5 @@
-﻿@{ 
+﻿@using Arity.Data.Helpers;
+@{ 
      Layout = "~/Views/Shared/_Layout.cshtml";
      ViewBag.Title = "Index";
 
@@ -35,7 +36,7 @@
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
                             <div class="breadcomb-report">
-                                @if (Convert.ToInt32(Session["UserTypeID"]) == (int)Arity.Service.Core.UserType.Admin)
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin)
                                 {
                                     <button onclick="AddEditParticular(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
                                 }

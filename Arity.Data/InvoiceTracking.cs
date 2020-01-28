@@ -12,10 +12,12 @@ namespace Arity.Data
     using System;
     using System.Collections.Generic;
     
-    public partial class InvoiceRecieptMapping
+    public partial class InvoiceTracking
     {
-        public long id { get; set; }
-        public Nullable<long> InvoiceId { get; set; }
-        public Nullable<long> RecieptId { get; set; }
+        public int id { get; set; }
+        public int InvoiceId { get; set; }
+        public Nullable<int> UserId { get; set; }
+        public string Comment { get; set; }
+        public Nullable<System.DateTime> CreatedAt { get; set; }
     }
 }

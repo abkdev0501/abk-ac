@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Arity.Data.Dto
 {
-  public class UsersDto
+    public class UsersDto
     {
         public string Username { get; set; }
         public string Password { get; set; }
@@ -19,5 +19,6 @@ namespace Arity.Data.Dto
         public System.DateTime UpdatedDated { get; set; }
         public long UserTypeId { get; set; }
         public long Id { get; set; }
+        public string UserType { get; set; }
     }
 }

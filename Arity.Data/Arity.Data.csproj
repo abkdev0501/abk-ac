@@ -45,6 +45,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -82,14 +83,23 @@
     <Compile Include="Dto\InvoiceEntry.cs" />
     <Compile Include="Dto\ParticularDto.cs" />
     <Compile Include="Dto\ReceiptDto.cs" />
+    <Compile Include="Dto\TrackingInformation.cs" />
+    <Compile Include="Dto\UserDTO.cs" />
     <Compile Include="Dto\UsersDto.cs" />
+    <Compile Include="Helpers\CurrencyToWord.cs" />
+    <Compile Include="Helpers\EnumHelper.cs" />
+    <Compile Include="Helpers\Funtion.cs" />
+    <Compile Include="Helpers\SessionHelper.cs" />
     <Compile Include="InvoiceDetail.cs">
       <DependentUpon>ArityModel.tt</DependentUpon>
     </Compile>
     <Compile Include="InvoiceParticular.cs">
       <DependentUpon>ArityModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="InvoiceRecieptMapping.cs">
+    <Compile Include="InvoiceReciept.cs">
+      <DependentUpon>ArityModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="InvoiceTracking.cs">
       <DependentUpon>ArityModel.tt</DependentUpon>
     </Compile>
     <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
@@ -114,7 +124,6 @@
     <Compile Include="User_Role.cs">
       <DependentUpon>ArityModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Vendor_User.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

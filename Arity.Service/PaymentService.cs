@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Arity.Service
 {
-   public class PaymentService : IPaymentService
+    public class PaymentService : IPaymentService
     {
 
         private readonly RMNEntities _dbContext;
@@ -32,7 +32,7 @@ namespace Arity.Service
                 exitingReceipt.ChequeNumber = receiptEntry.ChequeNumber;
                 exitingReceipt.BankName = receiptEntry.BankName;
 
-                _dbContext.InvoiceRecieptMappings.RemoveRange(await _dbContext.InvoiceRecieptMappings.Where(_ => _.RecieptId == exitingReceipt.Id).ToListAsync());
+                _dbContext.InvoiceReciepts.RemoveRange(await _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == exitingReceipt.Id).ToListAsync());
                 await _dbContext.SaveChangesAsync();
                 ReceiptId = exitingReceipt.Id;
             }
@@ -58,7 +58,7 @@ namespace Arity.Service
             {
                 foreach (var invoiceId in receiptEntry.InvoiceIds)
                 {
-                    _dbContext.InvoiceRecieptMappings.Add(new InvoiceRecieptMapping
+                    _dbContext.InvoiceReciepts.Add(new InvoiceReciept
                     {
                         RecieptId = ReceiptId,
                         InvoiceId = invoiceId
@@ -92,26 +92,42 @@ namespace Arity.Service
                         TotalAmount = receipt.TotalAmount,
                         Status = receipt.Status ?? false,
                         CreatedDateString = receipt.CreatedDate.ToString("MM/dd/yyyy"),
-                        InvoiceNumbers = string.Join(",", _dbContext.InvoiceDetails.Where(i => _dbContext.InvoiceRecieptMappings.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id)).Select(i => i.Invoice_Number).ToList())
+                        InvoiceNumbers = string.Join(",", _dbContext.InvoiceDetails.Where(i => _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id)).Select(i => i.Invoice_Number).ToList())
                     }).ToList();
         }
 
         public async Task<ReceiptDto> GetReceipt(int id)
         {
-            return (from receipt in _dbContext.RecieptDetails.ToList()
-                    where receipt.Id == id
-                    select new ReceiptDto()
-                    {
-                        ReceiptId = receipt.Id,
-                        ChequeNumber = receipt.ChequeNumber,
-                        BankName = receipt.BankName,
-                        Discount = receipt.Discount,
-                        RecieptNo = receipt.RecieptNo,
-                        TotalAmount = receipt.TotalAmount,
-                        Status = receipt.Status ?? false,
-                        CreatedDate = receipt.CreatedDate,
-                        InvoiceIds = _dbContext.InvoiceRecieptMappings.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList()
-                    }).FirstOrDefault();
+            var reciept = (from receipt in _dbContext.RecieptDetails.ToList()
+                           where receipt.Id == id
+                           select new ReceiptDto()
+                           {
+                               ReceiptId = receipt.Id,
+                               ChequeNumber = receipt.ChequeNumber,
+                               BankName = receipt.BankName,
+                               Discount = receipt.Discount,
+                               RecieptNo = receipt.RecieptNo,
+                               TotalAmount = receipt.TotalAmount,
+                               Status = receipt.Status ?? false,
+                               CreatedDate = receipt.CreatedDate,
+                               InvoiceIds = _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList(),
+                               Invoices = _dbContext.InvoiceDetails.Where(i => _dbContext.InvoiceReciepts
+                               .Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id))
+                               .Select(i => new InvoiceEntry
+                               {
+                                   InvoiceNumber = i.Invoice_Number,
+                                   ClientId = i.ClientId,
+                                   InvoiceId = i.Id,
+                                   CompanyId = i.CompanyId,
+                                   FullName = _dbContext.Users.FirstOrDefault(_ => _.Id == i.ClientId).FullName
+                               }).ToList()
+                           }).FirstOrDefault();
+            if (reciept != null)
+            {
+                long invoiceId = reciept.Invoices.FirstOrDefault().InvoiceId;
+                reciept.Year = _dbContext.InvoiceParticulars.FirstOrDefault(pm => invoiceId == pm.InvoiceId).year;
+            }
+            return reciept;
         }
     }
 }

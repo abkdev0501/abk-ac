@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace Arity.Data.Dto
 {
-   public class CompanyDto
+    public class CompanyDto
     {
         public int Id { get; set; }
         public string CompanyName { get; set; }
         public string CompanyBanner { get; set; }
         public string Address { get; set; }
         public Nullable<bool> IsActive { get; set; }
+        public string Type { get; set; }
+        public int? PreferedColor { get; set; }
     }
 }

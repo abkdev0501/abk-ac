@@ -55,20 +55,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccountService.cs" />
-    <Compile Include="Class1.cs" />
     <Compile Include="Contract\IAccountService.cs" />
     <Compile Include="Contract\IInvoiceService.cs" />
     <Compile Include="Contract\IParticularServices.cs" />
     <Compile Include="Contract\IPaymentService.cs" />
-    <Compile Include="Contract\IVendorServices.cs" />
     <Compile Include="Core\EnumHelper.cs" />
     <Compile Include="Core\Function.cs" />
     <Compile Include="Infrastructure\DocumentViewDownload.cs" />
     <Compile Include="InvoiceService.cs" />
     <Compile Include="ParticularServices.cs" />
     <Compile Include="PaymentService.cs" />
-    <Compile Include="PdfPCell.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserDTO.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Arity.Data\Arity.Data.csproj">

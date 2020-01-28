@@ -1,0 +1,203 @@
+﻿@model Arity.Data.Dto.UsersDto
+<form>
+    @Html.HiddenFor(_ => _.Id)
+    @Html.HiddenFor(_ => _.CreatedDate)
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Name<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.FullName, new { @class = "form-control input-sm", placeholder = "Enter name", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Address<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Address, new { @class = "form-control input-sm", placeholder = "Enter address", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">City<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.City, new { @class = "form-control input-sm", placeholder = "Enter city" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Pincode<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Pincode, new { @class = "form-control input-sm", placeholder = "Enter pincode" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Phone<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.PhoneNumber, new { @class = "form-control input-sm", placeholder = "Enter phone number" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Username<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-3 col-md-2 col-sm-2 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Username, new { @class = "form-control input-sm", placeholder = "Enter username" })
+                    </div>
+                </div>
+                @if (Model.Id <= 0)
+                {
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                        <label class="hrzn-fm">Password<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                    </div>
+                    <div class="col-lg-3 col-md-2 col-sm-2 col-xs-12">
+                        <div class="nk-int-st">
+                            @Html.PasswordFor(_ => _.Password, new { @class = "form-control input-sm", placeholder = "Enter password" })
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">User Type<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.UserTypeId, ViewBag.UserType as SelectList, "-- Select Type--", new { @class = "form-control input-sm", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="width:100%;text-align:center;padding: 25px 0 5px;">
+        <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.Id > 0 ? "Update" : "Add")</button>
+        <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
+    </div>
+</form>
+@if (Model != null && Model.Id > 0)
+{
+    <script>$("#UserType").val(@Model.UserTypeId)</script>
+}
+<script>
+
+    $("#btnAdd").click(function () {
+        var isValid = true;
+        if ($("#FullName").val() == null || $("#FullName").val() == "") {
+            Notification('', 'Please enter name', 'danger');
+            isValid = false;
+        }
+        else if ($("#Address").val() == null || $("#Address").val() == "") {
+            Notification('', 'Please enter address', 'danger');
+            isValid = false;
+        }
+        else if($("#Username").val() == null || $("#Username").val() == "") {
+            Notification('', 'Please enter username', 'danger');
+            isValid = false;
+        }
+        else if($("#UserTypeId").val() == null || $("#UserTypeId").val() == "") {
+                Notification('', 'Please enter user type', 'danger');
+                isValid = false;
+            }
+            @if (Model.Id <= 0)
+                    {
+                    @:if ($("#Password").val() == null || $("#Password").val() == "") {
+                        @:Notification('', 'Please enter password', 'danger');
+                        @:isValid = false;
+                    @:}
+                }
+
+
+
+            var data = JSON.stringify({
+                "user": {
+                    "FullName": $("#FullName").val(),
+                    "Id": $("#Id").val(),
+                    "Address": $("#Address").val(),
+                    "City": $("#City").val(),
+                    "PhoneNumber": $("#PhoneNumber").val(),
+                    "Pincode": $("#Pincode").val(),
+                    "Username": $("#Username").val(),
+                    "Password": $("#Password").val(),
+                    "UserTypeId": $("#UserTypeId").val()
+                }
+            });
+
+        if (isValid) {
+            $.ajax({
+                url: '@Url.Action("AddUpdateUser", "Home")',
+                dataType: "json",
+                type: "POST",
+                data:data,
+                cache: false,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    $("#loading").hide();
+                    if (response) {
+                        if (@Model.Id <= 0) {
+                            Notification('', 'User added successfuly', 'success');
+                        }
+                        else {
+                            Notification('', 'User updated successfuly', 'success');
+                        }
+                        table.ajax.reload();
+                        $("#modelUser").modal('toggle');
+                    }
+                    else {
+                         Notification('', 'Something went wrong, Please try again', 'danger');
+                    }
+                },
+                error: function (error) {
+                    $("#loading").hide();
+                    Notification('', 'Something went wrong, use different username', 'danger');
+                }
+            });
+        }
+    });
+
+</script>

@@ -1,4 +1,6 @@
-﻿<!doctype html>
+﻿@using Arity.Data.Helpers
+
+<!doctype html>
 <html class="no-js" lang="">
 
 <head>
@@ -80,12 +82,15 @@
                 </div>
 
                 <ul class="nav navbar-nav notika-top-nav">
-                    <li class="nav-item dropdown">
-                        <a href="/home/payment" style="font-size:15px;" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span>Payment</span></a>
+                    <li class="nav-item">
+                        <a href="/home/payment" style="font-size:15px;"  aria-expanded="false" class="nav-link"><span>Payment</span></a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a href="#" style="font-size:15px;" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnParticular"><span>Particular</span></a>
-                    </li>
+                    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                    {
+                        <li class="nav-item dropdown">
+                            <a href="#" style="font-size:15px;" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnParticular"><span>Particular</span></a>
+                        </li>
+                    }
                     <li class="nav-item dropdown">
                         <a href="#" style="font-size:15px;" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnHome"><span>Invoice</span></a>
                     </li>
@@ -205,7 +210,6 @@
         });
 
         $('#btnParticular').on("click", function () {
-            debugger
             $.ajax({
                 url: '@Url.Action("Index","Particular")',
                 dataType: "html",
@@ -219,7 +223,6 @@
         });
 
         $('#btnHome').on("click", function () {
-            debugger
             $.ajax({
                 url: '@Url.Action("Index","Home")',
                 dataType: "html",

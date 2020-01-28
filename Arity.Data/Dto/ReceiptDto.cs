@@ -22,5 +22,8 @@ namespace Arity.Data.Dto
         public long ReceiptMappingId { get; set; }
         public string CreatedDateString { get; set; }
         public string InvoiceNumbers { get; set; }
+        public string Year { get; set; }
+
+        public List<InvoiceEntry> Invoices { get; set; }
     }
 }

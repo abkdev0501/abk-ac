@@ -21,5 +21,10 @@ namespace Arity.Service.Contract
         Task DeleteInvoiceParticularEntry(int id);
         Task<DocumentViewDownload> DownloadInvoice(int id);
         Task<InvoiceEntry> GetInvoiceSingle(int invoiceId);
+        Task<List<TrackingInformation>> GetTrackingInformation(int invoiceId);
+        Task<bool> AddTrackingInformation(TrackingInformation trackingInformation);
+        Task<bool> RemoveInvoiceTracking(int trackingId);
+        Task<TrackingInformation> GetTrackingInformationById(int invoiceTrackingId);
+        Task<CompanyDto> GetCompanyDetailById(int companyId);
     }
 }

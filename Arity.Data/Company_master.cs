@@ -19,5 +19,7 @@ namespace Arity.Data
         public string CompanyBanner { get; set; }
         public string Address { get; set; }
         public Nullable<bool> IsActive { get; set; }
+        public string Type { get; set; }
+        public Nullable<int> PreferedColor { get; set; }
     }
 }

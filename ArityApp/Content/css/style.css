@@ -2033,17 +2033,17 @@ ul.wizard-nav-ac {
 
 .modal-dialog.modals-default {
     width: 720px;
-    margin-top: 110px;
+    margin-top: 55px;
 }
 
 .modal-dialog.modal-sm {
     width: 510px;
-    margin-top: 110px;
+    margin-top: 55px;
 }
 
 .modal-dialog.modal-large {
     width: 910px;
-    margin-top: 110px;
+    margin-top: 55px;
 }
 
     .modal-dialog.modals-default .modal-content, .modal-dialog.modal-sm .modal-content, .modal-dialog.modal-large .modal-content {
