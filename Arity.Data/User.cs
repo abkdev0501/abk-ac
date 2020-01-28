@@ -25,6 +25,5 @@ namespace Arity.Data
         public System.DateTime UpdatedDated { get; set; }
         public long UserTypeId { get; set; }
         public long Id { get; set; }
-    
     }
 }

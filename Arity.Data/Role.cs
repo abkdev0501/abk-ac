@@ -16,7 +16,5 @@ namespace Arity.Data
     {
         public string RoleName { get; set; }
         public long Id { get; set; }
-    
-        
     }
 }

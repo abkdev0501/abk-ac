@@ -17,6 +17,5 @@ namespace Arity.Data
         public long id { get; set; }
         public Nullable<long> InvoiceId { get; set; }
         public Nullable<long> RecieptId { get; set; }
-    
     }
 }

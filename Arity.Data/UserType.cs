@@ -18,6 +18,5 @@ namespace Arity.Data
         public string UserTypeName { get; set; }
         public System.DateTime CreatedDate { get; set; }
         public System.DateTime UpdatedDate { get; set; }
-    
     }
 }

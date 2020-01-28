@@ -15,6 +15,7 @@ namespace Arity.Data.Dto
         public string ParticularFF { get; set; }
 
         public DateTime CreatedDate { get; set; }
+        public string CreatedDateString { get; set; }
 
         public DateTime UpdatedDate { get; set; }
     }

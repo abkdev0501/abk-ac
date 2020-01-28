@@ -54,29 +54,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArityModel.Context.cs">
+    <Compile Include="ArityDB.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>ArityModel.Context.tt</DependentUpon>
+      <DependentUpon>ArityDB.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="ArityModel.cs">
+    <Compile Include="ArityDB.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
-    <Compile Include="ArityModel.Designer.cs">
+    <Compile Include="ArityDB.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>ArityModel.edmx</DependentUpon>
+      <DependentUpon>ArityDB.edmx</DependentUpon>
     </Compile>
     <Compile Include="Client_Particular_Mapping.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Company_Client_Mapping.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Company_master.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Dto\ClientParticularMappingDto.cs" />
     <Compile Include="Dto\CompanyDto.cs" />
@@ -92,62 +92,60 @@
     <Compile Include="Helpers\Funtion.cs" />
     <Compile Include="Helpers\SessionHelper.cs" />
     <Compile Include="InvoiceDetail.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
     <Compile Include="InvoiceParticular.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
     <Compile Include="InvoiceReciept.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
     <Compile Include="InvoiceTracking.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
     <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
     <Compile Include="Particular.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RecieptDetail.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Role.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
     <Compile Include="User.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
     <Compile Include="UserType.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
     <Compile Include="User_Role.cs">
-      <DependentUpon>ArityModel.tt</DependentUpon>
+      <DependentUpon>ArityDB.tt</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EntityDeploy Include="ArityModel.edmx">
+    <EntityDeploy Include="ArityDB.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>ArityModel.Designer.cs</LastGenOutput>
+      <LastGenOutput>ArityDB.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <None Include="ArityModel.edmx.diagram">
-      <DependentUpon>ArityModel.edmx</DependentUpon>
+    <None Include="ArityDB.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ArityDB.edmx</DependentUpon>
+      <LastGenOutput>ArityDB.Context.cs</LastGenOutput>
+    </None>
+    <None Include="ArityDB.edmx.diagram">
+      <DependentUpon>ArityDB.edmx</DependentUpon>
+    </None>
+    <None Include="ArityDB.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ArityDB.edmx</DependentUpon>
+      <LastGenOutput>ArityDB.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="ArityModel.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>ArityModel.edmx</DependentUpon>
-      <LastGenOutput>ArityModel.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="ArityModel.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>ArityModel.edmx</DependentUpon>
-      <LastGenOutput>ArityModel.cs</LastGenOutput>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
