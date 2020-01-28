@@ -19,7 +19,5 @@ namespace Arity.Data
         public long RoleId { get; set; }
         public System.DateTime CreatedDate { get; set; }
         public System.DateTime UpdatedDate { get; set; }
-    
-      
     }
 }

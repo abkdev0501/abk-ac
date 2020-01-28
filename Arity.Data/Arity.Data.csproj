@@ -81,6 +81,7 @@
     <Compile Include="Dto\ClientParticularMappingDto.cs" />
     <Compile Include="Dto\CompanyDto.cs" />
     <Compile Include="Dto\InvoiceEntry.cs" />
+    <Compile Include="Dto\InvoiceParticularDto.cs" />
     <Compile Include="Dto\ParticularDto.cs" />
     <Compile Include="Dto\ReceiptDto.cs" />
     <Compile Include="Dto\TrackingInformation.cs" />

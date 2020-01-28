@@ -14,8 +14,6 @@ namespace Arity.Data
     
     public partial class UserType
     {
-       
-    
         public long Id { get; set; }
         public string UserTypeName { get; set; }
         public System.DateTime CreatedDate { get; set; }

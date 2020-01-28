@@ -14,9 +14,6 @@ namespace Arity.Data
     
     public partial class User
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-      
-    
         public string Username { get; set; }
         public string Password { get; set; }
         public string FullName { get; set; }
@@ -29,6 +26,5 @@ namespace Arity.Data
         public long UserTypeId { get; set; }
         public long Id { get; set; }
     
-      
     }
 }

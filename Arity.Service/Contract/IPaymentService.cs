@@ -11,7 +11,7 @@ namespace Arity.Service.Contract
     {
         Task<List<ReceiptDto>> GetAllReceipts(DateTime from, DateTime to);
         Task<ReceiptDto> GetReceipt(int id);
-        Task<List<InvoiceEntry>> GetAllInvoice();
+        
         Task AddUpdateReceiptEntry(ReceiptDto receiptEntry);
     }
 }

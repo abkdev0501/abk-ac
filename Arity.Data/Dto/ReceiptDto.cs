@@ -25,5 +25,7 @@ namespace Arity.Data.Dto
         public string Year { get; set; }
 
         public List<InvoiceEntry> Invoices { get; set; }
+        public int CompanyId { get; set; }
+        public int ClientId { get; set; }
     }
 }

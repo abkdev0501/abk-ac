@@ -15,7 +15,7 @@ namespace Arity.Data
     public partial class Company_Client_Mapping
     {
         public int Id { get; set; }
-        public Nullable<int> CompanyId { get; set; }
-        public Nullable<int> UserId { get; set; }
+        public int CompanyId { get; set; }
+        public int UserId { get; set; }
     }
 }

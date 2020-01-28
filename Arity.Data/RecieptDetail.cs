@@ -14,7 +14,7 @@ namespace Arity.Data
     
     public partial class RecieptDetail
     {
-        public long Id { get; set; }
+       public long Id { get; set; }
         public System.DateTime CreatedDate { get; set; }
         public string RecieptNo { get; set; }
         public decimal TotalAmount { get; set; }

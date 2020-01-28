@@ -1,7 +1,45 @@
-﻿@model Arity.Data.Dto.ReceiptDto
+﻿
+@model Arity.Data.Dto.ReceiptDto
+
+@*<script src="~/Content/js/bootstrap.min.js"></script>
+    <script src="~/Content/js/bootstrap-select/bootstrap-select.js"></script>
+    <link href="~/Content/css/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet" />*@
+@*<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.js"></script>*@
 <form>
     @Html.HiddenFor(_ => _.ReceiptId)
     @Html.HiddenFor(_ => _.CreatedDate)
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Company<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.CompanyId, ViewBag.company as SelectList, "-- Select Company--", new { @class = "form-control input-sm", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Client<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.ClientId, ViewBag.client as SelectList, "-- Select Client--", new { @class = "form-control input-sm", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="form-example-int form-horizental">
         <div class="form-group">
             <div class="row">
@@ -10,12 +48,15 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
                     <div class="nk-int-st">
-                        @Html.DropDownListFor(_ => _.InvoiceIds, ViewBag.Invoice as MultiSelectList, "-- Select Invoice--", new { @class = "form-control input-sm", @required = "required", multiple = "multiple" })
+                        @Html.DropDownListFor(_ => _.InvoiceIds, ViewBag.Invoice as MultiSelectList, "-- Select Invoice--", new { @class = "form-control bootstrap-select", @required = "required", multiple = "multiple" })
+                        @*@Html.ListBoxFor(_ => _.InvoiceIds, ViewBag.Invoice as MultiSelectList, new { @class = "form-control input-sm selectpicker", @required = "required", multiple = "multiple" })*@
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="form-example-int form-horizental">
         <div class="form-group">
             <div class="row">
@@ -24,7 +65,7 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
                     <div class="nk-int-st">
-                        @Html.TextBoxFor(_ => _.Discount, new { @class = "form-control input-sm", placeholder = "Enter discount amount", @required = "required", @type = "number" })
+                        @Html.TextBoxFor(_ => _.Discount, new { @class = "form-control input-sm", placeholder = "Enter discount amount", @required = "required", @type = "number",onkeyup="finalAmount()" })
                     </div>
                 </div>
             </div>
@@ -38,9 +79,9 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
                     <div class="nk-int-st">
-                        @Html.TextBoxFor(_ => _.TotalAmount, new { @class = "form-control input-sm", placeholder = "Enter total amount", @required = "required", @type = "number" })
+                        @Html.TextBoxFor(_ => _.TotalAmount, new { @class = "form-control input-sm", placeholder = "Enter total amount", @required = "required", @type = "number",disabled="disabled" })
                     </div>
-                </div>
+                </div> 
             </div>
         </div>
     </div>
@@ -91,8 +132,14 @@
         <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
     </div>
 </form>
-<script>
 
+<script>
+    var actualTotal;
+
+    //$("#demo").dropdown({
+    //    debugger
+    //    data: Viewbag.invoice
+    //});
     $("#btnAdd").click(function () {
         var isValid = true;
         if ($("#InvoiceIds").val() == null || $("#InvoiceIds").val() == "") {
@@ -159,4 +206,70 @@
             });
         }
     });
+
+    //Get client by company
+    $("#CompanyId").on('change', function () {
+        $.ajax({
+            url: '@Url.Action("GetClientByCompany", "Home")',
+            dataType: "json",
+            type: "GET",
+            data: {companyId:$("#CompanyId").val()},
+            cache: false,
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                $("#ClientId").html("<option value>-- Select client --</option>");
+                $.each(response, function (i, client) {
+                    $("#ClientId").append($("<option />").val(client.Id).text(client.FullName));
+                });
+            },
+            error: function () {
+
+            },
+        });
+    });
+
+    //Get invoice by client
+    $("#ClientId").on('change', function () {
+        $.ajax({
+            url: '@Url.Action("GetInvoiceByClientAndCompany", "Home")',
+            dataType: "json",
+            type: "GET",
+            data: { clientId: $("#ClientId").val(), companyId: $("#CompanyId").val() },
+            cache: false,
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                $("#InvoiceIds").html("<option value>-- Select Invoices --</option>");
+                $.each(response, function (i, invoice) {
+                    $("#InvoiceIds").append($("<option />").val(invoice.InvoiceId).text(invoice.InvoiceNumber));
+                });
+            },
+            error: function () {
+
+            },
+        });
+    });
+
+    $("#InvoiceIds").on('change', function () {
+        $("#TotalAmount").val('');
+        $.ajax({
+            url: '@Url.Action("GetTotalOfInvoice","Home")',
+            dataType: "json",
+            type: "get",
+            traditional:true,
+            contentType: 'application/json; charset=utf-8',
+            data: {"invoices":$("#InvoiceIds").val()},
+            success: function (response) {
+                console.log(response)
+                actualTotal = response
+                finalAmount();
+            },
+
+        })
+    });
+
+    function finalAmount() {
+        var total = parseFloat(actualTotal) - Number($("#Discount").val())
+        console.log(total);
+        $("#TotalAmount").val(total);
+    }
 </script>

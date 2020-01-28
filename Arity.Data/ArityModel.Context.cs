@@ -25,7 +25,7 @@ namespace Arity.Data
         }
     
         public virtual DbSet<Client_Particular_Mapping> Client_Particular_Mapping { get; set; }
-        public virtual DbSet<Company_Client_Mapping> Company_Client_Mapping { get; set; }
+        public virtual DbSet<Company_master> Company_master { get; set; }
         public virtual DbSet<InvoiceDetail> InvoiceDetails { get; set; }
         public virtual DbSet<InvoiceParticular> InvoiceParticulars { get; set; }
         public virtual DbSet<Particular> Particulars { get; set; }
@@ -37,5 +37,6 @@ namespace Arity.Data
         public virtual DbSet<Company_master> Company_master { get; set; }
         public virtual DbSet<RecieptDetail> RecieptDetails { get; set; }
         public virtual DbSet<InvoiceReciept> InvoiceReciepts { get; set; }
+        public virtual DbSet<Company_Client_Mapping> Company_Client_Mapping { get; set; }
     }
 }

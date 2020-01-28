@@ -18,8 +18,8 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="CompanyId" Type="int" />
-          <Property Name="UserId" Type="int" />
+          <Property Name="CompanyId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="Company_master">
           <Key>
@@ -303,6 +303,16 @@
           <Property Name="CompanyId" Type="Int32" />
           <Property Name="UserId" Type="Int32" />
         </EntityType>
+        <EntityType Name="Company_master">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CompanyName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyBanner" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="Address" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="IsActive" Type="Boolean" />
+        </EntityType>
         <EntityType Name="InvoiceDetail">
           <Key>
             <PropertyRef Name="Id" />
@@ -466,6 +476,7 @@
         </Association>
         <EntityContainer Name="RMNEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Client_Particular_Mapping" EntityType="Self.Client_Particular_Mapping" />
+          <EntitySet Name="Company_master" EntityType="Self.Company_master" />
           <EntitySet Name="Company_Client_Mapping" EntityType="Self.Company_Client_Mapping" />
           <EntitySet Name="InvoiceDetails" EntityType="Self.InvoiceDetail" />
           <EntitySet Name="InvoiceParticulars" EntityType="Self.InvoiceParticular" />
@@ -601,6 +612,17 @@
           </ReferentialConstraint>
         </Association>
         </Schema>
+          <EntitySet Name="Company_Client_Mapping" EntityType="RMNContext.Company_Client_Mapping" />
+        </EntityContainer>
+        <EntityType Name="Company_Client_Mapping">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CompanyId" Type="Int32" Nullable="false" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+        </EntityType>
+      </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -621,6 +643,17 @@
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Company_master">
+            <EntityTypeMapping TypeName="RMNContext.Company_master">
+              <MappingFragment StoreEntitySet="Company_master">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
+                <ScalarProperty Name="CompanyBanner" ColumnName="CompanyBanner" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -751,6 +784,15 @@
                 <ScalarProperty Name="RecieptId" ColumnName="RecieptId" />
                 <ScalarProperty Name="InvoiceId" ColumnName="InvoiceId" />
                 <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Company_Client_Mapping">
+            <EntityTypeMapping TypeName="RMNContext.Company_Client_Mapping">
+              <MappingFragment StoreEntitySet="Company_Client_Mapping">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

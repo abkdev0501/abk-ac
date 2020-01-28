@@ -154,7 +154,7 @@
         }
     });
 
-     $("#CompanyId").on('change', function () {
+    $("#CompanyId").on('change', function () {
         $.ajax({
             url: '@Url.Action("GetClientByCompany", "Home")',
             dataType: "json",
