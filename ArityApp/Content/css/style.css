@@ -91,6 +91,8 @@ body {
     margin: 0 auto 15px
 }
 
+
+
 a:focus {
     outline: 0px solid
 }
@@ -2046,7 +2048,7 @@ ul.wizard-nav-ac {
 
 .modal-dialog.modal-large {
     width: 910px;
-    margin-top: 55px;
+    margin-top: 30px;
 }
 
     .modal-dialog.modals-default .modal-content, .modal-dialog.modal-sm .modal-content, .modal-dialog.modal-large .modal-content {
@@ -3810,7 +3812,7 @@ textarea.auto-size {
         background-color: #00c292;
         background-image: none;
         color: #fff;
-        padding: 5px 10px;
+        padding: 5px 15px;
     }
 
         .chosen-select-act .chosen-container-multi .chosen-choices li.search-choice span {

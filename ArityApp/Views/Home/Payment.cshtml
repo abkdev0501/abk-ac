@@ -23,6 +23,9 @@
         tr.shown td.details-control {
             background: url('/Content/images/details_close.png') no-repeat center center;
         }
+         .date-filter .filter-date-button {
+            width: 14%;
+        }
     </style>
 </head>
 
@@ -107,26 +110,35 @@
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
                             <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnFilterGrid">Search</button>
                         </div>
+                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
+                            <button type="button" class="btn btn-success notika-btn-success waves-effect" onclick="downloadPDF()">Export PDF</button>
+                        </div>
+                        @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                        {
+                            <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
+                                <button type="button" class="btn btn-success notika-btn-success waves-effect" onclick="downloadReciept()">Export Excel</button>
+                            </div>
+                        }
 
                     </div>
                     <div class="table-responsive">
                         <table id="tblPaymentHistory" class="table table-striped" style="width:100%;">
                             <thead>
                                 <tr>
+                                    <th style="width:5%;"><input type="checkbox" class="chkSelectAll" /></th>
                                     <th style="width:12%;">Invoice#</th>
                                     <th style="width:12%;">Receipt#</th>
                                     <th style="width:10%;">Discount</th>
-                                    <th style="width:10%;">Total Amount</th>
+                                    <th style="width:12%;">Total Amount</th>
                                     <th style="width:10%;">Date</th>
                                     <th style="width:10%;">Bank Name</th>
                                     <th style="width:10%;">Cheque#</th>
                                     <th style="width:9%;">Status</th>
-                                    <th style="width:7%;">Download</th>
                                     @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                     {
                                         <th style="width:9%;">Update</th>
                                     }
-                                    </tr>
+                                </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -169,6 +181,13 @@
                 "emptyTable": "No receipts found"
             },
             "columns": [
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                        return '<input type="checkbox" class="chkSelect" data-id="'+data.ReceiptId+'" data-toggle="tooltip" \>';
+                    }
+               },
                 { "data": "InvoiceNumbers" },
                 { "data": "RecieptNo" },
                 { "data": "Discount" },
@@ -177,13 +196,6 @@
                 { "data": "BankName" },
                 { "data": "ChequeNumber" },
                 { "data": "Status" },
-                {
-                    "orderable": false,
-                    "data": null,
-                    "render": function (data, type, full) {
-                        return '<button class="btn waves-effect" onclick="downloadPayment(' + data.ReceiptId + ')"><i class="fa fa-download" aria-hidden="true"></i></button>';
-                    }
-                },
                 @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                 {
                     @:{
@@ -200,11 +212,44 @@
 
          $("#btnFilterGrid").click(function () {
                 table.ajax.reload();
+         });
+
+         $(".chkSelectAll").change(function () {
+
+            $(".chkSelect").each(function ()
+            {
+                $(this).prop("checked",$(".chkSelectAll").is(":checked"));
+            });
+
         });
        });
 
-        function downloadPayment(id) {
-            window.open("/home/GenerateReciept/"+id);
+        function downloadReciept() {
+             var recieptIds = "";
+            $(".chkSelect").each(function () {
+                if ($(this).is(":checked")) {
+                    recieptIds = recieptIds + $(this).attr("data-id") + ",";
+                }
+            });
+            if (recieptIds === "") {
+                Notification('', 'Please select atleast one receipt', 'danger');
+                return;
+            }
+            window.open("/home/GenerateReciept/"+recieptIds);
+        }
+
+        function downloadPDF() {
+            var recieptIds = "";
+            $(".chkSelect").each(function () {
+                if ($(this).is(":checked")) {
+                    recieptIds = recieptIds + $(this).attr("data-id") + ",";
+                }
+            });
+            if (recieptIds === "") {
+                Notification('', 'Please select atleast one receipt', 'danger');
+                return;
+            }
+                window.open("/home/GenerateReceiptPDF/" + recieptIds);
         }
     </script>
 }
@@ -212,27 +257,6 @@
 @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
 {
     <script>
-         function RemvoeParticulars(id) {
-            if (confirm("Are you sure you want to delete this particular?")) {
-                $("#loading").show();
-            $.ajax({
-                url: '@Url.Action("RemoveInvoiceEntry", "Home")',
-                dataType: "json",   
-                type: "GET",
-                data: { id: id },
-                success: function (response) {
-                    $("#loading").hide();
-                     Notification('', 'Particular deleted successfuly', 'success');
-                    table.ajax.reload();
-                },
-                error: function (error) {
-                    $("#loading").hide();
-                    Notification('', 'Something went wrong, Please try again', 'danger');
-                }
-            });
-            }
-        }
-
         function AddUpdatePaymentEntry(id) {
               $("#loading").show();
             $.ajax({

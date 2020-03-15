@@ -1,5 +1,7 @@
 ﻿using Arity.Data;
 using Arity.Data.Dto;
+using Arity.Data.Entity;
+using Arity.Data.Helpers;
 using Arity.Service.Contract;
 using Arity.Service.Infrastructure;
 using System;
@@ -72,6 +74,8 @@ namespace Arity.Service
                     invoiceDetail.Invoice_Number = GenerateInvoiceNumber((int)invoiceDetail.CompanyId);
                     invoiceDetail.UpdatedDate = DateTime.Now;
                     invoiceDetail.CreatedDate = DateTime.Now;
+                    invoiceDetail.InvoiceDate = invoiceEntry.InvoiceDate;
+                    invoiceDetail.CreatedBy = Convert.ToInt32(SessionHelper.UserTypeId);
                     _dbContext.InvoiceDetails.Add(invoiceDetail);
                     await _dbContext.SaveChangesAsync();
                 }
@@ -83,6 +87,7 @@ namespace Arity.Service
                 invoiceParticular.UpdatedDate = DateTime.Now;
                 invoiceParticular.InvoiceId = invoiceDetail.Id;
                 invoiceParticular.ParticularId = invoiceEntry.ParticularId;
+                invoiceParticular.CreatedBy = Convert.ToInt32(SessionHelper.UserTypeId);
 
                 _dbContext.InvoiceParticulars.Add(invoiceParticular);
             }
@@ -117,33 +122,53 @@ namespace Arity.Service
                           {
                               ClientId = invoice.ClientId,
                               CompanyId = invoice.CompanyId,
-                              InvoiceId = invoice.Id
+                              InvoiceId = invoice.Id,
+                              InvoiceDate = invoice.InvoiceDate
                           }).FirstOrDefaultAsync();
         }
 
         public async Task<List<InvoiceEntry>> GetAllInvoice(DateTime fromDate, DateTime toDate)
         {
-            return (from invoice in _dbContext.InvoiceDetails.ToList()
-                    join user in _dbContext.Users.ToList() on invoice.ClientId equals user.Id
-                    where invoice.CreatedDate >= fromDate && invoice.CreatedDate <= toDate
-                    select new InvoiceEntry()
-                    {
-                        Amount = _dbContext.InvoiceParticulars.Where(_ => _.InvoiceId == invoice.Id).Sum(_ => (decimal?)_.Amount) ?? 0,
-                        CreatedDateString = invoice.CreatedDate.ToString("MM/dd/yyyy"),
-                        UpdatedDate = invoice.UpdatedDate,
-                        InvoiceNumber = invoice.Invoice_Number,
-                        InvoiceId = invoice.Id,
-                        Address = user.Address,
-                        City = user.City,
-                        FullName = user.FullName
-                    }).ToList();
+            if (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.User)
+                return (from invoice in _dbContext.InvoiceDetails.ToList()
+                        join user in _dbContext.Users.ToList() on invoice.ClientId equals user.Id
+                        where invoice.CreatedDate >= fromDate && invoice.CreatedDate <= toDate && invoice.ClientId == SessionHelper.UserId
+                        select new InvoiceEntry()
+                        {
+                            Amount = _dbContext.InvoiceParticulars.Where(_ => _.InvoiceId == invoice.Id).Sum(_ => (decimal?)_.Amount) ?? 0,
+                            CreatedDateString = invoice.CreatedDate.ToString("MM/dd/yyyy"),
+                            UpdatedDate = invoice.UpdatedDate,
+                            InvoiceNumber = invoice.Invoice_Number,
+                            InvoiceId = invoice.Id,
+                            Address = user.Address,
+                            City = user.City,
+                            FullName = user.FullName,
+                            CreatedBy = invoice.CreatedBy
+                        }).ToList();
+            else
+
+                return (from invoice in _dbContext.InvoiceDetails.ToList()
+                        join user in _dbContext.Users.ToList() on invoice.ClientId equals user.Id
+                        where invoice.CreatedDate >= fromDate && invoice.CreatedDate <= toDate
+                        select new InvoiceEntry()
+                        {
+                            Amount = _dbContext.InvoiceParticulars.Where(_ => _.InvoiceId == invoice.Id).Sum(_ => (decimal?)_.Amount) ?? 0,
+                            CreatedDateString = invoice.CreatedDate.ToString("MM/dd/yyyy"),
+                            UpdatedDate = invoice.UpdatedDate,
+                            InvoiceNumber = invoice.Invoice_Number,
+                            InvoiceId = invoice.Id,
+                            Address = user.Address,
+                            City = user.City,
+                            FullName = user.FullName,
+                            CreatedBy = invoice.CreatedBy
+                        }).ToList();
         }
 
         public async Task<List<InvoiceEntry>> GetAllInvoiceParticulars(int invoiceId)
         {
             return (from invoiceParticular in _dbContext.InvoiceParticulars.ToList()
                     join particular in _dbContext.Particulars.ToList() on invoiceParticular.ParticularId equals particular.Id
-                    where invoiceParticular.InvoiceId == invoiceId && particular.IsExclude == false
+                    where invoiceParticular.InvoiceId == invoiceId
                     select new InvoiceEntry()
                     {
                         Amount = invoiceParticular.Amount,
@@ -152,7 +177,9 @@ namespace Arity.Service
                         FFParticulars = particular.ParticularFF,
                         InvoiceParticularId = invoiceParticular.Id,
                         Year = invoiceParticular.year,
-                        InvoiceId = invoiceParticular.InvoiceId
+                        InvoiceId = invoiceParticular.InvoiceId,
+                        CreatedBy = invoiceParticular.CreatedBy,
+                        IsExclude = particular.IsExclude ?? false
                     }).ToList();
         }
 
@@ -179,10 +206,11 @@ namespace Arity.Service
                                                      Address = user.Address,
                                                      City = user.City,
                                                      FullName = user.FullName,
-                                                     CompanyId = invoice.CompanyId
+                                                     CompanyId = invoice.CompanyId,
+                                                     InvoiceDate = invoice.InvoiceDate
                                                  }).FirstOrDefault();
 
-            documentViewDownload.Particulars = await GetAllInvoiceParticulars(id);
+            documentViewDownload.Particulars = GetAllInvoiceParticulars(id).Result.Where(_ => _.IsExclude == false).ToList();
             return documentViewDownload;
         }
 
@@ -198,22 +226,18 @@ namespace Arity.Service
 
         public async Task<List<InvoiceEntry>> GetInvoiceByClientandCompany(int companyId, int clientId)
         {
-            return await (from invoice in _dbContext.InvoiceDetails
-                          join invoiceParti in _dbContext.InvoiceParticulars
-                          on invoice.Id equals invoiceParti.InvoiceId
-                          join parti in _dbContext.Particulars
-                          on invoiceParti.ParticularId equals parti.Id
-                          where (invoice.ClientId == clientId && invoice.CompanyId == companyId /*&& parti.isExcluded ==false*/)
-                          select new InvoiceEntry()
-                          {
-                              CompanyId = invoice.CompanyId,
-                              ClientId = invoice.ClientId,
-                              InvoiceId = invoice.Id,
-                              InvoiceNumber = invoice.Invoice_Number,
-                              ParticularId = invoiceParti.ParticularId,
-                              Amount = invoiceParti.Amount
+            var invoices = (from invoice in _dbContext.InvoiceDetails.ToList()
+                            where (invoice.ClientId == clientId && invoice.CompanyId == companyId)
+                            select new InvoiceEntry()
+                            {
+                                CompanyId = invoice.CompanyId,
+                                ClientId = invoice.ClientId,
+                                InvoiceNumber = invoice.Invoice_Number,
+                                InvoiceId = invoice.Id,
+                                Amount = _dbContext.InvoiceParticulars.Where(_ => _.InvoiceId == invoice.Id).Sum(_ => _.Amount)
 
-                          }).ToListAsync();
+                            }).Distinct().ToList();
+            return invoices;
         }
 
         #region company
@@ -261,7 +285,8 @@ namespace Arity.Service
                         TrackingId = tracking.id,
                         InvoiceId = tracking.InvoiceId,
                         Comment = tracking.Comment,
-                        CreatedAt = tracking.CreatedAt.Value.ToString("MM/dd/yyyy")
+                        CreatedAt = tracking.CreatedAt.Value.ToString("MM/dd/yyyy"),
+                        CreatedBy = tracking.CreatedBy
                     }).ToList();
         }
 
@@ -279,7 +304,8 @@ namespace Arity.Service
                     {
                         Comment = trackingInformation.Comment,
                         CreatedAt = DateTime.Now,
-                        InvoiceId = trackingInformation.InvoiceId
+                        InvoiceId = trackingInformation.InvoiceId,
+                        CreatedBy = Convert.ToInt32(SessionHelper.UserTypeId)
                     });
 
                 await _dbContext.SaveChangesAsync();
@@ -301,7 +327,8 @@ namespace Arity.Service
             {
                 TrackingId = trackingDetails.id,
                 Comment = trackingDetails.Comment,
-                InvoiceId = trackingDetails.InvoiceId
+                InvoiceId = trackingDetails.InvoiceId,
+                CreatedBy = trackingDetails.CreatedBy
             };
         }
 

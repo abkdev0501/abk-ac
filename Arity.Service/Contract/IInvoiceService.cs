@@ -1,10 +1,8 @@
-﻿using Arity.Data;
-using Arity.Data.Dto;
+﻿using Arity.Data.Dto;
+using Arity.Data.Entity;
 using Arity.Service.Infrastructure;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Arity.Service.Contract

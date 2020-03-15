@@ -50,7 +50,7 @@
 
     <div style="width:100%;text-align:center;padding: 25px 0 5px;">
         <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnOkParticular">@(Model.Id > 0 ? "Update" : "Add")</button>
-        <button type="button" class="btn btn-default notika-btn-default waves-effect" id="btnCancleParticular">Cancel</button>
+        <button type="button" class="btn btn-default notika-btn-default waves-effect" id="btnCancel">Cancel</button>
     </div>
 </form>
 
@@ -71,7 +71,7 @@
             $.ajax({
                 url: '@Url.Action("AddParticularToDB", "Particular")',
                 type: 'post',
-                data: { ID: $('#Id').val(), ParticularFF: $('#ParticularFF').val(), ParticularSF: $('#ParticularSF').val(),IsExlude:$("#IsExlude").val() },
+                data: { ID: $('#Id').val(), ParticularFF: $('#ParticularFF').val(), ParticularSF: $('#ParticularSF').val(),IsExclude:$("#IsExclude").is(":checked") },
                 success: function () {
                     $("#loading").hide();
                         if (@Model.Id <= 0) {

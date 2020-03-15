@@ -1,5 +1,7 @@
 ﻿using Arity.Data;
 using Arity.Data.Dto;
+using Arity.Data.Entity;
+using Arity.Data.Helpers;
 using Arity.Service.Contract;
 using System;
 using System.Collections.Generic;
@@ -48,7 +50,9 @@ namespace Arity.Service
                     CreatedDate = DateTime.Now,
                     Discount = receiptEntry.Discount,
                     ChequeNumber = receiptEntry.ChequeNumber,
-                    BankName = receiptEntry.BankName
+                    BankName = receiptEntry.BankName,
+                    CreatedBy = Convert.ToInt32(SessionHelper.UserTypeId),
+                    RecieptDate = receiptEntry.RecieptDate
                 };
                 _dbContext.RecieptDetails.Add(receiptDetail);
                 await _dbContext.SaveChangesAsync();
@@ -73,20 +77,54 @@ namespace Arity.Service
 
         public async Task<List<ReceiptDto>> GetAllReceipts(DateTime fromDate, DateTime toDate)
         {
-            return (from receipt in _dbContext.RecieptDetails.ToList()
-                    where receipt.CreatedDate >= fromDate && receipt.CreatedDate <= toDate
-                    select new ReceiptDto()
-                    {
-                        ReceiptId = receipt.Id,
-                        ChequeNumber = receipt.ChequeNumber,
-                        BankName = receipt.BankName,
-                        Discount = receipt.Discount,
-                        RecieptNo = receipt.RecieptNo,
-                        TotalAmount = receipt.TotalAmount,
-                        Status = receipt.Status ?? false,
-                        CreatedDateString = receipt.CreatedDate.ToString("MM/dd/yyyy"),
-                        InvoiceNumbers = string.Join(",", _dbContext.InvoiceDetails.Where(i => _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id)).Select(i => i.Invoice_Number).ToList())
-                    }).ToList();
+            if (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.User)
+            {
+                var receipts = (from receipt in _dbContext.RecieptDetails.ToList()
+                                where receipt.CreatedDate >= fromDate && receipt.CreatedDate <= toDate
+                                select new ReceiptDto()
+                                {
+                                    ReceiptId = receipt.Id,
+                                    ChequeNumber = receipt.ChequeNumber,
+                                    BankName = receipt.BankName,
+                                    Discount = receipt.Discount,
+                                    RecieptNo = receipt.RecieptNo,
+                                    TotalAmount = receipt.TotalAmount,
+                                    Status = receipt.Status ?? false,
+                                    CreatedDateString = receipt.CreatedDate.ToString("MM/dd/yyyy"),
+                                    InvoiceNumbers = string.Join(",", _dbContext.InvoiceDetails.Where(i => _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id)).Select(i => i.Invoice_Number).ToList())
+                                }).ToList();
+
+                var clientIds = (from rec in _dbContext.InvoiceReciepts.ToList()
+                                 join inv in _dbContext.InvoiceDetails on rec.InvoiceId equals inv.Id
+                                 where receipts.Any(_ => _.ReceiptId == rec.RecieptId) && inv.ClientId == SessionHelper.UserId
+                                 select new ReceiptDto
+                                 {
+                                     ReceiptId = rec.RecieptId ?? 0
+                                 }).Distinct().ToList();
+
+                if (clientIds.Count()==0)
+                    return new List<ReceiptDto>();
+
+                receipts.RemoveAll(_ => clientIds.Any(c => c.ReceiptId == _.ReceiptId));
+
+                return receipts;
+
+            }
+            else
+                return (from receipt in _dbContext.RecieptDetails.ToList()
+                        where receipt.CreatedDate >= fromDate && receipt.CreatedDate <= toDate
+                        select new ReceiptDto()
+                        {
+                            ReceiptId = receipt.Id,
+                            ChequeNumber = receipt.ChequeNumber,
+                            BankName = receipt.BankName,
+                            Discount = receipt.Discount,
+                            RecieptNo = receipt.RecieptNo,
+                            TotalAmount = receipt.TotalAmount,
+                            Status = receipt.Status ?? false,
+                            CreatedDateString = receipt.CreatedDate.ToString("MM/dd/yyyy"),
+                            InvoiceNumbers = string.Join(",", _dbContext.InvoiceDetails.Where(i => _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id)).Select(i => i.Invoice_Number).ToList())
+                        }).ToList();
         }
 
         public async Task<ReceiptDto> GetReceipt(int id)

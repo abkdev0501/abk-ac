@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Arity.Data.Helpers
 {
@@ -14,7 +11,7 @@ namespace Arity.Data.Helpers
 
         #region Encryption
 
-        public static string Encrypt_QueryString(string str)
+        public static string Encrypt(string str)
         {
             string EncrptKey = encyptPassword;
             byte[] byKey = { };
@@ -29,7 +26,7 @@ namespace Arity.Data.Helpers
             return Convert.ToBase64String(ms.ToArray());
         }
 
-        public static string Decrypt_QueryString(string str)
+        public static string Decrypt(string str)
         {
             str = str.Replace(" ", "+");
             string DecryptKey = encyptPassword;

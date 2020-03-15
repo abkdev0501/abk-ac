@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/ArityApp/App_Data/wkhtmltopdf
+/ArityApp/bin/Release/Publish
+/ArityApp/bin/Release

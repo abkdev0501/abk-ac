@@ -20,6 +20,10 @@
             cursor: pointer;
         }
 
+        .date-filter .filter-date-button {
+            width: 14%;
+        }
+
         tr.shown td.details-control {
             background: url('/Content/images/details_close.png') no-repeat center center;
         }
@@ -146,20 +150,31 @@
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
                             <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnFilterGrid">Search</button>
                         </div>
-
+                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
+                            <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnExportPDF" onclick="downloadPDF()">Export PDF</button>
+                        </div>
+                        @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                        {
+                            <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
+                                <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnExportExcel" onclick="downloadInvoice()">Export Excel</button>
+                            </div>
+                        }
                     </div>
                     <div class="table-responsive">
                         <table id="tblInvoiceHistory" class="table table-striped" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th style="width:5%;"></th>
-                                    <th style="width:5%;"></th>
+                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                    {
+                                        <th style="width:5%;"></th>
+                                    }
+                                    <th style="width:5%;"><input type="checkbox" class="chkSelectAll" /></th>
                                     <th style="width:10%;">Invoice#</th>
                                     <th style="width:20%;">Name</th>
                                     <th style="width:20%;">Address</th>
                                     <th style="width:10%;">Total Amount</th>
                                     <th style="width:7%;">Date</th>
-                                    <th style="width:5%;">Download</th>
                                     @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                     {
                                         <th style="width:5%;">Add Entry</th>
@@ -180,7 +195,7 @@
     <script>
     $(document).ready(function () {
 
-       table =  $('#tblInvoiceHistory').DataTable({
+        table = $('#tblInvoiceHistory').DataTable({
             "ajax": function (data, callback, settings) {
                 $.ajax({
                     url: '@Url.Action("LoadInvoiceHistory","Home")',
@@ -193,12 +208,12 @@
                     beforeSend: function (xhrObj) {
                         $("#loading").show();
                     }
-                    })
+                })
                     .done(function (data, textStatus, jqXHR) {
                         callback(data);
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        Notification('Error! ', ''+errorThrown+'', 'danger');
+                        Notification('Error! ', '' + errorThrown + '', 'danger');
                     })
                     .always(function (data, textStatus, jqXHR) {
                         $("#loading").hide();
@@ -207,35 +222,40 @@
             "language": {
                 "emptyTable": "No invoice found"
             },
-           "columns": [
+            "columns": [
                 {
-                "className":      'details-control',
-                "orderable":      false,
-                "data":           null,
-               'render': function (data, type, full, meta) {
-                            return '<button class="btn btn-success notika-btn-success waves-effect btn-particular"><i class="fa fa-plus-circle"></i></button>';
-                        }
+                    "className": 'details-control',
+                    "orderable": false,
+                    "data": null,
+                    'render': function (data, type, full, meta) {
+                        return '<button class="btn btn-success notika-btn-success waves-effect btn-particular"><i class="fa fa-plus-circle"></i></button>';
+                    }
+                },
+               @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                {
+
+               @:{
+               @: "className": 'tracking-control',
+               @: "orderable": false,
+               @: "data": null,
+               @: 'render': function (data, type, full, meta) {
+               @:             return '<button class="btn btn-primary btn-log"><i class="fa fa-plus-circle"></i> Logs</button>';
+               @:         }
+               @:},
+               }
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                        return '<input type="checkbox" class="chkSelect" data-id="'+data.InvoiceId+'" data-toggle="tooltip" \>';
+                    }
                },
-               {
-                "className":      'tracking-control',
-                "orderable":      false,
-                "data":           null,
-                'render': function (data, type, full, meta) {
-                            return '<button class="btn btn-primary btn-log"><i class="fa fa-plus-circle"></i> Logs</button>';
-                        }
-            },
                 { "data": "InvoiceNumber" },
                 { "data": "FullName" },
                 { "data": "Address" },
                 { "data": "Amount" },
                 { "data": "CreatedDateString" },
-                {
-                    "orderable": false,
-                    "data": null,
-                    "render": function (data, type, full) {
-                        return '<button class="btn  waves-effect" data-toggle="tooltip" data-placement="left" title="add payment entry" onclick="downloadInvoice(' + data.InvoiceId + ')"><i class="fa fa-download" aria-hidden="true"></i></button>';
-                    }
-               },
+
                 @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                 {
         @:{
@@ -257,7 +277,7 @@
             "order": [[5, "desc"]]
        });
 
-       $('#tblInvoiceHistory tbody').on('click', 'td.details-control', function () {
+        $('#tblInvoiceHistory tbody').on('click', 'td.details-control', function () {
         var tr = $(this).closest('tr');
         var row = table.row(tr);
 
@@ -276,7 +296,7 @@
         }
        });
 
-          $('#tblInvoiceHistory tbody').on('click', 'td.tracking-control', function () {
+        $('#tblInvoiceHistory tbody').on('click', 'td.tracking-control', function () {
         var tr = $(this).closest('tr');
         var row = table.row(tr);
 
@@ -294,6 +314,15 @@
 
         $("#btnFilterGrid").click(function () {
              table.ajax.reload();
+        });
+
+        $(".chkSelectAll").change(function () {
+
+            $(".chkSelect").each(function ()
+            {
+                $(this).prop("checked",$(".chkSelectAll").is(":checked"));
+            });
+
         });
     });
 
@@ -319,9 +348,21 @@
                                         '<td>' + data.Amount + '</td>' +
                                         '<td>' + data.Year + '</td>';
 
-                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin)
+                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                     {
+                                        @:if (data.CreatedBy == @SessionHelper.UserTypeId)
+                                        @: {
                                           @:html += '<td>' + data.CreatedDateString + '</td><td><i style="cursor:pointer;" class="fa fa-edit" onclick="AddUpdateInvoiceEntry(' + data.InvoiceParticularId + ',' + data.InvoiceId + ')"></i></td><td><i style="cursor:pointer;" class="fa fa-trash" onclick="RemvoeParticulars(' + data.InvoiceParticularId + ')"></i></td>';
+                                        @:}
+                                        @:else if (@((int)Arity.Service.Core.UserType.MasterAdmin) === @SessionHelper.UserTypeId)
+                                        @: {
+                                          @:html += '<td>' + data.CreatedDateString + '</td><td><i style="cursor:pointer;" class="fa fa-edit" onclick="AddUpdateInvoiceEntry(' + data.InvoiceParticularId + ',' + data.InvoiceId + ')"></i></td><td><i style="cursor:pointer;" class="fa fa-trash" onclick="RemvoeParticulars(' + data.InvoiceParticularId + ')"></i></td>';
+                                        @:}
+                                         @:else
+                                        @: {
+                                          @:html += '<td colspan="3">' + data.CreatedDateString + '</td>';
+                                        @:}
+
                                         }
                                     else {
                                          @:html += '<td colspan="3">' + data.CreatedDateString + '</td>';
@@ -338,7 +379,7 @@
             return html;
         }
 
-         function trackingLog(invoice) {
+        function trackingLog(invoice) {
           var html = '<div class="child-heading">Invoice tracking information</div><table cellpadding="5" cellspacing="0" border="0" style="margin-left:5%;width:90%;    border: 1px solid #eee;margin-bottom: 2%;"><tr><th>Information</th><th>Date</th><th></th><th></th></tr>';
              $.ajax({
                         url: "@Url.Action("GetInvoiceTrackingInformation", "Home")",
@@ -350,7 +391,7 @@
                         if (response != null) {
                             if (response.length <= 0) {
                                 html += '<tr>' +
-                                    '<td colspan="4" align="center">Logs not found</td>' +
+                                    '<td colspan="4" align="center">No logs found</td>' +
                                     '</tr>';
                             }
                             else {
@@ -358,9 +399,20 @@
                                     html += '<tr>' +
                                         '<td>' + data.Comment + '</td>' ;
 
-                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin)
+                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                     {
+                                        @:if (data.CreatedBy == @SessionHelper.UserTypeId)
+                                        @: {
                                           @:html += '<td>' + data.CreatedAt + '</td><td><i style="cursor:pointer;" class="fa fa-edit" onclick="AddUpdateInvoiceTracking(' + data.TrackingId + ',' + data.InvoiceId + ')"></i></td><td><i style="cursor:pointer;" class="fa fa-trash" onclick="RemvoeTracking(' + data.TrackingId + ')"></i></td>';
+                                        @:}
+                                        @:else if(@((int)Arity.Service.Core.UserType.MasterAdmin) === @SessionHelper.UserTypeId)
+                                        @: {
+                                          @:html += '<td>' + data.CreatedAt + '</td><td><i style="cursor:pointer;" class="fa fa-edit" onclick="AddUpdateInvoiceTracking(' + data.TrackingId + ',' + data.InvoiceId + ')"></i></td><td><i style="cursor:pointer;" class="fa fa-trash" onclick="RemvoeTracking(' + data.TrackingId + ')"></i></td>';
+                                        @:}
+                                         @:else
+                                        @: {
+                                          @:html += '<td colspan="3">' + data.CreatedAt + '</td>';
+                                        @:}
                                         }
                                     else {
                                          @:html += '<td colspan="3">' + data.CreatedAt + '</td>';
@@ -377,10 +429,32 @@
             return html;
         }
 
+        function downloadInvoice() {
+            var invoiceIds = "";
+            $(".chkSelect").each(function () {
+                if ($(this).is(":checked")) {
+                    invoiceIds = invoiceIds + $(this).attr("data-id") + ",";
+                }
+            });
+            if (invoiceIds === "") {
+                Notification('', 'Please select atleast one invoice', 'danger');
+                return;
+            }
+                window.open("/home/GenerateInvoice/" + invoiceIds);
+        }
 
-
-        function downloadInvoice(id) {
-            window.open("/home/GenerateInvoice/"+id);
+         function downloadPDF() {
+            var invoiceIds = "";
+            $(".chkSelect").each(function () {
+                if ($(this).is(":checked")) {
+                    invoiceIds = invoiceIds + $(this).attr("data-id") + ",";
+                }
+            });
+            if (invoiceIds === "") {
+                Notification('', 'Please select atleast one invoice', 'danger');
+                return;
+            }
+                window.open("/home/GeneratePDF/" + invoiceIds);
         }
     </script>
 }
@@ -388,7 +462,7 @@
 @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
 {
     <script>
-         function RemvoeParticulars(id) {
+        function RemvoeParticulars(id) {
             if (confirm("Are you sure you want to delete this particular?")) {
                 $("#loading").show();
             $.ajax({
@@ -429,7 +503,6 @@
                 }
             });
         }
-
 
         function AddUpdateInvoiceTracking(trackingId,invoiceId) {
               $("#loading").show();

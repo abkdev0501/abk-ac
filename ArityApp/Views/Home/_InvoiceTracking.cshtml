@@ -19,13 +19,13 @@
     </div>
     
     <div style="width:100%;text-align:center;padding: 25px 0 5px;">
-        <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.TrackingId > 0 ? "Update" : "Add")</button>
+        <button id="btnAddTracking" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.TrackingId > 0 ? "Update" : "Add")</button>
         <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
     </div>
 </form>
 <script>
 
-    $("#btnAdd").click(function () {
+    $("#btnAddTracking").click(function () {
         var isValid = true;
         if ($("#Comment").val() == null || $("#Comment").val() == "") {
             Notification('', 'Please enter comment', 'danger');

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Arity.Data.Dto
 {
@@ -27,5 +24,7 @@ namespace Arity.Data.Dto
         public List<InvoiceEntry> Invoices { get; set; }
         public long CompanyId { get; set; }
         public long ClientId { get; set; }
+        public DateTime RecieptDate { get; set; }
+        public int CreatedBy { get; set; }
     }
 }

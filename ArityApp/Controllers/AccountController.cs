@@ -1,4 +1,5 @@
 ﻿using Arity.Data;
+using Arity.Data.Entity;
 using Arity.Data.Helpers;
 using Arity.Service;
 using Arity.Service.Contract;
@@ -43,13 +44,13 @@ namespace ArityApp.Controllers
             if (!string.IsNullOrEmpty(user.Password) && !string.IsNullOrEmpty(user.Username))
             {
                 _accountService = new AccountService();
-                var validUser = await _accountService.Login(user.Username, Functions.Encrypt_QueryString(user.Password));
+                var validUser = await _accountService.Login(user.Username, Functions.Encrypt(user.Password));
                 if (validUser != null)
                 {
                     FormsAuthentication.SetAuthCookie(validUser.Username, false);
                     SessionHelper.UserId = validUser.Id;
                     SessionHelper.UserTypeId = validUser.UserTypeId;
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Dashboard", "Home");
                 }
                 ViewBag.Message = "Invalid Credential";
             }

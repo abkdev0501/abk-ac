@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Arity.Data;
 using Arity.Data.Dto;
+using Arity.Data.Entity;
 using Arity.Service.Contract;
 namespace Arity.Service
 {

@@ -18,7 +18,7 @@ namespace ArityApp
                 url: "invoice",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
-            
+
             routes.MapRoute(
                 name: "particular",
                 url: "particular",
@@ -35,6 +35,12 @@ namespace ArityApp
                 url: "user",
                 defaults: new { controller = "Home", action = "Users", id = UrlParameter.Optional }
             );
+
+            routes.MapRoute(
+              name: "dashboard",
+              url: "dashboard",
+              defaults: new { controller = "Home", action = "Dashboard", id = UrlParameter.Optional }
+          );
 
             routes.MapRoute(
                 name: "Default",

@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Arity.Data.Dto
 {
-   public class InvoiceEntry
+    public class InvoiceEntry
     {
         public long InvoiceId { get; set; }
         public long InvoiceParticularId { get; set; }
@@ -24,5 +20,8 @@ namespace Arity.Data.Dto
         public string CreatedDateString { get; set; }
         public string SFParticulars { get; set; }
         public string FFParticulars { get; set; }
+        public int CreatedBy { get; set; }
+        public DateTime InvoiceDate{ get; set; }
+        public bool IsExclude { get; set; }
     }
 }

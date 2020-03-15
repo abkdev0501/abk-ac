@@ -1,5 +1,10 @@
 ﻿@using Arity.Data.Helpers
-
+@{
+    if (SessionHelper.UserTypeId <= 0 || SessionHelper.UserId <= 0)
+    {
+        <script>location.href = "/account/login";</script>
+    }
+}
 <!doctype html>
 <html class="no-js" lang="">
 
@@ -62,9 +67,18 @@
     <!-- responsive CSS
         ============================================ -->
     <link rel="stylesheet" href="/Content/css/responsive.css">
+    <!-- main CSS
+    ============================================ -->
+    <link rel="stylesheet" href="css/chosen/chosen.css">
     <!-- modernizr JS
         ============================================ -->
     <script src="/Content/js/vendor/modernizr-2.8.3.min.js"></script>
+    <style>
+        .no-rights {
+            pointer-events: none;
+        }
+        
+    </style>
 </head>
 
 <body>
@@ -83,24 +97,27 @@
 
                 <ul class="nav navbar-nav notika-top-nav">
                     <li class="nav-item">
-                        <a href="/Home/Payment" style="font-size:15px;" class="nav-link"><span>Payment</span></a>
+                        <a href="/Home/Index" style="font-size:15px;" class="nav-link" id="btnHome"><span>Invoice</span></a>
                     </li>
-                    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                    <li class="nav-item">
+                        <a href="/Home/Payment" style="font-size:15px;" class="nav-link"><span>Receipt</span></a>
+                    </li>
+                    @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin || Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
                     {
                         <li class="nav-item">
-                            <a href="/user" style="font-size:15px;" class="nav-link"><span>User</span></a>
+                            <a href="/task/index" style="font-size:15px;" class="nav-link"><span>Task</span></a>
                         </li>
                         <li class="nav-item">
                             <a href="/particular" style="font-size:15px;" class="nav-link"><span>Particular</span></a>
                         </li>
+                        <li class="nav-item">
+                            <a href="/user" style="font-size:15px;" class="nav-link"><span>User</span></a>
+                        </li>
                     }
                     <li class="nav-item">
-                        <a href="/Home/Index" style="font-size:15px;" class="nav-link" id="btnHome"><span>Invoice</span></a>
+                        <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnProfile"><span><i class="notika-icon notika-support"></i></span></a>
                     </li>
-                    <li class="nav-item">
-                        <a href="#"  data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnProfile"><span><i class="notika-icon notika-support"></i></span></a>
-                    </li>
-                    <li><a href="#" id="logout"  class="nav-link" ><span><i class="fa fa-sign-in" aria-hidden="true"></i></span></a></li>
+                    <li><a href="#" id="logout" class="nav-link"><span><i class="fa fa-sign-in" aria-hidden="true"></i></span></a></li>
                 </ul>
 
                 <div>
@@ -201,6 +218,10 @@
 
     <script src="/Content/js/data-table/jquery.dataTables.min.js"></script>
     <script src="/Content/js/data-table/data-table-act.js"></script>
+
+    <!--  chosen JS
+       ============================================ -->
+    <script src="/Content/js/chosen/chosen.jquery.js"></script>
     @RenderSection("scripts", required: false)
     <script>
         $("#logout").click(function () {
@@ -217,6 +238,15 @@
                 }
             });
         });
+
+        $("body").on("click","#btnCancel",function () {
+            $(".close").trigger("click");
+        });
+
+        function validateEmail(email) {
+            var re = /^(([^<>()\[\]\\.,;:\s@@"]+(\.[^<>()\[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
+        }
     </script>
 </body>
 </html>

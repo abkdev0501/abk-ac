@@ -36,7 +36,7 @@
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
                             <div class="breadcomb-report">
-                                @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.Admin)
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                 {
                                     <button id="btnAddInvoiceEntry" onclick="AddUpdateUser(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
                                 }
@@ -163,16 +163,21 @@
                 { "data": "PhoneNumber" },
                 { "data": "Pincode" },
                 { "data": "UserType" },
-                { "data": "UserType" },
+                { "data": "Active" },
                 {
                     "orderable": false,
                     "data": null,
                     "render": function (data, type, full) {
+                        if(data.CreatedBy == @SessionHelper.UserTypeId)
                             return '<button class="btn waves-effect" onclick="AddUpdateUser(' + data.Id + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                        else if(@((int)Arity.Service.Core.UserType.MasterAdmin) === @SessionHelper.UserTypeId)
+                            return '<button class="btn waves-effect" onclick="AddUpdateUser(' + data.Id + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                        else
+                            return '';
                     }
                 }
             ],
-            "order": [[1, "desc"]]
+            "order": []
        });
 
          $("#btnFilterGrid").click(function () {

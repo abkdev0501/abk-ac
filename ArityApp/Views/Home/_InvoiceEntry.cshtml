@@ -3,6 +3,7 @@
     @Html.HiddenFor(_ => _.InvoiceId)
     @Html.HiddenFor(_ => _.InvoiceParticularId)
     @Html.HiddenFor(_ => _.CreatedDate)
+    @Html.HiddenFor(_ => _.CreatedBy)
 
     <div class="form-example-int form-horizental">
         <div class="form-group">
@@ -10,7 +11,7 @@
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                     <label class="hrzn-fm">Company<span style="color:red;vertical-align:text-bottom;">*</span></label>
                 </div>
-                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(Model.InvoiceId>0?"onlyviewmode":"")">
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(Model.CompanyId > 0?"no-rights":"")">
                     <div class="nk-int-st">
                         @Html.DropDownListFor(_ => _.CompanyId, ViewBag.company as SelectList, "-- Select Company--", new { @class = "form-control input-sm", @required = "required" })
                     </div>
@@ -25,7 +26,7 @@
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                     <label class="hrzn-fm">Client<span style="color:red;vertical-align:text-bottom;">*</span></label>
                 </div>
-                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(Model.InvoiceId>0?"onlyviewmode":"")">
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(Model.CompanyId > 0?"no-rights":"")">
                     <div class="nk-int-st">
                         @Html.DropDownListFor(_ => _.ClientId, ViewBag.Client as SelectList, "-- Select Client--", new { @class = "form-control input-sm", @required = "required" })
                     </div>
@@ -39,7 +40,7 @@
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                     <label class="hrzn-fm">Particular<span style="color:red;vertical-align:text-bottom;">*</span></label>
                 </div>
-                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 cls-particular @(Model.ParticularId > 0?"no-rights":"")">
                     <div class="nk-int-st">
                         @Html.DropDownListFor(_ => _.ParticularId, ViewBag.Particular as SelectList, "-- Select Particular--", new { @class = "form-control input-sm", @required = "required" })
                     </div>
@@ -75,24 +76,35 @@
             </div>
         </div>
     </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group ">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Invoice Date<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 nk-datapk-ctm form-elet-mg filter-date @(Model.CompanyId > 0?"no-rights":"")">
+                    <div class="nk-int-st date">
+                        @Html.TextBox("InvoiceDate", Model.InvoiceDate.ToString("mm/dd/yyyy"),new { @class = "form-control input-sm", placeholder = "Select invoice date" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div style="width:100%;text-align:center;padding: 25px 0 5px;">
         <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.InvoiceParticularId > 0 ? "Update" : "Add")</button>
         <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
     </div>
 </form>
-@if (Model != null && Model.InvoiceId > 0)
-{
-    <script>$("#ClientId").attr("readonly","readonly")</script>
-}
-<script>
 
+<script>
+      $("#InvoiceDate").datepicker();
     $("#btnAdd").click(function () {
         var isValid = true;
         if ($("#CompanyId").val() == null || $("#CompanyId").val() == "") {
             Notification('', 'Please select Company', 'danger');
             isValid = false;
         }
-        if ($("#ClientId").val() == null || $("#ClientId").val() == "") {
+        else if ($("#ClientId").val() == null || $("#ClientId").val() == "") {
             Notification('', 'Please select client', 'danger');
             isValid = false;
         }
@@ -108,6 +120,10 @@
             Notification('', 'Please enter year', 'danger');
             isValid = false;
         }
+        else if ($("#InvoiceDate").val() == null || $("#InvoiceDate").val() == "") {
+            Notification('', 'Please select invoie date', 'danger');
+            isValid = false;
+        }
 
         var data = JSON.stringify({
             "invoiceEntry": {
@@ -118,7 +134,9 @@
                 "Year": $("#Year").val(),
                 "InvoiceId": $("#InvoiceId").val(),
                 "CreatedDate": $("#CreatedDate").val(),
-                "InvoiceParticularId": $("#InvoiceParticularId").val()
+                "InvoiceParticularId": $("#InvoiceParticularId").val(),
+                "CreatedBy": $("#CreatedBy").val(),
+                "InvoiceDate": $("#InvoiceDate").val()
             }
         });
 
@@ -133,14 +151,26 @@
                 success: function (response) {
                     $("#loading").hide();
                     if (response) {
-                        if (@Model.InvoiceParticularId <= 0) {
+                        if (@Model.InvoiceId <= 0) {
                             Notification('', 'Invoice entry added successfuly', 'success');
+                             table.ajax.reload();
+                            $("#modelInvoiceEntry").modal('toggle');
                         }
                         else {
-                            Notification('', 'Invoice entry updated successfuly', 'success');
+                            if (@Model.InvoiceParticularId <= 0) {
+                                   Notification('', 'Invoice entry added successfuly', 'success');
+                            }
+                            else {
+                                Notification('', 'Invoice entry updated successfuly', 'success');
+                            }
+                            $("#ParticularId").val("");
+                            $("#Amount").val("");
+                            $("#Year").val("");
+                            $("#InvoiceParticularId").val(0);
+                            $(".cls-particular").removeClass("no-rights");
+                            $("#btnAdd").html("Add");
                         }
-                        table.ajax.reload();
-                        $("#modelInvoiceEntry").modal('toggle');
+
                     }
                     else {
                          Notification('', 'Something went wrong, Please try again', 'danger');

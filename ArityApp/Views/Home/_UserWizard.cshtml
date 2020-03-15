@@ -1,7 +1,30 @@
 ﻿@model Arity.Data.Dto.UsersDto
+@using Arity.Data.Helpers;
+@{
+
+    string IsAllowed()
+    {
+        if (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.MasterAdmin)
+            return "";
+
+        if (Model.Id > 0 && Model.CreatedBy != SessionHelper.UserTypeId)
+            return "no-rights";
+        return "denied";
+    }
+}
+<style>
+    .chosen-container {
+        width: 100% !important;
+    }
+
+    .search-field input {
+        width: 100% !important;
+    }
+</style>
 <form>
     @Html.HiddenFor(_ => _.Id)
     @Html.HiddenFor(_ => _.CreatedDate)
+    @Html.HiddenFor(_ => _.CreatedBy)
 
     <div class="form-example-int form-horizental">
         <div class="form-group">
@@ -12,6 +35,21 @@
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
                     <div class="nk-int-st">
                         @Html.TextBoxFor(_ => _.FullName, new { @class = "form-control input-sm", placeholder = "Enter name", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Email<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Email, new { @class = "form-control input-sm", placeholder = "Enter email", @required = "required" })
                     </div>
                 </div>
             </div>
@@ -86,14 +124,14 @@
                         @Html.TextBoxFor(_ => _.Username, new { @class = "form-control input-sm", placeholder = "Enter username" })
                     </div>
                 </div>
-                @if (Model.Id <= 0)
+                @if (Model.Id <= 0 || string.IsNullOrEmpty(IsAllowed()))
                 {
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                         <label class="hrzn-fm">Password<span style="color:red;vertical-align:text-bottom;">*</span></label>
                     </div>
                     <div class="col-lg-3 col-md-2 col-sm-2 col-xs-12">
                         <div class="nk-int-st">
-                            @Html.PasswordFor(_ => _.Password, new { @class = "form-control input-sm", placeholder = "Enter password" })
+                            @Html.TextBoxFor(_ => _.Password, new { @class = "form-control input-sm", placeholder = "Enter password" })
                         </div>
                     </div>
                 }
@@ -115,6 +153,35 @@
             </div>
         </div>
     </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Map with Company</label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.ListBoxFor(_ => _.CompanyIds, ViewBag.Companies as MultiSelectList, new { @class = "form-control input-sm chosen", @required = "required", multiple = "multiple" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Status</label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.CheckBoxFor(_ => _.Active)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div style="width:100%;text-align:center;padding: 25px 0 5px;">
         <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.Id > 0 ? "Update" : "Add")</button>
         <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
@@ -122,14 +189,22 @@
 </form>
 @if (Model != null && Model.Id > 0)
 {
-    <script>$("#UserType").val(@Model.UserTypeId)</script>
+    <script>$("#UserType").val(@Model.UserTypeId);</script>
 }
 <script>
-
+      $("#CompanyIds").chosen();
     $("#btnAdd").click(function () {
         var isValid = true;
         if ($("#FullName").val() == null || $("#FullName").val() == "") {
             Notification('', 'Please enter name', 'danger');
+            isValid = false;
+        }
+        else if ($("#Email").val() == null || $("#Email").val() == "") {
+            Notification('', 'Please enter email', 'danger');
+            isValid = false;
+        }
+        else if (!validateEmail($("#Email").val())) {
+            Notification('', 'Please enter valid email', 'danger');
             isValid = false;
         }
         else if ($("#Address").val() == null || $("#Address").val() == "") {
@@ -147,16 +222,18 @@
         else if($("#UserTypeId").val() == null || $("#UserTypeId").val() == "") {
                 Notification('', 'Please enter user type', 'danger');
                 isValid = false;
-            }
-            @if (Model.Id <= 0)
+        }
+            @if (Model.Id <= 0 || string.IsNullOrEmpty(IsAllowed()))
                     {
                     @:if ($("#Password").val() == null || $("#Password").val() == "") {
                         @:Notification('', 'Please enter password', 'danger');
                         @:isValid = false;
                     @:}
+                    @:if ($("#Password").val() == null || $("#Password").val() == "" || $("#Password").val().length <5) {
+                        @:Notification('', 'Password must be 5 character long', 'danger');
+                        @:isValid = false;
+                    @:}
                 }
-
-
 
             var data = JSON.stringify({
                 "user": {
@@ -168,7 +245,11 @@
                     "Pincode": $("#Pincode").val(),
                     "Username": $("#Username").val(),
                     "Password": $("#Password").val(),
-                    "UserTypeId": $("#UserTypeId").val()
+                    "UserTypeId": $("#UserTypeId").val(),
+                    "Email": $("#Email").val(),
+                    "Active": $("#Active").is(":checked"),
+                    "CreatedBy": $("#CreatedBy").val(),
+                    "CompanyIds": $("#CompanyIds").val()
                 }
             });
 
