@@ -155,9 +155,68 @@ namespace Arity.Service
             }
         }
 
-        public async Task<List<TaskDTO>> GetAll(int userId)
+        public async Task<List<TaskDTO>> GetAll(int userId, int typeId)
         {
-            throw new NotImplementedException();
+            if (typeId == (int)Arity.Service.Core.UserType.MasterAdmin)
+                return (from task in _dbContext.Tasks.ToList()
+                        join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
+                        join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
+                        where userTask.CreatedOn >= Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01))
+                        select new TaskDTO
+                        {
+                            TaskId = task.Id,
+                            TaskUserId = userTask.Id,
+                            UserComment = userTask.Comment,
+                            UserId = userTask.UserId,
+                            Description = task.Description,
+                            TaskName = task.Name,
+                            DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("MM/dd/yyyy") : "",
+                            CreatedBy = userTask.CreatedBy,
+                            CreatedOnString = userTask.CreatedOn.ToString("MM/dd/yyyy"),
+                            UserName = user.FullName,
+                            StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
+                            StatusId = userTask.Status
+                        }).OrderBy(_ => _.StatusId).ToList();
+            else if (typeId == (int)Arity.Service.Core.UserType.User)
+                return (from task in _dbContext.Tasks.ToList()
+                        join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
+                        join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
+                        where task.ClientId == userId && userTask.CreatedOn >= Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01))
+                        select new TaskDTO
+                        {
+                            TaskId = task.Id,
+                            TaskUserId = userTask.Id,
+                            UserComment = userTask.Comment,
+                            UserId = userTask.UserId,
+                            Description = task.Description,
+                            TaskName = task.Name,
+                            DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("MM/dd/yyyy") : "",
+                            CreatedBy = userTask.CreatedBy,
+                            CreatedOnString = userTask.CreatedOn.ToString("MM/dd/yyyy"),
+                            UserName = user.FullName,
+                            StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
+                            StatusId = userTask.Status
+                        }).OrderBy(_ => _.StatusId).ToList();
+            else
+                return (from task in _dbContext.Tasks.ToList()
+                        join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
+                        join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
+                        where userTask.UserId == userId && userTask.CreatedOn >= Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01))
+                        select new TaskDTO
+                        {
+                            TaskId = task.Id,
+                            TaskUserId = userTask.Id,
+                            UserComment = userTask.Comment,
+                            UserId = userTask.UserId,
+                            Description = task.Description,
+                            TaskName = task.Name,
+                            DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("MM/dd/yyyy") : "",
+                            CreatedBy = userTask.CreatedBy,
+                            CreatedOnString = userTask.CreatedOn.ToString("MM/dd/yyyy"),
+                            UserName = user.FullName,
+                            StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
+                            StatusId = userTask.Status
+                        }).OrderBy(_ => _.StatusId).ToList();
         }
     }
 }

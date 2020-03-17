@@ -184,6 +184,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MasterController.cs" />
     <Compile Include="Controllers\ParticularController.cs" />
     <Compile Include="Controllers\TaskController.cs" />
     <Compile Include="Global.asax.cs">
@@ -404,6 +405,12 @@
     <Content Include="Views\Task\Index.cshtml" />
     <Content Include="Views\Task\_TaskWizard.cshtml" />
     <Content Include="Views\Home\Dashboard.cshtml" />
+    <Content Include="Views\Master\Company.cshtml" />
+    <Content Include="Views\Master\_CompanyWizard.cshtml" />
+    <Content Include="Views\Master\GroupMaster.cshtml" />
+    <Content Include="Views\Master\_GroupMasterWizard.cshtml" />
+    <Content Include="Views\Master\ClientMaster.cshtml" />
+    <Content Include="Views\Master\ManageClient.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -251,7 +251,7 @@ namespace Arity.Service
                         Address = company.Address,
                         CompanyBanner = company.CompanyBanner,
                         CompanyName = company.CompanyName,
-                        IsActive = company.IsActive,
+                        IsActive = company.IsActive ?? false,
                         Id = company.Id,
                         PreferedColor = company.PreferedColor,
                         Type = company.Type

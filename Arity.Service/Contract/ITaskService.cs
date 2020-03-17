@@ -11,6 +11,6 @@ namespace Arity.Service.Contract
         Task<List<TaskDTO>> GetAll(DateTime from,DateTime to);
         Task<TaskDTO> GetTask(int id);
         Task AddUpdateTask(TaskDTO task);
-        Task<List<TaskDTO>> GetAll(int userId);
+        Task<List<TaskDTO>> GetAll(int userId, int typeId);
     }
 }

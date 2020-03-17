@@ -27,5 +27,6 @@ namespace Arity.Data
         public virtual DbSet<UserTask> UserTasks { get; set; }
         public virtual DbSet<Consultants> Consultant { get; set; }
         public virtual DbSet<DocumentMaster> DocumentMasters { get; set; }
+        public virtual DbSet<GroupMaster> GroupMasters { get; set; }
     }
 }

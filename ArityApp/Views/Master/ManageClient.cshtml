@@ -1,0 +1,487 @@
+﻿@model Arity.Data.Dto.UsersDto
+@using Arity.Data.Helpers;
+@{
+    ViewBag.Title = "ManageClient";
+
+    string IsAllowed()
+    {
+        if (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.MasterAdmin)
+            return "";
+
+        if (Model.Id > 0 && Model.CreatedBy != SessionHelper.UserTypeId)
+            return "no-rights";
+        return "denied";
+    }
+}
+
+<link rel="stylesheet" href="/Content/css/chosen/chosen.css">
+
+<div class="breadcomb-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="breadcomb-list">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="breadcomb-wp">
+                                <div class="breadcomb-icon">
+                                    <i class="notika-icon notika-form"></i>
+                                </div>
+                                <div class="breadcomb-ctn">
+                                    @if (Model.Id > 0)
+                                    {
+                                        <h2>Update client</h2>
+                                    }
+                                    else
+                                    {
+                                        <h2>Add client</h2>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("ManageClient", "Master", FormMethod.Post))
+{
+    <div class="tabs-info-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="widget-tabs-int">
+                        <div class="widget-tabs-list">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a data-toggle="tab" href="#home">Basic details</a></li>
+                                <li><a data-toggle="tab" href="#menu2">Important details</a></li>
+                                <li><a data-toggle="tab" href="#menu1">Other details</a></li>
+                            </ul>
+                            <div class="tab-content tab-custom-st">
+                                <div id="home" class="tab-pane fade in active">
+                                    <div class="tab-ctn">
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Name<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.FullName, new { @class = "form-control input-sm", placeholder = "Enter name", @required = "required" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Email<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.Email, new { @class = "form-control input-sm", placeholder = "Enter email", @required = "required",@type="email" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Username<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.Username, new { @class = "form-control input-sm", placeholder = "Enter username", @required = "required" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Password<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.Password, new { @class = "form-control input-sm", placeholder = "Enter password", @required = "required" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Address<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.Address, new { @class = "form-control input-sm", placeholder = "Enter address", @required = "required" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">City<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.City, new { @class = "form-control input-sm", placeholder = "Enter city", @required = "required" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Phone<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.PhoneNumber, new { @class = "form-control input-sm", placeholder = "Enter phone number" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Pincode<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.Pincode, new { @class = "form-control input-sm", placeholder = "Enter pincode" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Company<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.ListBoxFor(_ => _.CompanyIds, ViewBag.Companies as MultiSelectList, new { @class = "form-control input-sm chosen", multiple = "multiple" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Consultant<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.DropDownListFor(_ => _.ConsultantId, ViewBag.Consultant as SelectList, "-- select consultant --", new { @class = "form-control input-sm chosen" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Group<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.DropDownListFor(_ => _.GroupId, ViewBag.Groups as SelectList, "--select group--", new { @class = "form-control input-sm chosen" })
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Rates<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.Rates, new { @class = "form-control input-sm", placeholder = "Enter rates" })
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Status<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.CheckBoxFor(_ => _.Active)
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Remarks<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.Remarks, new { @class = "form-control input-sm", placeholder = "Enter remarks" })
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="menu1" class="tab-pane fade">
+                                    <div class="tab-ctn">
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Contact Person<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.ContactPerson, new { @class = "form-control input-sm", placeholder = "Enter contact person" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Master Mobile<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.MasterMobile, new { @class = "form-control input-sm", placeholder = "Enter master mobile" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Accountant Name<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.AccountantName, new { @class = "form-control input-sm", placeholder = "Enter account name" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Accountant Mobile<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.AccountantMobile, new { @class = "form-control input-sm", placeholder = "Enter accountant mobile" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="menu2" class="tab-pane fade">
+                                    <div class="tab-ctn">
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Pan Number<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.PanNumber, new { @class = "form-control input-sm", placeholder = "Enter pan number" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">TAN Number<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.TANNumber, new { @class = "form-control input-sm", placeholder = "Enter TAN number" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">GSTIN<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.GSTIN, new { @class = "form-control input-sm", placeholder = "Enter GSTIN" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">EFFDate<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.EFFDate, new { @class = "form-control input-sm date", placeholder = "Enter EFFDate", @readonly = "readonly" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">GST Rate<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.GSTRate, new { @class = "form-control input-sm", placeholder = "Enter GST rate" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Applicable Rate<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.ApplicableRate, new { @class = "form-control input-sm", placeholder = "Enter applicable rate" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Commodity Name<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.CommodityName, new { @class = "form-control input-sm", placeholder = "Enter commodity name" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Commodity HSN<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.CommodityHSN, new { @class = "form-control input-sm", placeholder = "Enter commodity HSN" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Jurisdiction<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.JURISDICTION, new { @class = "form-control input-sm", placeholder = "Enter Jurisdiction" })
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">RTN Type<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.RTNType, new { @class = "form-control input-sm", placeholder = "Enter RTN type" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Business Status<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.BusinessStatus, new { @class = "form-control input-sm", placeholder = "Enter business status" })
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Service Types<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.ServiceTypes, new { @class = "form-control input-sm", placeholder = "Enter service types" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Business Type<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                        <div class="nk-int-st">
+                                                            @Html.DropDownListFor(_ => _.BusinessType, ViewBag.BusinessType as SelectList, "--select business type--", new { @class = "form-control input-sm chosen" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="width:100%;text-align:center;padding: 25px 0 5px;">
+                                <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="submit" style="align-content:center">@(Model.Id > 0 ? "Update" : "Add")</button>
+                                <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts{
+        <script>
+            $(".chosen").chosen();
+              $("#liUser").addClass("active");
+        $("#User").addClass("active");
+        $("#liHome").removeClass("active");
+            @if (ViewBag.ErrorMsg != null)
+{
+                @:Notification('', 'Please fill up all required details or use different username', 'danger');
+            }
+        </script>
+    }
+}
+
+
+

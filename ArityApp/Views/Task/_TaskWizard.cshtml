@@ -10,183 +10,183 @@
         return Model.StatusId > 0 && Model.CreatedBy != SessionHelper.UserTypeId;
     }
 }
-    <form>
-        @Html.HiddenFor(_ => _.TaskId)
-        @Html.HiddenFor(_ => _.CreatedOn)
-        @Html.HiddenFor(_ => _.TaskUserId)
-        @Html.HiddenFor(_ => _.CreatedBy)
-        @Html.HiddenFor(_ => _.AddedBy)
+<form>
+    @Html.HiddenFor(_ => _.TaskId)
+    @Html.HiddenFor(_ => _.CreatedOn)
+    @Html.HiddenFor(_ => _.TaskUserId)
+    @Html.HiddenFor(_ => _.CreatedBy)
+    @Html.HiddenFor(_ => _.AddedBy)
 
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Title<span style="color:red;vertical-align:text-bottom;">*</span></label>
-                    </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(IsAllowed()?"no-rights":"")">
-                        <div class="nk-int-st">
-                            @Html.TextBoxFor(_ => _.TaskName, new { @class = "form-control input-sm", placeholder = "Enter task title", @required = "required" })
-                        </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Title<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(IsAllowed()?"no-rights":"")">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.TaskName, new { @class = "form-control input-sm", placeholder = "Enter task title", @required = "required" })
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Description</label>
-                    </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(IsAllowed()?"no-rights":"")">
-                        <div class="nk-int-st">
-                            @Html.TextBoxFor(_ => _.Description, new { @class = "form-control input-sm", placeholder = "Enter description" })
-                        </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Description</label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(IsAllowed()?"no-rights":"")">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Description, new { @class = "form-control input-sm", placeholder = "Enter description" })
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Client<span style="color:red;vertical-align:text-bottom;">*</span></label>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Client<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 @(IsAllowed()?"no-rights":"")">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.ClientId, ViewBag.Clients as SelectList, "-- Select Client--", new { @class = "form-control input-sm choosen-drop", @required = "required" })
                     </div>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 @(IsAllowed()?"no-rights":"")">
-                        <div class="nk-int-st">
-                            @Html.DropDownListFor(_ => _.ClientId, ViewBag.Clients as SelectList, "-- Select Client--", new { @class = "form-control input-sm choosen-drop", @required = "required" })
-                        </div>
+                </div>
+
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <label class="hrzn-fm">Assign To<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 @(IsAllowed()?"no-rights":"")">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.UserId, ViewBag.Users as SelectList, "-- Select User--", new { @class = "form-control input-sm choosen-drop", @required = "required" })
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Priority<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.Priorities, ViewBag.Prioritis as SelectList, "-- Select priority--", new { @class = "form-control input-sm choosen-drop", @required = "required" })
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <label class="hrzn-fm">Status<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.StatusId, ViewBag.Status as SelectList, "-- Select status--", new { @class = "form-control input-sm choosen-drop", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Due Date<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 @(IsAllowed()?"no-rights":"")">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.DueDate, new { @class = "form-control input-sm", @readonly = "readonly", placeholder = "Enter due date" })
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <label class="hrzn-fm">Complete Date<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.CompletedOn, new { @class = "form-control input-sm", @readonly = "readonly", placeholder = "Enter complete date" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Chargeable</label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.CheckBoxFor(_ => _.IsChargeble)
+                    </div>
+                </div>
+                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                {
 
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                        <label class="hrzn-fm">Assign To<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                        <label class="hrzn-fm">Status</label>
                     </div>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 @(IsAllowed()?"no-rights":"")">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                         <div class="nk-int-st">
-                            @Html.DropDownListFor(_ => _.UserId, ViewBag.Users as SelectList, "-- Select User--", new { @class = "form-control input-sm choosen-drop", @required = "required" })
+                            @Html.CheckBoxFor(_ => _.Active)
                         </div>
+                    </div>
+                }
+                else
+                {
+                    @Html.HiddenFor(_ => _.Active)
+                }
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Remarks<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Remarks, new { @class = "form-control input-sm", placeholder = "Enter remarks" })
                     </div>
                 </div>
             </div>
         </div>
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">User Comment<span style="color:red;vertical-align:text-bottom;"></span></label>
                 </div>
-            </div>
-        </div>
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Priority<span style="color:red;vertical-align:text-bottom;">*</span></label>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <div class="nk-int-st">
-                            @Html.DropDownListFor(_ => _.Priorities, ViewBag.Prioritis as SelectList, "-- Select priority--", new { @class = "form-control input-sm choosen-drop", @required = "required" })
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                        <label class="hrzn-fm">Status<span style="color:red;vertical-align:text-bottom;">*</span></label>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <div class="nk-int-st">
-                            @Html.DropDownListFor(_ => _.StatusId, ViewBag.Status as SelectList, "-- Select status--", new { @class = "form-control input-sm choosen-drop", @required = "required" })
-                        </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.UserComment, new { @class = "form-control input-sm", placeholder = "Enter comment" })
                     </div>
                 </div>
             </div>
         </div>
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Due Date<span style="color:red;vertical-align:text-bottom;"></span></label>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 @(IsAllowed()?"no-rights":"")">
-                        <div class="nk-int-st">
-                            @Html.TextBoxFor(_ => _.DueDate, new { @class = "form-control input-sm", @readonly = "readonly", placeholder = "Enter due date" })
-                        </div>
-                    </div>
-
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                        <label class="hrzn-fm">Complete Date<span style="color:red;vertical-align:text-bottom;"></span></label>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <div class="nk-int-st">
-                            @Html.TextBoxFor(_ => _.CompletedOn, new { @class = "form-control input-sm", @readonly = "readonly", placeholder = "Enter complete date" })
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Chargeable</label>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <div class="nk-int-st">
-                            @Html.CheckBoxFor(_ => _.IsChargeble)
-                        </div>
-                    </div>
-                    @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
-                    {
-
-                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                            <label class="hrzn-fm">Status</label>
-                        </div>
-                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                            <div class="nk-int-st">
-                                @Html.CheckBoxFor(_ => _.Active)
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        @Html.HiddenFor(_ => _.Active)
-                    }
-                </div>
-            </div>
-        </div>
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Remarks<span style="color:red;vertical-align:text-bottom;"></span></label>
-                    </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
-                        <div class="nk-int-st">
-                            @Html.TextBoxFor(_ => _.Remarks, new { @class = "form-control input-sm", placeholder = "Enter remarks" })
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">User Comment<span style="color:red;vertical-align:text-bottom;"></span></label>
-                    </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
-                        <div class="nk-int-st">
-                            @Html.TextBoxFor(_ => _.UserComment, new { @class = "form-control input-sm", placeholder = "Enter comment" })
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    </div>
 
 
-        <div style="width:100%;text-align:center;padding: 25px 0 5px;">
-            <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.TaskId > 0 ? "Update" : "Add")</button>
-            <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
-        </div>
-    </form>
+    <div style="width:100%;text-align:center;padding: 25px 0 5px;">
+        <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.TaskId > 0 ? "Update" : "Add")</button>
+        <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
+    </div>
+</form>
 
 <script>
      $(".choosen-drop").chosen();
@@ -213,7 +213,8 @@
             isValid = false;
         }
 
-        var data = JSON.stringify({
+        if (isValid) {
+            var data = JSON.stringify({
             "task": {
                 "TaskName": $("#TaskName").val(),
                 "UserId": $("#UserId").val(),
@@ -234,9 +235,8 @@
                 "Priorities": $("#Priorities").val(),
                 "ClientId": $("#ClientId").val()
             }
-        });
+            });
 
-        if (isValid) {
             $.ajax({
                 url: '@Url.Action("AddUpdateTask", "Task")',
                 dataType: "json",

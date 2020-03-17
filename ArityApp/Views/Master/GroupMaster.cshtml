@@ -1,7 +1,7 @@
 ﻿@using Arity.Data.Helpers;
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Group";
 
 }
 <head>
@@ -28,8 +28,8 @@
                                     <i class="notika-icon notika-form"></i>
                                 </div>
                                 <div class="breadcomb-ctn">
-                                    <h2>Particulars</h2>
-                                    <p>List of particulars</p>
+                                    <h2>Group</h2>
+                                    <p>List of groups</p>
                                 </div>
                             </div>
                         </div>
@@ -37,7 +37,7 @@
                             <div class="breadcomb-report">
                                 @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                 {
-                                    <button onclick="AddEditParticular(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
+                                    <button onclick="AddEditGroup(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
                                 }
                             </div>
                         </div>
@@ -56,39 +56,19 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="data-table-list">
                     <div class="basic-tb-hd">
-                        <h2>Particular List</h2>
-                        <p>Below are List of Particular.</p>
+                        <h2>Group List</h2>
+                        <p>Below are List of Groups.</p>
                     </div>
                     <div class="date-filter">
-
-                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
-                            <label>From</label>
-                            <div class="input-group date nk-int-st">
-                                <span class="input-group-addon"></span>
-                                <input type="text" id="FromDate" class="form-control" value="@(((DateTime)ViewBag.FromDate).ToString("MM/dd/yyyy"))" readonly>
-                            </div>
-                        </div>
-                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
-                            <label>To</label>
-                            <div class="input-group date nk-int-st">
-                                <span class="input-group-addon"></span>
-                                <input type="text" id="ToDate" class="form-control" value="@(((DateTime)ViewBag.ToDate).ToString("MM/dd/yyyy"))" readonly>
-                            </div>
-                        </div>
-                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
-                            <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnFilterGrid">Search</button>
-                        </div>
-
                     </div>
                     <div class="table-responsive">
-                        <table id="tblParticular" class="table table-striped">
+                        <table id="tblGroup" class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th style="width:10%;">Short form</th>
-                                    <th style="width:60%;">Full Form</th>
-                                    <th style="width:10%;">Created At</th>
-                                    <th style="width:10%;" align="center">Exclude from Invoice</th>
-                                    <th style="width:10%;">Update</th>
+                                    <th style="width:40%;">Name</th>
+                                    <th style="width:40%;">Description</th>
+                                    <th style="width:15%;">Added By</th>
+                                    <th style="width:5%;">Update</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -99,11 +79,11 @@
         </div>
     </div>
 
-    <div class="modal animated fade" id="modalParticular" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
+    <div class="modal animated fade" id="modalGroup" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-large">
             <div class="modal-content">
                 <div class="modal-header" style="margin-bottom:35px;">
-                    <h3>Add/Update Particular</h3>
+                    <h3>Add/Update Group</h3>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -123,15 +103,13 @@
             $("#liMaster").addClass("active");
             $("#Master").addClass("active");
             $("#liHome").removeClass("active");
-        table =  $('#tblParticular').DataTable({
+        table =  $('#tblGroup').DataTable({
             "ajax": function (data, callback, settings) {
                 $.ajax({
-                    url: '@Url.Action("LoadParticulars","Particular")',
+                    url: '@Url.Action("LoadGroup","Master")',
                     type: "GET",
                     dataType: "json",
                     data: {
-                        from: $("#FromDate").val(),
-                        to: $("#ToDate").val()
                     },
                     beforeSend: function (xhrObj) {
                         $("#loading").show();
@@ -148,48 +126,34 @@
                     });
             },
             "language": {
-                "emptyTable": "No particular found"
+                "emptyTable": "No group found"
             },
            "columns": [
-                { "data": "ParticularSF" },
-                { "data": "ParticularFF" },
-                { "data": "CreatedDateString" },
+                { "data": "Name" },
+                { "data": "Description" },
+                { "data": "AddedByName" },
                 {
                     "orderable": false,
                     "data": null,
                     "render": function (data, type, full) {
-                        if(data.IsExclude)
-                            return '<i class="notika-icon notika-checked" aria-hidden="true"></i>';
-                        else
-                            return '<i class="notika-icon notika-close" aria-hidden="true"></i>';
-                    }
-                },
-                {
-                    "orderable": false,
-                    "data": null,
-                    "render": function (data, type, full) {
-                            return '<button class="btn waves-effect" onclick="AddEditParticular(' + data.Id + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                            return '<button class="btn waves-effect" onclick="AddEditGroup(' + data.GroupId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
                     }
                 }
             ],
-            "order": [[2, "desc"]]
-        });
-
-         $("#btnFilterGrid").click(function () {
-                 table.ajax.reload();
+            "order": [[0, "asc"]]
         });
     });
 
-      function AddEditParticular(Id) {
+      function AddEditGroup(Id) {
           $("#loading").show();
         $.ajax({
-            url: '@Url.Action("AddParticular","Particular")',
+            url: '@Url.Action("AddGroup","Master")',
             data: { id: Id},
             type: 'GET',
             dataType: 'Html',
             success: function (response) {
-                $('#modalParticular .modal-body').html(response);
-                $('#modalParticular').modal('show');
+                $('#modalGroup .modal-body').html(response);
+                $('#modalGroup').modal('show');
                  $("#loading").hide();
             },
             failure: function () {
@@ -200,3 +164,5 @@
     }
     </script>
 }
+
+

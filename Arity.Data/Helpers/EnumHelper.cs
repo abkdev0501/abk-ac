@@ -27,5 +27,11 @@
             Important = 4,
             Urgent = 5
         }
+
+        public enum BusinessType
+        {
+            Partnership =1,
+            Proprietorship =2
+        }
     }
 }
