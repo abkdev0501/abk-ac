@@ -105,6 +105,7 @@
     <Folder Include="bin\Release\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Entity\script\GroupMaster.sql" />
     <Content Include="Entity\script\RMN.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
