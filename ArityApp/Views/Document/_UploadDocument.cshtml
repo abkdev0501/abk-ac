@@ -1,0 +1,123 @@
+﻿@model Arity.Data.Dto.DocumentMasterDto
+@{
+    ViewBag.Title = "_UploadDocument";
+}
+@using (Html.BeginForm("UploadDocument", "Document", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.HiddenFor(_ => _.DocumentId)
+    @Html.HiddenFor(_ => _.CreatedBy)
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Document Name<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Name, new { @class = "form-control", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Client<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 ">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.ClientId, ViewBag.Client as SelectList, "-- Select Client--", new { @class = "form-control", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Document Type<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 ">
+                    <div class="nk-int-st">
+                        @Html.EnumDropDownListFor(_ => _.DocumentType, "-- Select DocumentType--", new { @class = "form-control", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Status<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 cls-particular">
+                    <div class="nk-int-st">
+                        @Html.EnumDropDownListFor(_ => _.Status, "Select Document status", new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Document file<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        <input type="file" name="DocumentFile" />
+                        <span class="text-info">choose document to replace existing</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    if(Model.DocumentId > 0 ){
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">File exist currently<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        <label>@(Model != null && Model.FileName != null ?@Model.FileName:"")</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="form-example-int form-horizental">
+    <div class="form-group">
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                <label class="hrzn-fm">Active</label>
+            </div>
+            <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                <div class="nk-int-st">
+                    @Html.CheckBoxFor(_ => _.IsActive)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="width:100%;text-align:center;padding: 25px 0 5px;">
+    <button id="btnDocUpload" class="btn btn-success notika-btn-success waves-effect" type="submit" style="align-content:center">Upload</button>
+    <button id="btnDocUploadCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
+</div>
+
+}

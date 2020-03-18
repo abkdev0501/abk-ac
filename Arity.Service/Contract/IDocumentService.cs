@@ -1,0 +1,19 @@
+﻿using Arity.Data.Dto;
+using Arity.Data.Entity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Arity.Service.Contract
+{
+    public interface IDocumentService 
+    {
+
+        Task<List<User>> GetClient();
+        int SaveDocument(DocumentMasterDto document);
+        Task<List<DocumentMasterDto>> FetchDocuments(DateTime toDate, DateTime fromDate);
+        DocumentMasterDto GetDocumentByID(int documentID);
+    }
+}

@@ -27,5 +27,31 @@
             Important = 4,
             Urgent = 5
         }
+
+        public enum DocumentStatus
+        {
+            RECEIVED = 1,
+            SENT = 2,
+            SUBMITTED = 3
+        }
+        public enum DocumentType
+        {
+            PHOTOS = 1,
+            PAN,
+            TAN,
+            ITR_RECEIPTS,
+            ITR_COMPUTATIONS,
+            AUDIT_REPORTS,
+            BALANCE_SHEETS,
+            NOTES,
+            CERTI,
+            RTN_RECEIPTS,
+            RTN_FILLING_DETAILS,
+            GST_CALCULATIONS,
+            GST_DOCS,
+            GST_NOTES,
+            GST_CHALLANS,
+            ROF_ETC
+        }
     }
 }

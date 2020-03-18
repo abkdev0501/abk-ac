@@ -183,6 +183,7 @@
     <Compile Include="App_Start\IsAuthorizeAttribute.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\DocumentController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ParticularController.cs" />
     <Compile Include="Controllers\TaskController.cs" />
@@ -404,6 +405,8 @@
     <Content Include="Views\Task\Index.cshtml" />
     <Content Include="Views\Task\_TaskWizard.cshtml" />
     <Content Include="Views\Home\Dashboard.cshtml" />
+    <Content Include="Views\Document\Index.cshtml" />
+    <Content Include="Views\Document\_UploadDocument.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -423,6 +426,10 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Arity.AutoMapper\Arity.AutoMapper.csproj">
+      <Project>{C8AF9EFB-1C14-463F-8591-DFDECE90FC28}</Project>
+      <Name>Arity.AutoMapper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Arity.Data\Arity.Data.csproj">
       <Project>{a9784b16-fc7b-4456-8b34-8a89913f7c5d}</Project>
       <Name>Arity.Data</Name>

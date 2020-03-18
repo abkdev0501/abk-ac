@@ -63,6 +63,7 @@
     <Compile Include="Dto\ReceiptDto.cs" />
     <Compile Include="Dto\TaskDTO.cs" />
     <Compile Include="Dto\TrackingInformation.cs" />
+    <Compile Include="Dto\DocumentMasterDto.cs" />
     <Compile Include="Dto\UserDTO.cs" />
     <Compile Include="Dto\UsersDto.cs" />
     <Compile Include="Entity\Client_Particular_Mapping.cs" />
