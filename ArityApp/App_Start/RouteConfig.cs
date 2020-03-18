@@ -43,6 +43,36 @@ namespace ArityApp
           );
 
             routes.MapRoute(
+              name: "receipt",
+              url: "receipt",
+              defaults: new { controller = "Home", action = "Payment", id = UrlParameter.Optional }
+          );
+
+            routes.MapRoute(
+              name: "task",
+              url: "task",
+              defaults: new { controller = "Task", action = "Index", id = UrlParameter.Optional }
+          );
+
+            routes.MapRoute(
+              name: "company",
+              url: "company",
+              defaults: new { controller = "Master", action = "Company", id = UrlParameter.Optional }
+          );
+
+            routes.MapRoute(
+              name: "group",
+              url: "group",
+              defaults: new { controller = "Master", action = "GroupMaster", id = UrlParameter.Optional }
+          );
+           
+            routes.MapRoute(
+              name: "client",
+              url: "client",
+              defaults: new { controller = "Master", action = "ClientMaster", id = UrlParameter.Optional }
+          );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Account", action = "Login", id = UrlParameter.Optional }

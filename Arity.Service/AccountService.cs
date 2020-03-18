@@ -34,8 +34,7 @@ namespace Arity.Service
                 existingUser.UserTypeId = user.UserTypeId;
                 existingUser.Email = user.Email;
                 existingUser.Active = user.Active;
-                if (existingUser.CreatedBy == user.CreatedBy)
-                    existingUser.Password = Functions.Encrypt(user.Password);
+                existingUser.Password = Functions.Encrypt(user.Password);
 
                 if (existingUser.Username != user.Username)
                 {
@@ -112,13 +111,6 @@ namespace Arity.Service
                             CompanyId = companyid
                         });
                 }
-                _dbContext.User_Role.Add(new User_Role
-                {
-                    CreatedDate = DateTime.Now,
-                    RoleId = user.UserTypeId,
-                    UserId = userModel.Id,
-                    UpdatedDate = DateTime.Now
-                });
             }
             await _dbContext.SaveChangesAsync();
         }
@@ -127,7 +119,7 @@ namespace Arity.Service
         {
             return (from user in _dbContext.Users
                     join type in _dbContext.UserTypes on user.UserTypeId equals type.Id
-                    where user.CreatedDate >= fromDate && user.CreatedDate <= toDate
+                    where user.CreatedDate >= fromDate && user.CreatedDate <= toDate && user.UserTypeId != (int)Arity.Service.Core.UserType.User
                     select new UsersDto
                     {
                         Id = user.Id,

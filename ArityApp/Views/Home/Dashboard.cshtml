@@ -2,26 +2,104 @@
     ViewBag.Title = "Dashboard";
 }
 
-    <div class="realtime-statistic-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
-                    <div class="add-todo-list notika-shadow mg-t-30">
-                        <div class="realtime-ctn">
-                            <div class="realtime-title">
-                                <h2>Tasks</h2>
-                            </div>
+
+
+<div class="notika-status-area" style="margin-top:30px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30">
+                    <div class="website-traffic-ctn">
+                        <h2><span class="counter">50,000</span></h2>
+                        <p>Total Website Traffics</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30">
+                    <div class="website-traffic-ctn">
+                        <h2><span class="counter">90,000</span>k</h2>
+                        <p>Website Impressions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30 dk-res-mg-t-30">
+                    <div class="website-traffic-ctn">
+                        <h2>$<span class="counter">40,000</span></h2>
+                        <p>Total Online Sales</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                <div class="wb-traffic-inner notika-shadow sm-res-mg-t-30 tb-res-mg-t-30 dk-res-mg-t-30">
+                    <div class="website-traffic-ctn">
+                        <h2><span class="counter">1,000</span></h2>
+                        <p>Total Support Tickets</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="realtime-statistic-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+                <div class="add-todo-list notika-shadow mg-t-30">
+                    <div class="realtime-ctn">
+                        <div class="realtime-title">
+                            <h2>Tasks</h2>
                         </div>
-                        <div class="card-box">
-                            <div class="todoapp">
-                                 <div class="notika-todo-scrollbar">
-                                    <ul class="list-group no-margn todo-list" id="todo-list"></ul>
-                                </div>
-                              
+                    </div>
+                    <div class="card-box">
+                        <div class="todoapp">
+                            <div class="notika-todo-scrollbar">
+                                <ul class="list-group no-margn todo-list" id="task-list"></ul>
                             </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                <div class="add-todo-list notika-shadow mg-t-30">
+                    <div class="realtime-ctn">
+                        <div class="realtime-title">
+                            <h2>Documents</h2>
+                        </div>
+                    </div>
+                    <div class="card-box">
+                        <div class="todoapp">
+                            <div class="notika-todo-scrollbar">
+                                <ul class="list-group no-margn todo-list" id="task-list"></ul>
+                            </div>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+@section Scripts{
+    <script>
+    $("#task-list").html('<li class="list-group-item"><div class="checkbox checkbox-primary"><label for="9">Loading...</label></div></li>')
+    $.ajax({
+                url: '@Url.Action("GetAllTask", "Home")',
+                dataType: "json",
+                type: "GET",
+                cache: false,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    $("#task-list").html('');
+                    $(response.Result).each(function (i, data) {
+                        $("#task-list").append('<li class="list-group-item"><div class="checkbox checkbox-primary"><label for="9">'+data.TaskName+'</label></div></li>')
+                    });
+                },
+                error: function (error) {
+                }
+            });
+    </script>
+}

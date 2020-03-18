@@ -39,7 +39,9 @@ namespace Arity.Data.Dto
         public string CommodityHSN { get; set; }
         public string GSTRate { get; set; }
         public DateTime? ApplicableRate { get; set; }
-        public int? ServiceTypes { get; set; }
+        public string ServiceTypes { get; set; }
         public string Rates { get; set; }
+        public int AddedBy { get; set; }
+        public string AddedByName { get; set; }
     }
 }

@@ -1,0 +1,148 @@
+﻿@model Arity.Data.Dto.CompanyDto
+
+<form>
+    @Html.HiddenFor(_ => _.Id)
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Name<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.CompanyName, new { @class = "form-control input-sm", placeholder = "Enter name", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Address<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Address, new { @class = "form-control input-sm", placeholder = "Enter address", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Head<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Type, new { @class = "form-control input-sm", placeholder = "Enter head" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Prefix<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Prefix, new { @class = "form-control input-sm", placeholder = "Enter prefix" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Color<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.PreferedColor, ViewBag.Color as SelectList, "-- Select color--", new { @class = "form-control input-sm choosen-drop" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Status<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.CheckBoxFor(_ => _.IsActive)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="width:100%;text-align:center;padding: 25px 0 5px;">
+        <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnCompany">@(Model.Id > 0 ? "Update" : "Add")</button>
+        <button type="button" class="btn btn-default notika-btn-default waves-effect" id="btnCancel">Cancel</button>
+    </div>
+</form>
+
+<script>
+
+    $('#btnCompany').on('click', function () {
+        var isValid = true;
+        if ($("#CompanyName").val() == null || $("#CompanyName").val() == "") {
+            Notification('', 'Please enter name', 'danger');
+            isValid = false;
+        }
+        else if ($("#Address").val() == null || $("#Address").val() == "") {
+            Notification('', 'Please enter address', 'danger');
+            isValid = false;
+        }
+        if (isValid) {
+
+            var data = JSON.stringify({
+            "company": {
+                "CompanyName": $("#CompanyName").val(),
+                "Address": $("#Address").val(),
+                "Type": $("#Type").val(),
+                "Prefix": $("#Prefix").val(),
+                "PreferedColor": $("#PreferedColor").val(),
+                "IsActive": $("#IsActive").val(),
+                "Id": $("#Id").val()
+            }
+        });
+
+            $('#loading').show();
+            $.ajax({
+                url: '@Url.Action("AddCompany", "Master")',
+                type: 'post',
+                data: data,
+                contentType: 'application/json; charset=utf-8',
+                success: function () {
+                    $("#loading").hide();
+                        if (@Model.Id <= 0) {
+                            Notification('', 'Company added successfuly', 'success');
+                        }
+                        else {
+                            Notification('', 'Company updated successfuly', 'success');
+                        }
+                        table.ajax.reload();
+                        $("#modalCompany").modal('toggle');
+                },
+                failure: function () {
+                    Notification('', 'Something went wrong, Please try again', 'danger');
+                }
+            });
+        }
+    })
+</script>

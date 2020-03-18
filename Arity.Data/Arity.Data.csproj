@@ -57,6 +57,7 @@
     <Compile Include="ArityDBContext.cs" />
     <Compile Include="Dto\ClientParticularMappingDto.cs" />
     <Compile Include="Dto\CompanyDto.cs" />
+    <Compile Include="Dto\GroupMasterDTO.cs" />
     <Compile Include="Dto\InvoiceEntry.cs" />
     <Compile Include="Dto\InvoiceParticularDto.cs" />
     <Compile Include="Dto\ParticularDto.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Entity\Company_master.cs" />
     <Compile Include="Entity\Consultants.cs" />
     <Compile Include="Entity\DocumentMaster.cs" />
+    <Compile Include="Entity\GroupMaster.cs" />
     <Compile Include="Entity\InvoiceDetail.cs" />
     <Compile Include="Entity\InvoiceParticular.cs" />
     <Compile Include="Entity\InvoiceReciept.cs" />
@@ -104,6 +106,7 @@
     <Folder Include="bin\Release\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Entity\script\GroupMaster.sql" />
     <Content Include="Entity\script\RMN.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

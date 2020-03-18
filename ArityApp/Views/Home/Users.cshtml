@@ -127,7 +127,9 @@
 @section Scripts {
     <script>
     $(document).ready(function () {
-
+        $("#liUser").addClass("active");
+        $("#User").addClass("active");
+        $("#liHome").removeClass("active");
        table =  $('#tblUsers').DataTable({
             "ajax": function (data, callback, settings) {
                 $.ajax({

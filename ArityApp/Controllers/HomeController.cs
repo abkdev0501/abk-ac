@@ -874,10 +874,15 @@ namespace ArityApp.Controllers
                 userDto = userDto ?? new UsersDto();
                 var userTypes = await _accountService.GetAllUserType();
                 if (SessionHelper.UserTypeId != (int)Arity.Service.Core.UserType.MasterAdmin)
+                {
                     userTypes.RemoveAt(0);
+                    userTypes.RemoveAt(1);
+                }
+                else
+                    userTypes.RemoveAt(2);
 
                 ViewBag.UserType = new SelectList(userTypes, "Id", "UserTypeName", userDto.UserTypeId);
-                ViewBag.Companies = new MultiSelectList(await _invoiceService.GetCompany(), "Id", "CompanyName", userDto.CompanyIds);
+               // ViewBag.Companies = new MultiSelectList(await _invoiceService.GetCompany(), "Id", "CompanyName", userDto.CompanyIds);
                 return PartialView("_UserWizard", userDto);
             }
             catch (Exception ex)
@@ -925,7 +930,7 @@ namespace ArityApp.Controllers
         public async Task<JsonResult> GetAllTask()
         {
             _taskService = new TaskService();
-            var tasks = _taskService.GetAll(Convert.ToInt32(SessionHelper.UserId));
+            var tasks = _taskService.GetAll(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId));
             return Json(tasks, JsonRequestBehavior.AllowGet);
         }
         #endregion

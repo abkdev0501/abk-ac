@@ -53,5 +53,11 @@
             GST_CHALLANS,
             ROF_ETC
         }
+
+        public enum BusinessType
+        {
+            Partnership =1,
+            Proprietorship =2
+        }
     }
 }
