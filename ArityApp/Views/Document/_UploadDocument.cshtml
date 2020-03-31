@@ -60,7 +60,7 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 cls-particular">
                     <div class="nk-int-st">
-                        @Html.EnumDropDownListFor(_ => _.Status, "Select Document status", new { @class = "form-control" })
+                        @Html.EnumDropDownListFor(_ => _.Status, "Select Document status", new { @class = "form-control", @required = "required"  })
                     </div>
                 </div>
             </div>
@@ -75,7 +75,7 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
                     <div class="nk-int-st">
-                        <input type="file" name="DocumentFile" />
+                        <input type="file" name="DocumentFile" required />
                         <span class="text-info">choose document to replace existing</span>
                     </div>
                 </div>

@@ -73,12 +73,15 @@
     <!-- modernizr JS
         ============================================ -->
     <script src="/Content/js/vendor/modernizr-2.8.3.min.js"></script>
+    <link href="/Content/css/dialog/sweetalert2.min.css" rel="stylesheet" />
+    <link href="/Content/css/dialog/dialog.css" rel="stylesheet" />
     <style>
         .no-rights {
             pointer-events: none;
         }
-        
     </style>
+
+
 </head>
 
 <body>
@@ -112,6 +115,9 @@
                         </li>
                         <li class="nav-item">
                             <a href="/user" style="font-size:15px;" class="nav-link"><span>User</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/Document/Index" style="font-size:15px;" class="nav-link"><span>Document</span></a>
                         </li>
                     }
                     <li class="nav-item">
@@ -272,13 +278,16 @@
                             <a href="/receipt"><i class="notika-icon notika-edit"></i> Receipt</a>
                         </li>
                         <li id="liMaster">
-                            <a data-toggle="tab"  href="#Master"><i class="notika-icon notika-windows"></i> Masters</a>
+                            <a data-toggle="tab" href="#Master"><i class="notika-icon notika-windows"></i> Masters</a>
                         </li>
                         <li id="liTask">
                             <a href="/task"><i class="notika-icon notika-form"></i> Task</a>
                         </li>
                         <li id="liUser">
                             <a data-toggle="tab" href="#User"><i class="notika-icon notika-support"></i> Users</a>
+                        </li>
+                        <li id="liUser">
+                            <a href="/Document/Index"><i class="notika-icon notika-support"></i>Document</a>
                         </li>
                     </ul>
                     <div class="tab-content custom-menu-content">
@@ -408,6 +417,9 @@
     <!--  chosen JS
        ============================================ -->
     <script src="/Content/js/chosen/chosen.jquery.js"></script>
+
+    <script src="/Content/js/dialog/dialog-active.js"></script>
+    <script src="/Content/js/dialog/sweetalert2.min.js"></script>
     @RenderSection("scripts", required: false)
     <script>
         @*$("#logout").click(function () {

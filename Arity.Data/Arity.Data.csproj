@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="ArityDBContext.cs" />
     <Compile Include="Dto\ClientParticularMappingDto.cs" />
+    <Compile Include="Dto\CompanyClientList.cs" />
     <Compile Include="Dto\CompanyDto.cs" />
     <Compile Include="Dto\GroupMasterDTO.cs" />
     <Compile Include="Dto\InvoiceEntry.cs" />

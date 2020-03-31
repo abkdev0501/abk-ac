@@ -97,7 +97,16 @@
 </form>
 
 <script>
-      $("#InvoiceDate").datepicker();
+           var d = new Date();
+           var currMonth = d.getMonth();
+           var currYear = d.getFullYear();
+           var startDate = new Date(currYear, currMonth, 1);
+    $("#InvoiceDate").datepicker(
+        {
+        "setDate": startDate,
+        "autoclose": true
+        });
+
     $("#btnAdd").click(function () {
         var isValid = true;
         if ($("#CompanyId").val() == null || $("#CompanyId").val() == "") {

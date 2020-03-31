@@ -27,5 +27,8 @@ namespace Arity.Service.Contract
         Task<TrackingInformation> GetTrackingInformationById(int invoiceTrackingId);
         Task<CompanyDto> GetCompanyDetailById(int companyId);
         Task<decimal> GetInvoiceAmountTotal(List<long> invoices);
+        Task<bool> DeleteInvoiceById(int invoiceId);
+
+        Task<List<CompanyClientList>> GetAllCompanyWithClients();
     }
 }

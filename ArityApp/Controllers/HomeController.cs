@@ -11,6 +11,7 @@ using OfficeOpenXml;
 using Arity.Data.Helpers;
 using Arity.Data.Entity;
 using System.Text;
+using System.Drawing;
 
 namespace ArityApp.Controllers
 {
@@ -22,6 +23,7 @@ namespace ArityApp.Controllers
         private IInvoiceService _invoiceService;
         private IPaymentService _paymentService;
         private ITaskService _taskService;
+        private IDocumentService _documentService;
         #endregion
 
         #region Invoice
@@ -95,7 +97,7 @@ namespace ArityApp.Controllers
                     invoiceEntry.InvoiceId = default(int);
                 ViewBag.Company = new SelectList(await _invoiceService.GetCompany(), "Id", "CompanyName", invoiceEntry.CompanyId);
                 ViewBag.Client = new SelectList(await _invoiceService.GetClient(Convert.ToInt32(invoiceEntry.CompanyId)), "Id", "FullName", invoiceEntry.ClientId);
-                ViewBag.Particular = new SelectList(await _invoiceService.GetParticular(), "Id", "ParticularSF", invoiceEntry.ParticularId);
+                ViewBag.Particular = new SelectList(await _invoiceService.GetParticular(), "Id", "ParticularFF", invoiceEntry.ParticularId);
                 return PartialView("_InvoiceEntry", invoiceEntry);
             }
             catch
@@ -229,6 +231,21 @@ namespace ArityApp.Controllers
             {
                 throw;
             }
+        }
+        public async Task<ActionResult> DeleteInvoice(int invoiceId)
+        {
+            try
+            {
+                _invoiceService = new InvoiceService();
+             await _invoiceService.DeleteInvoiceById(invoiceId);
+                return Json(true,JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return Json(true, JsonRequestBehavior.AllowGet);
         }
 
         #endregion
@@ -832,6 +849,44 @@ namespace ArityApp.Controllers
 
         #endregion
 
+        #region Generate sample Invoice
+
+        public async Task SampleInvoiceCreateFile()
+        {
+            _invoiceService = new InvoiceService();
+            _invoiceService.GetAllCompanyWithClients();
+
+            ExcelPackage Ep = new ExcelPackage();
+            ExcelWorksheet Sheet = Ep.Workbook.Worksheets.Add("Create Invoice");
+            int currentCell = 1;
+
+            //Instruction in excel file
+            Sheet.Cells["A1"].Value = "**** Do not change anything in file Excepting filling data****";
+            Sheet.Cells["A1"].Style.Font.Color.SetColor(Color.Red);
+            currentCell++;
+
+            Sheet.Cells["A2"].Value = "**** enter data that available in given list ****";
+            Sheet.Cells["A2"].Style.Font.Color.SetColor(Color.Red);
+            currentCell++;
+
+            Sheet.Cells["A3"].Value = "* ***Select client associated with company ****";
+            Sheet.Cells["A3"].Style.Font.Color.SetColor(Color.Red);
+            currentCell++;
+
+            using (var memoryStream = new MemoryStream())
+            {
+                Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                Response.AddHeader("content-disposition", "attachment;  filename= SampleCreateInvoice.xlsx");
+                Ep.SaveAs(memoryStream);
+                memoryStream.WriteTo(Response.OutputStream);
+                Response.Flush();
+                Response.End();
+            }
+            
+        }
+
+        #endregion
+
         #region User
         public async Task<ActionResult> Users()
         {
@@ -912,7 +967,7 @@ namespace ArityApp.Controllers
             }
         }
         #endregion
-
+         
         #region Dashboard
         /// <summary>
         /// Dashboard landing page
@@ -933,6 +988,43 @@ namespace ArityApp.Controllers
             var tasks = _taskService.GetAll(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId));
             return Json(tasks, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Fetch documents from db
+        /// </summary>
+        /// <returns></returns>
+        public async Task<JsonResult>GetDocumentList()
+        {
+            _documentService = new DocumentService();
+            var DocumentList = new List<DocumentMasterDto>();
+
+            if (SessionHelper.UserTypeId == (int)EnumHelper.UserType.Master)
+            {
+                DocumentList = await _documentService.GetAllDocuments();
+            }
+            if (SessionHelper.UserTypeId == (int)EnumHelper.UserType.User)
+            {
+                DocumentList = await _documentService.GetDocumentByUserID((int)SessionHelper.UserId);
+            }
+            return Json(DocumentList, JsonRequestBehavior.AllowGet);
+        }
+
+        public FileResult DownloadDocument(int documentID)
+        {
+            try
+            {
+                string folderPath = Server.MapPath("~/Content/Documents/1002_mathOperation.PNG");
+                byte[] fileBytes = System.IO.File.ReadAllBytes(@folderPath);
+                string fileName = "1002_mathOperation.PNG";
+                return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+
         #endregion
 
         /// <summary>

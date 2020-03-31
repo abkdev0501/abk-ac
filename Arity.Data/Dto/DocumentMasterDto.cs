@@ -26,6 +26,6 @@ namespace Arity.Data.Dto
         public string FileName { get; set; }
         public string ALreadyUploadedFile { get; set; }
 
-
-    }
+      }
 }
+ 

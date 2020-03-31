@@ -121,6 +121,26 @@ namespace ArityApp.Controllers
             return View("Index");
         }
 
+        /// <summary>
+        /// Delete Document from db
+        /// </summary>
+        /// <param name="documentID"></param>
+        /// <returns></returns>
+        public async Task<ActionResult> DeleteDocument(int? documentID)
+        {
+            _documentService = new DocumentService();
+
+            try
+            {
+                _documentService.DeleteDocumentByID(documentID??0);
+                
+            }
+            catch (Exception ex)
+            {
+            }
+            return RedirectToAction("Index");
+        }
+
         public async Task<JsonResult> LoadDocuments(DateTime from, DateTime to)
         {
             _documentService = new DocumentService();

@@ -73,7 +73,34 @@
                     <div class="card-box">
                         <div class="todoapp">
                             <div class="notika-todo-scrollbar">
-                                <ul class="list-group no-margn todo-list" id="task-list"></ul>
+                                <ul class="list-group no-margn todo-list" id="documentList">
+                                    <li class="list-group-item">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="breadcomb-list" style="padding:0px !important; background: #fff; margin-top: 10px !important;">
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                    <div class="breadcomb-wp">
+                                                        <div class="breadcomb-ctn" style="margin-left:0px !important">
+                                                            <h2>Test Document</h2>
+                                                            <p>INCOME TAX RETURN <span class="bread-ntd" style="margin-left:20px;">Ashuni Gajjar</span></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+                                                    <div class="breadcomb-report">
+                                                        <button data-toggle="tooltip" data-placement="left" title="" class="btn waves-effect" data-original-title="Download Report"><i class="notika-icon notika-sent"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </li>
+                                </ul>
+
+
+
+
+
                             </div>
 
                         </div>
@@ -95,11 +122,77 @@
                 success: function (response) {
                     $("#task-list").html('');
                     $(response.Result).each(function (i, data) {
-                        $("#task-list").append('<li class="list-group-item"><div class="checkbox checkbox-primary"><label for="9">'+data.TaskName+'</label></div></li>')
+                        $("#task-list").append('<li class="list-group-item"><div class="checkbox checkbox-primary"><label for="9">'
+                            + data.TaskName + '</label></div></li>')
                     });
                 },
                 error: function (error) {
                 }
+    });
+
+        $.ajax({
+            url: '@Url.Action("GetDocumentList", "Home")',
+            dataType: "json",
+            type: "GET",
+            cache: false,
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                    $("#documentList").html('');
+                $(response).each(function (i, data) {
+                    debugger
+                    console.log(i.Name)
+                        //$("#documentList").append('<li class="list-group-item"><div class="checkbox checkbox-primary"><label for="document">'+data.Name+'</label></div></li>')
+                    $("#documentList").append('<li class="list-group-item">'+
+                                    '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">'+
+                                        '<div class="breadcomb-list" style="padding:0px !important; background: #fff; margin-top: 10px !important;">'+
+                                            '<div class="row">'+
+                                                '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">'+
+                                                    '<div class="breadcomb-wp">'+
+                                                        '<div class="breadcomb-ctn" style="margin-left:0px !important">'+
+                                                          '<p style="font-size: 16px;font-weight: 600;">' + data.Name +
+                                                            '<span style="color: #6e5e5e;font-size: 12px;font-weight: 400;margin-left:10px;">'
+                                                            + data.DocumentTypeName + '</span></p>' +
+                                                            '<span class="bread-ntd"  style="margin-top: 11px !important;color: #261d1d7a;">Created By:  '+
+                                                            '<span class="bread-ntd" style="margin-left: 5px;color: #6e5e5e;">' + data.ClientName +'</span></span>' +
+                                                        '</div>'+
+                                                    '</div>'+
+                                                '</div>'+
+                                                '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">'+
+                                                    '<div class="breadcomb-report">'+
+                                                        '<button data-toggle="tooltip" id="btnDownloadDocument" onClick="downloadDocument('+data.DocumentId+')" data-placement="left" title="" class="btn waves-effect" data-original-title="Download Report"><i class="notika-icon notika-down-arrow"></i></button>'+
+                                                    '</div>'+
+                                                '</div>'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</div>'+
+                                    '</li>')
+                });
+                },
+                error: function (error) {
+                }
+        });
+
+        function downloadDocument(docID) {
+            console.log(docID)
+            $("#loading").show();
+            $.ajax({
+                url: '@Url.Action("DownloadDocument", "Home")',
+                dataType: "html",
+                type: "GET",
+                data: {"documentID": docID},
+                cache: false,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    $("#loading").hide();
+                    $("#modelDocument .modal-body").html(response);
+                    $("#modelDocument").modal('toggle');
+                },
+                error: function (error) {
+                    $("#loading").hide();
+                    Notification('', 'Internal error occured, Please try again', 'danger');
+                }
             });
+        }
+
     </script>
 }
