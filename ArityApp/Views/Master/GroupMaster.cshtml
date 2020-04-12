@@ -4,17 +4,6 @@
     ViewBag.Title = "Group";
 
 }
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Data Table JS
-    ============================================ -->
-    <link rel="stylesheet" href="/Content/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="/Content/css/chosen/chosen.css">
-</head>
 
 <div class="breadcomb-area">
     <div class="container">
@@ -128,6 +117,14 @@
             "language": {
                 "emptyTable": "No group found"
             },
+            dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        title: 'Excel',
+                        text:'Export to excel'
+                    }
+                ],
            "columns": [
                 { "data": "Name" },
                 { "data": "Description" },

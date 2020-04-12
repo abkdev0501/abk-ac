@@ -264,21 +264,22 @@ namespace Arity.Service
         #region Private Method
         private string GenerateInvoiceNumber(int companyId)
         {
-            var genericNumber = _dbContext.InvoiceDetails.OrderByDescending(_ => _.Id).Select(_ => _.Invoice_Number).FirstOrDefault();
-            var compName = _dbContext.Company_master.Where(_ => _.Id == companyId).Select(_ => _.CompanyName).FirstOrDefault();
+            var genericNumber = _dbContext.InvoiceDetails.Where(_ => _.CompanyId == companyId).OrderByDescending(_ => _.Id).Select(_ => _.Invoice_Number).FirstOrDefault();
+            var compName = _dbContext.Company_master.Where(_ => _.Id == companyId).Select(_ => _.Prefix).FirstOrDefault();
             if (!string.IsNullOrEmpty(genericNumber) && genericNumber.Split('-').Count() > 1)
             {
-                genericNumber = (Convert.ToInt32(genericNumber.Split('-')[1].Substring(1, (genericNumber.Split('-')[1].Length - 1))) + 1).ToString();
+                genericNumber = (Convert.ToInt32(genericNumber.Split('-')[2]) + 1).ToString();
             }
             else
                 genericNumber = "1";
 
-            return (compName.ToUpper().Substring(0, 3) + "-I" + genericNumber);
+            return (compName + "-I-" + genericNumber);
         }
 
         public async Task<List<TrackingInformation>> GetTrackingInformation(int invoiceId)
         {
             return (from tracking in _dbContext.InvoiceTrackings.ToList()
+                    join user in _dbContext.Users on (tracking.UserId ?? 0) equals user.Id
                     where tracking.InvoiceId == invoiceId
                     select new TrackingInformation()
                     {
@@ -286,7 +287,8 @@ namespace Arity.Service
                         InvoiceId = tracking.InvoiceId,
                         Comment = tracking.Comment,
                         CreatedAt = tracking.CreatedAt.Value.ToString("MM/dd/yyyy"),
-                        CreatedBy = tracking.CreatedBy
+                        CreatedBy = tracking.CreatedBy,
+                        AddedBy = user.FullName
                     }).ToList();
         }
 
@@ -305,7 +307,8 @@ namespace Arity.Service
                         Comment = trackingInformation.Comment,
                         CreatedAt = DateTime.Now,
                         InvoiceId = trackingInformation.InvoiceId,
-                        CreatedBy = Convert.ToInt32(SessionHelper.UserTypeId)
+                        CreatedBy = Convert.ToInt32(SessionHelper.UserTypeId),
+                        UserId = Convert.ToInt32(SessionHelper.UserTypeId)
                     });
 
                 await _dbContext.SaveChangesAsync();

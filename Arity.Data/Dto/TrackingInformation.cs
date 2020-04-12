@@ -7,5 +7,6 @@
         public string CreatedAt { get; set; }
         public int InvoiceId { get; set; }
         public int CreatedBy { get; set; }
+        public string AddedBy { get; set; }
     }
 }

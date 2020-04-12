@@ -4,19 +4,6 @@
     ViewBag.Title = "Users";
 }
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Data Table JS
-        ============================================ -->
-    <link rel="stylesheet" href="/Content/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="/Content/css/chosen/chosen.css">
-
-</head>
-
 <div class="breadcomb-area">
     <div class="container">
         <div class="row">
@@ -44,7 +31,7 @@
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
                             <div class="breadcomb-report">
-                                  <button id="btnAddInvoiceEntry" onclick="AddUpdateTask(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
+                                <button id="btnAddInvoiceEntry" onclick="AddUpdateTask(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
                             </div>
                         </div>
                     </div>
@@ -119,8 +106,9 @@
                                 <tr>
                                     <th style="width:12%;">Title</th>
                                     <th style="width:12%;">Assign To</th>
-                                    <th style="width:12%;">Description</th>
-                                    <th style="width:10%;">DueDate</th>
+                                    <th style="width:8%;">client</th>
+                                    <th style="width:8%;">Description</th>
+                                    <th style="width:5%;">DueDate</th>
                                     <th style="width:10%;">Status</th>
                                     <th style="width:10%;">User comment</th>
                                     <th style="width:10%;">Created On</th>
@@ -138,8 +126,9 @@
 
 @section Scripts {
     <script>
-    $(document).ready(function () {
-
+        $(document).ready(function () {
+            $("#liHome").removeClass("active");
+        $("#liTask").addClass("active");
        table =  $('#tblUsers').DataTable({
             "ajax": function (data, callback, settings) {
                 $.ajax({
@@ -166,10 +155,19 @@
             },
             "language": {
                 "emptyTable": "No tasks found"
-            },
+           },
+            dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        title: 'Excel',
+                        text:'Export to excel'
+                    }
+                ],
            "columns": [
                 { "data": "TaskName" },
                 { "data": "UserName" },
+                { "data": "ClientName" },
                 { "data": "Description" },
                 { "data": "DueDateString" },
                  {

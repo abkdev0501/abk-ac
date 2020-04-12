@@ -26,6 +26,7 @@ namespace Arity.Service
                 return (from task in _dbContext.Tasks.ToList()
                         join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
                         join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
+                        join assignedTo in _dbContext.Users.ToList() on task.ClientId??0 equals assignedTo.Id
                         where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate && user.Id == SessionHelper.UserId
                         select new TaskDTO
                         {
@@ -40,7 +41,8 @@ namespace Arity.Service
                             CreatedOnString = userTask.CreatedOn.ToString("MM/dd/yyyy"),
                             UserName = user.FullName,
                             StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
-                            StatusId = userTask.Status
+                            StatusId = userTask.Status,
+                            ClientName = assignedTo.FullName
                         }).OrderBy(_ => _.StatusId).ToList();
             }
             else
@@ -49,6 +51,7 @@ namespace Arity.Service
                 return (from task in _dbContext.Tasks.ToList()
                         join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
                         join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
+                        join assignedTo in _dbContext.Users.ToList() on task.ClientId ?? 0 equals assignedTo.Id
                         where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate
                         select new TaskDTO
                         {
@@ -63,7 +66,8 @@ namespace Arity.Service
                             CreatedOnString = userTask.CreatedOn.ToString("MM/dd/yyyy"),
                             UserName = user.FullName,
                             StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
-                            StatusId = userTask.Status
+                            StatusId = userTask.Status,
+                            ClientName = assignedTo.FullName
                         }).OrderBy(_ => _.StatusId).ToList();
             }
         }

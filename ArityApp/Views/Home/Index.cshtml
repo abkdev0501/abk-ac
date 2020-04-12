@@ -4,38 +4,27 @@
     ViewBag.Title = "Index";
 }
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    td.details-control {
+        background: url('/Content/images/details_open.png') no-repeat center center;
+        cursor: pointer;
+    }
 
-    <!-- Data Table JS
-        ============================================ -->
-    <link rel="stylesheet" href="/Content/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="/Content/css/chosen/chosen.css">
-    <style>
-        td.details-control {
-            background: url('/Content/images/details_open.png') no-repeat center center;
-            cursor: pointer;
-        }
+    .date-filter .filter-date-button {
+        width: 14%;
+    }
 
-        .date-filter .filter-date-button {
-            width: 14%;
-        }
+    tr.shown td.details-control {
+        background: url('/Content/images/details_close.png') no-repeat center center;
+    }
 
-        tr.shown td.details-control {
-            background: url('/Content/images/details_close.png') no-repeat center center;
-        }
-
-        .child-heading {
-            padding-left: 5%;
-            font-weight: 600;
-            padding: 2% 2% 2% 5%;
-            font-style: italic;
-        }
-    </style>
-</head>
+    .child-heading {
+        padding-left: 5%;
+        font-weight: 600;
+        padding: 2% 2% 2% 5%;
+        font-style: italic;
+    }
+</style>
 
 <div class="breadcomb-area">
     <div class="container">
@@ -70,7 +59,6 @@
     </div>
 </div>
 <!-- Breadcrumb area End-->
-
 <!-- Modal pop-up area start -->
 <div class="modal animated fade" id="modelInvoiceEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-large">
@@ -89,7 +77,6 @@
     </div>
 </div>
 <!-- Modal pop-up area start -->
-
 <!--Drag and Drop end-->
 <!--profile update start-->
 <div class="modal animated fade" id="modelUpdateProfile" role="dialog">
@@ -198,7 +185,8 @@
 @section Scripts {
     <script>
     $(document).ready(function () {
-
+        $("#liInvoice").addClass("active");
+        $("#liHome").removeClass("active");
         table = $('#tblInvoiceHistory').DataTable({
             "ajax": function (data, callback, settings) {
                 $.ajax({
@@ -226,6 +214,7 @@
             "language": {
                 "emptyTable": "No invoice found"
             },
+
             "columns": [
                 {
                     "className": 'details-control',
@@ -243,7 +232,7 @@
                @: "orderable": false,
                @: "data": null,
                @: 'render': function (data, type, full, meta) {
-               @:             return '<button class="btn btn-primary btn-log"><i class="fa fa-plus-circle"></i> Logs</button>';
+               @:             return '<button class="btn btn-primary btn-log"><i class="fa fa-plus-circle"></i></button>';
                @:         }
                @:},
                }
@@ -307,12 +296,12 @@
         if ( row.child.isShown() ) {
             row.child.hide();
             tr.removeClass('shown');
-            tr.find(".tracking-control").find(".btn-log").html("<i class='fa fa-plus-circle'></i> Logs");
+            tr.find(".tracking-control").find(".btn-log").html("<i class='fa fa-plus-circle'></i>");
         }
         else {
             row.child( trackingLog(row.data()) ).show();
             tr.addClass('shown');
-            tr.find(".tracking-control").find(".btn-log").html("<i class='fa fa-minus-circle'></i> Logs");
+            tr.find(".tracking-control").find(".btn-log").html("<i class='fa fa-minus-circle'></i>");
         }
     });
 
@@ -384,7 +373,7 @@
         }
 
         function trackingLog(invoice) {
-          var html = '<div class="child-heading">Invoice tracking information</div><table cellpadding="5" cellspacing="0" border="0" style="margin-left:5%;width:90%;    border: 1px solid #eee;margin-bottom: 2%;"><tr><th>Information</th><th>Date</th><th></th><th></th></tr>';
+          var html = '<div class="child-heading">Invoice tracking information</div><table cellpadding="5" cellspacing="0" border="0" style="margin-left:5%;width:90%;    border: 1px solid #eee;margin-bottom: 2%;"><tr><th>Information</th><th>Date</th><th>Added By</th><th></th><th></th></tr>';
              $.ajax({
                         url: "@Url.Action("GetInvoiceTrackingInformation", "Home")",
                         method: "GET",
@@ -407,19 +396,19 @@
                                     {
                                         @:if (data.CreatedBy == @SessionHelper.UserTypeId)
                                         @: {
-                                          @:html += '<td>' + data.CreatedAt + '</td><td><i style="cursor:pointer;" class="fa fa-edit" onclick="AddUpdateInvoiceTracking(' + data.TrackingId + ',' + data.InvoiceId + ')"></i></td><td><i style="cursor:pointer;" class="fa fa-trash" onclick="RemvoeTracking(' + data.TrackingId + ')"></i></td>';
+                                          @:html += '<td>' + data.CreatedAt + '</td><td>' + data.AddedBy + '</td><td><i style="cursor:pointer;" class="fa fa-edit" onclick="AddUpdateInvoiceTracking(' + data.TrackingId + ',' + data.InvoiceId + ')"></i></td><td><i style="cursor:pointer;" class="fa fa-trash" onclick="RemvoeTracking(' + data.TrackingId + ')"></i></td>';
                                         @:}
                                         @:else if(@((int)Arity.Service.Core.UserType.MasterAdmin) === @SessionHelper.UserTypeId)
                                         @: {
-                                          @:html += '<td>' + data.CreatedAt + '</td><td><i style="cursor:pointer;" class="fa fa-edit" onclick="AddUpdateInvoiceTracking(' + data.TrackingId + ',' + data.InvoiceId + ')"></i></td><td><i style="cursor:pointer;" class="fa fa-trash" onclick="RemvoeTracking(' + data.TrackingId + ')"></i></td>';
+                                          @:html += '<td>' + data.CreatedAt + '</td><td>' + data.AddedBy + '</td><td><i style="cursor:pointer;" class="fa fa-edit" onclick="AddUpdateInvoiceTracking(' + data.TrackingId + ',' + data.InvoiceId + ')"></i></td><td><i style="cursor:pointer;" class="fa fa-trash" onclick="RemvoeTracking(' + data.TrackingId + ')"></i></td>';
                                         @:}
                                          @:else
                                         @: {
-                                          @:html += '<td colspan="3">' + data.CreatedAt + '</td>';
+                                          @:html += '<td>' + data.CreatedAt + '</td><td colspan="3">' + data.AddedBy + '</td>';
                                         @:}
                                         }
                                     else {
-                                         @:html += '<td colspan="3">' + data.CreatedAt + '</td>';
+                                         @:html += '<td>' + data.CreatedAt + '</td><td colspan="3">' + data.AddedBy + '</td>';
                                     }
                                     html +='</tr>';
                                     });

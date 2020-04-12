@@ -4,26 +4,6 @@
     ViewBag.Title = "Client";
 }
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Data Table JS
-        ============================================ -->
-    <link rel="stylesheet" href="/Content/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="/Content/css/chosen/chosen.css">
-    <style>
-        .exportExcel{
-  padding: 5px;
-  border: 1px solid grey;
-  margin: 5px;
-  cursor: pointer;
-}
-    </style>
-</head>
-
 <div class="breadcomb-area">
     <div class="container">
         <div class="row">
@@ -152,18 +132,14 @@
             "language": {
                 "emptyTable": "No users found"
            },
-            "sDom": 'T<"clear">lfrtip',
-		"oTableTools": {
-			"aButtons": [
-				"copy",
-				"print",
-				{
-					"sExtends":    "collection",
-					"sButtonText": "Save",
-					"aButtons":    [ "csv", "xls", "pdf" ]
-				}
-			]
-		},
+            dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        title: 'Excel',
+                        text:'Export to excel'
+                    }
+                ],
            "columns": [
                 { "data": "FullName" },
                 { "data": "Username" },

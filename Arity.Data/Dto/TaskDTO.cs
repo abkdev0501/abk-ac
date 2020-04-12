@@ -30,5 +30,6 @@ namespace Arity.Data.Dto
         public string CompletedOnString { get; set; }
         public int AddedBy { get; set; }
         public string AddedByName { get; set; }
+        public string ClientName { get; set; }
     }
 }

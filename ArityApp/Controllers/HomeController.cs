@@ -89,7 +89,7 @@ namespace ArityApp.Controllers
                     invoiceEntry.InvoiceId = invoiceId ?? 0;
                     invoiceEntry.ClientId = invoiceDetails != null ? invoiceDetails.ClientId : 0;
                     invoiceEntry.CompanyId = invoiceDetails != null ? invoiceDetails.CompanyId : 0;
-                    invoiceEntry.InvoiceDate = invoiceDetails != null ? invoiceDetails.InvoiceDate : invoiceEntry.InvoiceDate;
+                    invoiceEntry.InvoiceDate = invoiceDetails != null && invoiceDetails.InvoiceDate != default ? invoiceDetails.InvoiceDate : DateTime.Now;
                 }
                 else
                     invoiceEntry.InvoiceId = default(int);
@@ -278,6 +278,8 @@ namespace ArityApp.Controllers
                 if (id != null)
                     receiptDto = await _paymentService.GetReceipt(id ?? 0);
                 receiptDto = receiptDto ?? new ReceiptDto();
+
+                receiptDto.RecieptDate = receiptDto.RecieptDate != DateTime.MinValue ? receiptDto.RecieptDate : DateTime.Now;
 
                 ViewBag.Company = new SelectList(await _invoiceService.GetCompany(), "Id", "CompanyName", receiptDto.CompanyId);
                 ViewBag.Client = new SelectList(await _invoiceService.GetClient(Convert.ToInt32(receiptDto.CompanyId)), "Id", "FullName", receiptDto.ClientId);
@@ -882,7 +884,7 @@ namespace ArityApp.Controllers
                     userTypes.RemoveAt(2);
 
                 ViewBag.UserType = new SelectList(userTypes, "Id", "UserTypeName", userDto.UserTypeId);
-               // ViewBag.Companies = new MultiSelectList(await _invoiceService.GetCompany(), "Id", "CompanyName", userDto.CompanyIds);
+                // ViewBag.Companies = new MultiSelectList(await _invoiceService.GetCompany(), "Id", "CompanyName", userDto.CompanyIds);
                 return PartialView("_UserWizard", userDto);
             }
             catch (Exception ex)
@@ -995,7 +997,7 @@ namespace ArityApp.Controllers
         private string GetInvoiceHTML()
         {
             return @"
-    <head>
+    <div style='page-break-after:always'></div><head>
             <style>
                 body {
                 font - family: 'Segoe UI', Tahoma, Arial, Helvetica, sans - serif;
@@ -1074,7 +1076,7 @@ border-left:1px solid;
 }
         </style>
     </head>
-    <body>
+    <body style='margin:40px 40px;'>
         <div class='color' style='background-color:##COLOR##;'>
             <h1>##COMPANY##</h1>
              <h3>##TYPE##</h3>
@@ -1150,7 +1152,7 @@ border-left:1px solid;
         private string GetRecieptHTML()
         {
             return @"
-    <head>
+   <div style='page-break-after:always'></div> <head>
             <style>
                 body {
                 font - family: 'Segoe UI', Tahoma, Arial, Helvetica, sans - serif;
@@ -1229,7 +1231,7 @@ border-left:1px solid;
 }
         </style>
     </head>
-    <body>
+    <body  style='margin:40px 40px;'>
         <div class='color' >
             <div style='padding-left:22%;'>
             <h1 style='background-color:##COLOR##;width:70%;'>##COMPANY##</h1>
