@@ -865,13 +865,18 @@ namespace ArityApp.Controllers
             Sheet.Cells["A1"].Style.Font.Color.SetColor(Color.Red);
             currentCell++;
 
-            Sheet.Cells["A2"].Value = "**** enter data that available in given list ****";
-            Sheet.Cells["A2"].Style.Font.Color.SetColor(Color.Red);
+            Sheet.Cells["A6"].Value = "**** Do not change anything in file Excepting filling data****";
+            Sheet.Cells["A1"].Style.Font.Color.SetColor(Color.Red);
             currentCell++;
 
-            Sheet.Cells["A3"].Value = "* ***Select client associated with company ****";
-            Sheet.Cells["A3"].Style.Font.Color.SetColor(Color.Red);
+            Sheet.Cells["B6"].Value = "**** Do not change anything in file Excepting filling data****";
+            Sheet.Cells["A1"].Style.Font.Color.SetColor(Color.Red);
             currentCell++;
+
+            Sheet.Cells["C6"].Value = "**** Do not change anything in file Excepting filling data****";
+            Sheet.Cells["A1"].Style.Font.Color.SetColor(Color.Red);
+            currentCell++;
+
 
             using (var memoryStream = new MemoryStream())
             {
