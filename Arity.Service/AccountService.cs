@@ -193,5 +193,5 @@ namespace Arity.Service
             return await _dbContext.Users.FirstOrDefaultAsync(_ => _.Username == username && _.Password == password && _.Active == true);
         }
     }
-}
+} 
 

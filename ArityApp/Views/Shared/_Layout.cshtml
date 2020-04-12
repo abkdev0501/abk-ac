@@ -75,11 +75,15 @@
     <!-- modernizr JS
         ============================================ -->
     <script src="/Content/js/vendor/modernizr-2.8.3.min.js"></script>
+    <link href="/Content/css/dialog/sweetalert2.min.css" rel="stylesheet" />
+    <link href="/Content/css/dialog/dialog.css" rel="stylesheet" />
     <style>
         .no-rights {
             pointer-events: none;
         }
     </style>
+
+
 </head>
 
 <body>
@@ -265,6 +269,9 @@
                             <li id="liUser">
                                 <a data-toggle="tab" href="#User"><i class="notika-icon notika-support"></i> Users</a>
                             </li>
+                        <li id="liDoc">
+                            <a href="/Document/Index"><i class="notika-icon notika-support"></i>Document</a>
+                        </li>
                         }
                         </ul>
                     <div class="tab-content custom-menu-content">
@@ -397,6 +404,9 @@
     <script src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.2.2/js/buttons.html5.min.js"></script>
+
+    <script src="/Content/js/dialog/dialog-active.js"></script>
+    <script src="/Content/js/dialog/sweetalert2.min.js"></script>
     @RenderSection("scripts", required: false)
     <script>
         $(document).ready(function ()

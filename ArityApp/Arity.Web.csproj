@@ -204,6 +204,8 @@
     <Content Include="Content\css\chosen\chosen-sprite.png" />
     <Content Include="Content\css\chosen\chosen.css" />
     <Content Include="Content\css\datapicker\datepicker3.css" />
+    <Content Include="Content\css\dialog\dialog.css" />
+    <Content Include="Content\css\dialog\sweetalert2.min.css" />
     <Content Include="Content\css\dropzone.css" />
     <Content Include="Content\css\font-awesome.min.css" />
     <Content Include="Content\css\jquery.dataTables.min.css" />

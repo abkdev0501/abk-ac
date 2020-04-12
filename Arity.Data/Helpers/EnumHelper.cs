@@ -2,6 +2,19 @@
 {
     public static class EnumHelper
     {
+        public enum UserRole
+        {
+            Master = 1,
+            Admin = 2,
+            User = 10002
+        }
+        public enum UserType
+        {
+            Master = 1,
+            Admin = 2,
+            User = 3
+        }
+
         public enum CompanyColor
         {
             DarkOliveGreen = 1,

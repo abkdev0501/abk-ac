@@ -38,6 +38,33 @@
                                     <i class="notika-icon notika-form"></i>
                                 </div>
                                 <div class="breadcomb-ctn">
+                                    <h2>Add Invice in bulk</h2>
+                                    <p>Sample file to Create invoices</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+                            <div class="breadcomb-report">
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                {
+                                    <button id="btnCreateSampleInvoice" onclick="GenerateSampleInvoice()" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-file-excel-o" aria-hidden="true"></i></button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="breadcomb-list">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="breadcomb-wp">
+                                <div class="breadcomb-icon">
+                                    <i class="notika-icon notika-form"></i>
+                                </div>
+                                <div class="breadcomb-ctn">
                                     <h2>Invoice History</h2>
                                     <p>List of invoices</p>
                                 </div>
@@ -53,9 +80,9 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
+
     </div>
 </div>
 <!-- Breadcrumb area End-->
@@ -171,6 +198,7 @@
                                         <th style="width:5%;">Add Entry</th>
                                         <th style="width:5%;">Tracking</th>
                                     }
+                                        <th style="width:5%;">Delete</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -264,8 +292,20 @@
             @:"render": function(data, type, full) {
             @:return '<button class="btn waves-effect" onclick="AddUpdateInvoiceTracking(0,' + data.InvoiceId + ')"><i class="fa fa-commenting-o" aria-hidden="true"></i></button>';
               @:}
-        @:}
+        @:},
+
 }
+                {
+             "orderable": false,
+             "data": null,
+                    "render": function (data, type, full) {
+                        return '<div class="dialog-pro dialog">' +
+                            '<button class="btn btn-info" onclick="DeleteInvoice(' + data.InvoiceId + ')" id="sa-warning" >'+
+                            '< i class="fa fa-trash" aria-hidden="true"></i>' +
+                            '</button > </div > ';
+             //return '<button class="btn waves-effect" onclick="AddUpdateInvoiceEntry(0,' + data.InvoiceId + ')"><i class="fa fa-plus-circle" aria-hidden="true"></i></button>';
+                    }
+                }
             ],
             "order": [[5, "desc"]]
        });
@@ -449,6 +489,36 @@
             }
                 window.open("/home/GeneratePDF/" + invoiceIds);
         }
+
+        function DeleteInvoice(InvoiceID) {
+            swal({   
+			title: "Are you sure?",   
+			text: "You will not be able to recover this imaginary file!",   
+			type: "warning",   
+			showCancelButton: true,   
+			confirmButtonText: "Yes, delete it!",
+            }).then(function () {
+            console.log(InvoiceID);
+                $("#loading").show();
+                $.ajax({
+                    url: '@Url.Action("DeleteInvoice", "Home")',
+                    type: "POST",
+                    data: { invoiceId: InvoiceID },
+                    cache: false,
+                    success: function (response) {
+                        table.ajax.reload();
+                        $("#loading").hide();
+			            swal("Deleted!", "Your Invoice has been deleted.", "success"); 
+                        Notification('', 'Invoice deleted succesfully', 'success');
+                    },
+                    error: function (error) {
+                        $("#loading").hide();
+                        Notification('', 'Internal error occured, Please try again', 'danger');
+                    }
+                });
+		});
+            
+        }
     </script>
 }
 
@@ -537,6 +607,10 @@
                 }
             });
             }
+        }
+
+        function GenerateSampleInvoice() {
+            window.open("/home/SampleInvoiceCreateFile/");
         }
     </script>
 }

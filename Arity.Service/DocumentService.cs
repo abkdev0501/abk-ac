@@ -22,6 +22,8 @@ namespace Arity.Service
             _dbContext = new RMNEntities();
         }
 
+        
+
         /// <summary> 
         /// Fetch document list from database
         /// </summary>
@@ -57,7 +59,7 @@ namespace Arity.Service
                           select cd).ToListAsync();
         }
 
-        public DocumentMasterDto GetDocumentByID(int documentID)
+        public async Task<DocumentMasterDto> GetDocumentByID(int documentID)
         {
             DocumentMasterDto document = new DocumentMasterDto();
             return (from documentMaster
@@ -115,6 +117,62 @@ namespace Arity.Service
 
             }
             return documentMaster.DocumentId;
+        }
+
+        public bool DeleteDocumentByID(int documentID)
+        {
+            try
+            {
+                _dbContext.DocumentMasters.Remove(_dbContext.DocumentMasters.Where(_ => _.DocumentId == documentID).FirstOrDefault());
+                //_dbContext.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<List<DocumentMasterDto>> GetAllDocuments()
+        {
+            return (from data in _dbContext.DocumentMasters.ToList()
+                    join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
+                    select new DocumentMasterDto()
+                    {
+                        DocumentId = data.DocumentId,
+                        Name = data.Name,
+                        ClientId = data.ClientId,
+                        DocumentTypeName = Enum.GetName(typeof(DocumentType), data.DocumentType),
+                        IsActive = data.IsActive,
+                        CreatedBy = data.CreatedBy,
+                        CreatedOn = data.CreatedOn,
+                        StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
+                        ClientName = user.FullName
+                    }).OrderBy(_=>_.ClientId).ToList();
+        }
+
+        DocumentMasterDto IDocumentService.GetDocumentByID(int documentID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<DocumentMasterDto>> GetDocumentByUserID(int userId)
+        {
+            return (from data in _dbContext.DocumentMasters.ToList()
+                    join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
+                    where data.CreatedBy == userId
+                    select new DocumentMasterDto()
+                    {
+                        DocumentId = data.DocumentId,
+                        Name = data.Name,
+                        ClientId = data.ClientId,
+                        DocumentTypeName = Enum.GetName(typeof(DocumentType), data.DocumentType),
+                        IsActive = data.IsActive,
+                        CreatedBy = data.CreatedBy,
+                        CreatedOn = data.CreatedOn,
+                        StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
+                        ClientName = user.FullName
+                    }).ToList();
         }
     }
 }

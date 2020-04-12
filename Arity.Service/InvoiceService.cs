@@ -357,6 +357,40 @@ namespace Arity.Service
                           select pm).SumAsync(_ => _.Amount);
         }
 
+        public async Task<bool> DeleteInvoiceById(int invoiceId)
+        {
+            try
+            {
+                _dbContext.InvoiceDetails.Remove(await _dbContext.InvoiceDetails.Where(_ => _.Id == invoiceId).FirstOrDefaultAsync());
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<List<CompanyClientList>> GetAllCompanyWithClients()
+        {
+            try
+            {
+               return (from company in _dbContext.Company_master
+                 join client in _dbContext.Company_Client_Mapping on company.Id equals (client.CompanyId ?? 0)
+                 join user in _dbContext.Users on (client.UserId ?? 0) equals user.Id
+                 select new CompanyClientList {
+                     CompanyName = company.CompanyName,
+                     ClientName = user.Username
+                 }).ToList();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+
         #endregion
     }
-}
+    }

@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "Document";
 }
-
+ 
 <div class="breadcomb-area">
     <div class="container">
         <div class="row">
@@ -33,7 +33,6 @@
     </div>
 </div>
 <!-- Breadcrumb area End-->
-
 <!-- Data Table area Start-->
 <div class="data-table-area" style="margin-top:25px;height:100%">
     <div class="container">
@@ -76,6 +75,10 @@
                                     <th style="width:20%;" align="center">Status</th>
                                     <th style="width:20%;" align="center">Active</th>
                                     <th style="width:20%;">Update</th>
+                                    @if (SessionHelper.UserId == (long)Arity.Data.Helpers.EnumHelper.UserRole.Master)
+                                    {
+                                        <th style="width:20%;">Delete</th>
+                                    }
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -85,11 +88,9 @@
             </div>
         </div>
     </div>
-
 </div>
 
 <!--Data Table End-->
-
 <!-- Modal pop-up start-->
 <div class="modal animated fade" id="modelDocument" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-large">
@@ -126,11 +127,83 @@
 
     <script>
 
+        //Load document List
+        $(document).ready(function () {
+            table = $('#tblDocument').DataTable({
+                "ajax": function (data, callback, settings) {
+                    $.ajax({
+                        url: '@Url.Action("LoadDocuments","Document")',
+                        type: "GET",
+                        dataType: "json",
+                        data: {
+                            from: $("#FromDate").val(),
+                            to: $("#ToDate").val()
+                        },
+                        beforeSend: function (xhrObj) {
+                            $("#loading").show();
+                        }
+                    })
+                        .done(function (data, textStatus, jqXHR) {
+                            callback(data);
+                        })
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            Notification('Error! ', '' + errorThrown + '', 'danger');
+                        })
+                        .always(function (data, textStatus, jqXHR) {
+                            $("#loading").hide();
+                        });
+                },
+                "language": {
+                    "emptyTable": "No document found"
+                },
+                "columns": [
+                    //{ "data": "DocumentId" },
+                    { "data": "Name" },
+                    { "data": "ClientName" },
+                    { "data": "DocumentTypeName" },
+                    { "data": "StatusName" },
+                    {
+                        "orderable": false,
+                        "data": null,
+                        "render": function (data, type, full) {
+                            if (data.IsActive)
+                                return '<i class="notika-icon notika-checked" aria-hidden="true"></i>';
+                            else
+                                return '<i class="notika-icon notika-close" aria-hidden="true"></i>';
+                        }
+                    },
+                    {
+                        "orderable": false,
+                        "data": null,
+                        "render": function (data, type, full) {
+                            return '<button class="btn waves-effect" onclick="UploadDocument(' + data.DocumentId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                        }
+                    },
+             @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                {
+                    @:{
+                    @:    "orderable": false,
+                    @:    "data": null,
+                    @:    "render": function (data, type, full) {
+                                
+                    @:            return '<div class="dialog-pro dialog"> <button class="btn btn-info" id="sa-warning" onclick="DeleteDocument(' + data.DocumentId + ')"><i class="fa fa-trash" aria-hidden="true"></i></button> </div>';
+                    @:    }
+                    @:}
+                    }
+                ],
+                "order": [[2, "desc"]]
+            });
+
+         $("#btnFilterGrid").click(function () {
+                 table.ajax.reload();
+        });
+    });
+
+
         //Upload DOcument Model pop up
         function UploadDocument(DocumentID) {
-            debugger
             console.log(DocumentID);
-       $("#loading").show();
+            $("#loading").show();
             $.ajax({
                 url: '@Url.Action("UploadDocument", "Document")',
                 dataType: "html",
@@ -148,67 +221,40 @@
                     Notification('', 'Internal error occured, Please try again', 'danger');
                 }
             });
-    }
+        }
 
-         $(document).ready(function () {
-
-        table =  $('#tblDocument').DataTable({
-            "ajax": function (data, callback, settings) {
+        //Ajaxcall perform delete document
+        function DeleteDocument(DocumentID) {
+            swal({   
+			title: "Are you sure?",   
+			text: "You will not be able to recover this imaginary file!",   
+			type: "warning",   
+			showCancelButton: true,   
+			confirmButtonText: "Yes, delete it!",
+            }).then(function () {
+            console.log(DocumentID);
+                $("#loading").show();
                 $.ajax({
-                    url: '@Url.Action("LoadDocuments","Document")',
-                    type: "GET",
-                    dataType: "json",
-                    data: {
-                        from: $("#FromDate").val(),
-                        to: $("#ToDate").val()
-                    },
-                    beforeSend: function (xhrObj) {
-                        $("#loading").show();
-                    }
-                    })
-                    .done(function (data, textStatus, jqXHR) {
-                        callback(data);
-                    })
-                    .fail(function (jqXHR, textStatus, errorThrown) {
-                        Notification('Error! ', ''+errorThrown+'', 'danger');
-                    })
-                    .always(function (data, textStatus, jqXHR) {
+                    url: '@Url.Action("DeleteDocument", "Document")',
+                    type: "POST",
+                    data: { documentID: DocumentID },
+                    cache: false,
+                    success: function (response) {
+                        table.ajax.reload();
                         $("#loading").hide();
-                    });debugger
-            },
-            "language": {
-                "emptyTable": "No document found"
-            },
-            "columns": [
-                //{ "data": "DocumentId" },
-                { "data": "Name" },
-                { "data": "ClientName" },
-                { "data": "DocumentTypeName" },
-                { "data": "StatusName" },
-                {
-                    "orderable": false,
-                    "data": null,
-                    "render": function (data, type, full) {
-                        if(data.IsActive)
-                            return '<i class="notika-icon notika-checked" aria-hidden="true"></i>';
-                        else
-                            return '<i class="notika-icon notika-close" aria-hidden="true"></i>';
+			            swal("Deleted!", "Your imaginary file has been deleted.", "success"); 
+                        Notification('', 'Document deleted succesfully', 'success');
+                    },
+                    error: function (error) {
+                        $("#loading").hide();
+                        Notification('', 'Internal error occured, Please try again', 'danger');
                     }
-                },
-                {
-                    "orderable": false,
-                    "data": null,   
-                    "render": function (data, type, full) {
-                            return '<button class="btn waves-effect" onclick="UploadDocument(' + data.DocumentId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
-                    }
-                }
-            ],
-            "order": [[2, "desc"]]
-        });
+                });
+		});
+            
+        }
 
-         $("#btnFilterGrid").click(function () {
-                 table.ajax.reload();
-        });
-    });
+        
+
     </script>
 }
