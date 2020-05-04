@@ -93,5 +93,20 @@ namespace ArityApp.Controllers
                 return Json(false, JsonRequestBehavior.AllowGet);
             }
         }
+        
+        [HttpPost]
+        public async Task<ActionResult> DeleteTask(int taskId)
+        {
+            try
+            {
+                _taskService = new TaskService();
+                await _taskService.DeleteTask(taskId);
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
     }
 }

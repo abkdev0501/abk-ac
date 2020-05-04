@@ -90,7 +90,7 @@ namespace Arity.Service
                                     RecieptNo = receipt.RecieptNo,
                                     TotalAmount = receipt.TotalAmount,
                                     Status = receipt.Status ?? false,
-                                    CreatedDateString = receipt.CreatedDate.ToString("MM/dd/yyyy"),
+                                    CreatedDateString = receipt.CreatedDate.ToString("dd/MM/yyyy"),
                                     InvoiceNumbers = string.Join(",", _dbContext.InvoiceDetails.Where(i => _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id)).Select(i => i.Invoice_Number).ToList())
                                 }).ToList();
 
@@ -122,7 +122,7 @@ namespace Arity.Service
                             RecieptNo = receipt.RecieptNo,
                             TotalAmount = receipt.TotalAmount,
                             Status = receipt.Status ?? false,
-                            CreatedDateString = receipt.CreatedDate.ToString("MM/dd/yyyy"),
+                            CreatedDateString = receipt.CreatedDate.ToString("dd/MM/yyyy"),
                             InvoiceNumbers = string.Join(",", _dbContext.InvoiceDetails.Where(i => _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id)).Select(i => i.Invoice_Number).ToList())
                         }).ToList();
         }

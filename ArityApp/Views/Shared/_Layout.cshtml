@@ -269,35 +269,47 @@
                             <li id="liUser">
                                 <a data-toggle="tab" href="#User"><i class="notika-icon notika-support"></i> Users</a>
                             </li>
-                        <li id="liDoc">
-                            <a href="/Document/Index"><i class="notika-icon notika-support"></i>Document</a>
-                        </li>
+                            <li id="liDoc">
+                                <a href="/Document/Index"><i class="notika-icon notika-support"></i>Document</a>
+                            </li>
                         }
-                        </ul>
+                        @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
+                        {
+                            <li id="liNotes">
+                                <a href="/notes"><i class="notika-icon notika-form"></i>Notes</a>
+                            </li>
+                        }
+                    </ul>
                     <div class="tab-content custom-menu-content">
-                        <div id="Master" class="tab-pane notika-tab-menu-bg animated flipInX">
-                            <ul class="notika-main-menu-dropdown">
-                                <li>
-                                    <a href="\particular">Particulars</a>
-                                </li>
-                                <li>
-                                    <a href="\company">Company</a>
-                                </li>
-                                <li>
-                                    <a href="\group">Group</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div id="User" class="tab-pane notika-tab-menu-bg animated flipInX">
-                            <ul class="notika-main-menu-dropdown">
-                                <li>
-                                    <a href="/user">Users</a>
-                                </li>
-                                <li>
-                                    <a href="/client">Client</a>
-                                </li>
-                            </ul>
-                        </div>
+                        @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin || Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                        {
+                            <div id="Master" class="tab-pane notika-tab-menu-bg animated flipInX">
+                                <ul class="notika-main-menu-dropdown">
+                                    <li>
+                                        <a href="\particular">Particulars</a>
+                                    </li>
+                                    <li>
+                                        <a href="\company">Companies</a>
+                                    </li>
+                                    <li>
+                                        <a href="\group">Groups</a>
+                                    </li>
+                                    <li>
+                                        <a href="\notification">Notifications</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div id="User" class="tab-pane notika-tab-menu-bg animated flipInX">
+                                <ul class="notika-main-menu-dropdown">
+                                    <li>
+                                        <a href="/user">Users</a>
+                                    </li>
+                                    <li>
+                                        <a href="/client">Client</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -417,7 +429,7 @@
             $(".dt-button.buttons-excel.buttons-html5").addClass("btn btn-default notika-btn-default waves-effect");
             $(".dt-button.buttons-excel.buttons-html5").removeClass("dt-button buttons-excel buttons-html5");
 
-             @*$("#logout").click(function () {
+             $("#logout").click(function () {
                $.ajax({
                 url: '@Url.Action("Logout", "account")',
                 dataType: "json",
@@ -430,13 +442,13 @@
                     Notification('', 'Something went wrong, use different username', 'danger');
                 }
             });
-        });*@
+        });
 
         $("body").on("click","#btnCancel",function () {
             $(".close").trigger("click");
         });
         });
-       
+
         function validateEmail(email) {
             var re = /^(([^<>()\[\]\\.,;:\s@@"]+(\.[^<>()\[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(String(email).toLowerCase());

@@ -69,8 +69,14 @@
 
         public enum BusinessType
         {
-            Partnership =1,
-            Proprietorship =2
+            Partnership = 1,
+            Proprietorship = 2
+        }
+
+        public enum NotificationType
+        {
+            Notification = 1,
+            Notes = 2
         }
     }
 }

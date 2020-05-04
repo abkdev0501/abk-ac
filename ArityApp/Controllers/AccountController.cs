@@ -1,15 +1,9 @@
-﻿using Arity.Data;
-using Arity.Data.Entity;
+﻿using Arity.Data.Entity;
 using Arity.Data.Helpers;
 using Arity.Service;
 using Arity.Service.Contract;
-using Arity.Service.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -44,6 +38,7 @@ namespace ArityApp.Controllers
             if (!string.IsNullOrEmpty(user.Password) && !string.IsNullOrEmpty(user.Username))
             {
                 _accountService = new AccountService();
+                var pass = Functions.Decrypt("vPTOB971cL9xYBuyKAx12g==");
                 var validUser = await _accountService.Login(user.Username, Functions.Encrypt(user.Password));
                 if (validUser != null)
                 {

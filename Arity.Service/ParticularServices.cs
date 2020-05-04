@@ -57,7 +57,7 @@ namespace Arity.Service
                         CreatedDate = data.CreatedDate,
                         UpdatedDate = data.UpdatedDate,
                         IsExclude = data.IsExclude ?? false,
-                        CreatedDateString = data.CreatedDate.ToString("MM/dd/yyyy")
+                        CreatedDateString = data.CreatedDate.ToString("dd/MM/yyyy")
                     }).ToList();
         }
 

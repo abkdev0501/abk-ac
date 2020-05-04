@@ -184,6 +184,32 @@ namespace Arity.Service
         }
 
         /// <summary>
+        /// Get all clients
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<UsersDto>> GetAllClient()
+        {
+            return (from user in _dbContext.Users
+                    join type in _dbContext.UserTypes on user.UserTypeId equals type.Id
+                    where user.UserTypeId == (int)Arity.Service.Core.UserType.User
+                    select new UsersDto
+                    {
+                        Id = user.Id,
+                        Address = user.Address,
+                        City = user.City,
+                        Pincode = user.Pincode,
+                        FullName = user.FullName,
+                        PhoneNumber = user.PhoneNumber,
+                        Username = user.Username,
+                        UserType = type.UserTypeName,
+                        Email = user.Email,
+                        Active = user.Active,
+                        UserTypeId = user.UserTypeId,
+                        CreatedBy = user.CreatedBy
+                    }).ToList();
+        }
+
+        /// <summary>
         /// Get client by Id
         /// </summary>
         /// <param name="id"></param>
@@ -376,6 +402,144 @@ namespace Arity.Service
                 }
             }
 
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<NotificationDTO>> GetAllNotification()
+        {
+            var users = await _dbContext.Users.ToListAsync();
+
+            return (from n in _dbContext.Notifications.ToList()
+                    select new NotificationDTO
+                    {
+                        NotificationId = n.NotificationId,
+                        ClientId = n.ClientId,
+                        ClientName = users.FirstOrDefault(_ => _.Id == (n.ClientId ?? 0))?.FullName ?? "All",
+                        CreatedBy = n.CreatedBy,
+                        CreatedByName = users.FirstOrDefault(_ => _.Id == n.CreatedBy)?.FullName,
+                        IsComplete = n.IsComplete ?? false,
+                        Message = n.Message,
+                        OffBroadcastDateTime = n.OffBroadcastDateTime,
+                        OnBroadcastDateTime = n.OnBroadcastDateTime,
+                        OffBroadcastDateTimeString = n.OffBroadcastDateTime.ToString("dd/MM/yyyy"),
+                        OnBroadcastDateTimeString = n.OnBroadcastDateTime.ToString("dd/MM/yyyy"),
+                        TypeString = ((EnumHelper.NotificationType)n.Type).ToString()
+                    }).ToList();
+
+        }
+
+        public async Task<NotificationDTO> GetNotificationById(int id)
+        {
+            return (from n in _dbContext.Notifications
+                    where n.NotificationId == id
+                    select new NotificationDTO
+                    {
+                        NotificationId = n.NotificationId,
+                        ClientId = n.ClientId,
+                        CreatedBy = n.CreatedBy,
+                        IsComplete = n.IsComplete ?? false,
+                        Message = n.Message,
+                        OffBroadcastDateTime = n.OffBroadcastDateTime,
+                        OnBroadcastDateTime = n.OnBroadcastDateTime,
+                        Type = n.Type
+                    }).FirstOrDefault();
+        }
+
+        public async Task AddUpdateNotification(NotificationDTO notification)
+        {
+
+            if (notification.NotificationId > 0)
+            {
+                var existingNotifiction = await _dbContext.Notifications.FirstOrDefaultAsync(_ => _.NotificationId == notification.NotificationId);
+                existingNotifiction.Message = notification.Message;
+                existingNotifiction.IsComplete = notification.IsComplete;
+                existingNotifiction.OnBroadcastDateTime = notification.OnBroadcastDateTime;
+                existingNotifiction.OffBroadcastDateTime = notification.OffBroadcastDateTime;
+                existingNotifiction.ClientId = notification.ClientId;
+                existingNotifiction.Type = notification.Type;
+            }
+            else
+            {
+                _dbContext.Notifications.Add(new Notification
+                {
+                    Message = notification.Message,
+                    IsComplete = notification.IsComplete,
+                    OnBroadcastDateTime = notification.OnBroadcastDateTime,
+                    OffBroadcastDateTime = notification.OffBroadcastDateTime,
+                    ClientId = notification.ClientId,
+                    Type = notification.Type,
+                    CreatedBy = Convert.ToInt32(SessionHelper.UserId)
+                });
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<NotificationDTO>> GetAllNotification(int userId, int userType)
+        {
+            if (userType == (int)EnumHelper.UserType.User)
+            {
+                return (from n in _dbContext.Notifications.ToList()
+                        where n.Type == (int)EnumHelper.NotificationType.Notification
+                        && (n.ClientId == 0 || n.ClientId == userId)
+                        && (n.IsComplete ?? false) == false
+                        && DateTime.Now >= n.OnBroadcastDateTime
+                        && DateTime.Now <= n.OffBroadcastDateTime
+                        select new NotificationDTO
+                        {
+                            NotificationId = n.NotificationId,
+                            ClientId = n.ClientId,
+                            CreatedBy = n.CreatedBy,
+                            IsComplete = n.IsComplete ?? false,
+                            Message = n.Message,
+                            OffBroadcastDateTime = n.OffBroadcastDateTime,
+                            OnBroadcastDateTime = n.OnBroadcastDateTime,
+                        }).OrderBy(_ => _.ClientId).ToList();
+            }
+            else
+            {
+                var tt = (from n in _dbContext.Notifications.ToList()
+                          where n.Type == (int)EnumHelper.NotificationType.Notification
+                          && (n.IsComplete ?? false) == false
+                          && DateTime.Now >= n.OnBroadcastDateTime
+                          && DateTime.Now <= n.OffBroadcastDateTime
+                          select new NotificationDTO
+                          {
+                              NotificationId = n.NotificationId,
+                              ClientId = n.ClientId,
+                              CreatedBy = n.CreatedBy,
+                              IsComplete = n.IsComplete ?? false,
+                              Message = n.Message,
+                              OffBroadcastDateTime = n.OffBroadcastDateTime,
+                              OnBroadcastDateTime = n.OnBroadcastDateTime,
+                          }).AsQueryable();
+                return tt.OrderBy(_ => _.ClientId).ToList();
+            }
+        }
+
+        public async Task<List<NotificationDTO>> GetAllNotes(int userId, int userType)
+        {
+            return (from n in _dbContext.Notifications.ToList()
+                    where n.Type == (int)EnumHelper.NotificationType.Notes
+                    && (n.ClientId == 0 || n.ClientId == userId)
+                    select new NotificationDTO
+                    {
+                        NotificationId = n.NotificationId,
+                        ClientId = n.ClientId,
+                        CreatedBy = n.CreatedBy,
+                        IsComplete = n.IsComplete ?? false,
+                        Message = n.Message
+                    }).OrderBy(_ => _.ClientId).ToList();
+        }
+
+        public async Task DeleteNotification(int notificationId)
+        {
+            _dbContext.Notifications.Remove(_dbContext.Notifications.FirstOrDefault(_ => _.NotificationId == notificationId));
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteGroup(int groupId)
+        {
+            _dbContext.GroupMasters.Remove(_dbContext.GroupMasters.FirstOrDefault(_ => _.GroupId == groupId));
             await _dbContext.SaveChangesAsync();
         }
     }

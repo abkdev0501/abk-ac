@@ -126,8 +126,20 @@ namespace ArityApp.Controllers
 
             return Json(true, JsonRequestBehavior.AllowGet);
         }
-        #endregion
+        
+        /// <summary>
+        /// Delete group
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult> DeleteGroup(int groupId)
+        {
+            _masterService = new MasterService();
+            await _masterService.DeleteGroup(groupId);
 
+            return Json(true, JsonRequestBehavior.AllowGet);
+        }
+        #endregion
 
         #region Client Master
         /// <summary>
@@ -216,6 +228,102 @@ namespace ArityApp.Controllers
         }
         #endregion
 
+        #region Notification
+        /// <summary>
+        /// Landing page of Notification
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult NotificationMaster()
+        {
+            return View();
+        }
 
+        /// <summary>
+        /// Get all notifications
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> LoadNotification()
+        {
+            try
+            {
+                _masterService = new MasterService();
+                var notifications = await _masterService.GetAllNotification();
+                return Json(new { data = notifications }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Add/Update notification
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> AddNotification(int id)
+        {
+            _masterService = new MasterService();
+            var notificationMaster = await _masterService.GetNotificationById(id);
+            if (notificationMaster == null)
+                notificationMaster = new NotificationDTO { OnBroadcastDateTime = DateTime.Now, OffBroadcastDateTime = DateTime.Now };
+            var clients = await _masterService.GetAllClient();
+            clients.Add(new UsersDto { Id = 0, FullName = "All" });
+            ViewBag.Clients = new SelectList(clients, "Id", "FullName", notificationMaster.ClientId);
+            return PartialView("_NotificationMasterWizard", notificationMaster);
+        }
+
+        /// <summary>
+        /// Add/Update Notification
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult> AddNotification(NotificationDTO notification)
+        {
+            _masterService = new MasterService();
+            await _masterService.AddUpdateNotification(notification);
+
+            return Json(true, JsonRequestBehavior.AllowGet);
+        } 
+        
+        /// <summary>
+        /// Delete Notification
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult> DeleteNotification(int notificationId)
+        {
+            _masterService = new MasterService();
+            await _masterService.DeleteNotification(notificationId);
+
+            return Json(true, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Landing page of Notes
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult NotesMaster()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Get all notes
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> LoadNotes()
+        {
+            try
+            {
+                _masterService = new MasterService();
+                var notes = await _masterService.GetAllNotes(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId));
+                return Json(new { data = notes }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        #endregion
     }
 }

@@ -24,6 +24,7 @@ namespace ArityApp.Controllers
         private IPaymentService _paymentService;
         private ITaskService _taskService;
         private IDocumentService _documentService;
+        private IMasterService _masterService;
         #endregion
 
         #region Invoice
@@ -439,7 +440,7 @@ namespace ArityApp.Controllers
                 Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.White);
 
                 Sheet.Cells[string.Format("G{0}", currentCell)].Value = "Date:";
-                Sheet.Cells[string.Format("H{0}", currentCell)].Value = invoicDetails.InvoiceEntry.InvoiceDate.ToString("MM/dd/yyyy");
+                Sheet.Cells[string.Format("H{0}", currentCell)].Value = invoicDetails.InvoiceEntry.InvoiceDate.ToString("dd/MM/yyyy");
                 Sheet.Cells[string.Format("H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
                 currentCell++;
                 currentCell++;
@@ -634,7 +635,7 @@ namespace ArityApp.Controllers
 
                 Sheet.Cells[string.Format("G{0}", currentCell)].Value = "Date:";
                 Sheet.Cells[string.Format("G{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-                Sheet.Cells[string.Format("H{0}", currentCell)].Value = receiptDetails.RecieptDate.ToString("MM/dd/yyyy");
+                Sheet.Cells[string.Format("H{0}", currentCell)].Value = receiptDetails.RecieptDate.ToString("dd/MM/yyyy");
                 Sheet.Cells[string.Format("H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
                 currentCell++;
                 currentCell++;
@@ -796,7 +797,7 @@ namespace ArityApp.Controllers
                     .Replace("##ADDRESS##", companyDetail.Address)
                     .Replace("##COLOR##", GetColorString(companyDetail.PreferedColor ?? 0))
                     .Replace("##BILLNO##", invoicDetails.InvoiceEntry.InvoiceNumber)
-                    .Replace("##DATE##", invoicDetails.InvoiceEntry.InvoiceDate.ToString("MM/dd/yyyy"))
+                    .Replace("##DATE##", invoicDetails.InvoiceEntry.InvoiceDate.ToString("dd/MM/yyyy"))
                     .Replace("##NAME##", invoicDetails.InvoiceEntry.FullName)
                     .Replace("##CLIENTADDRESS##", invoicDetails.InvoiceEntry.Address)
                     .Replace("##PARTICULARS##", BindParticulars(invoicDetails.Particulars))
@@ -831,7 +832,7 @@ namespace ArityApp.Controllers
                     .Replace("##ADDRESS##", companyDetail.Address)
                     .Replace("##COLOR##", GetColorString(companyDetail.PreferedColor ?? 0))
                     .Replace("##BILLNO##", receiptDetails.RecieptNo)
-                    .Replace("##DATE##", receiptDetails.RecieptDate.ToString("MM/dd/yyyy"))
+                    .Replace("##DATE##", receiptDetails.RecieptDate.ToString("dd/MM/yyyy"))
                     .Replace("##NAME##", receiptDetails.Invoices.FirstOrDefault().FullName)
                     .Replace("##RECEIPTNO##", string.Join(", ", receiptDetails.Invoices.Select(_ => _.InvoiceNumber)))
                     .Replace("##BANK##", receiptDetails.BankName + " " + receiptDetails.ChequeNumber)
@@ -992,8 +993,19 @@ namespace ArityApp.Controllers
         public async Task<JsonResult> GetAllTask()
         {
             _taskService = new TaskService();
-            var tasks = _taskService.GetAll(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId));
+            var tasks = await _taskService.GetAll(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId));
             return Json(tasks, JsonRequestBehavior.AllowGet);
+        }
+        
+        /// <summary>
+        /// Get current user notification
+        /// </summary>
+        /// <returns></returns>
+        public async Task<JsonResult> GetAllNotification()
+        {
+            _masterService = new MasterService();
+            var notification = await _masterService.GetAllNotification(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId));
+            return Json(notification, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -1016,19 +1028,20 @@ namespace ArityApp.Controllers
             return Json(DocumentList, JsonRequestBehavior.AllowGet);
         }
 
-        public FileResult DownloadDocument(int documentID)
+        public ActionResult DownloadDocument(int documentID)
         {
             try
             {
-                string folderPath = Server.MapPath("~/Content/Documents/1002_mathOperation.PNG");
+                _documentService = new DocumentService();
+                var documnet = _documentService.GetDocumentByID(documentID).Result;
+                string folderPath = Server.MapPath("~/Content/Documents/"+documentID+"_"+documnet.FileName);
                 byte[] fileBytes = System.IO.File.ReadAllBytes(@folderPath);
-                string fileName = "1002_mathOperation.PNG";
+                string fileName = documnet.FileName;
                 return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
             }
             catch (Exception ex)
             {
-
-                throw;
+                return Content("Some error occurred during download file. Please contact support team.");
             }
         }
 

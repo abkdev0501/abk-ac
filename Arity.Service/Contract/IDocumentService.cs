@@ -14,7 +14,7 @@ namespace Arity.Service.Contract
         Task<List<User>> GetClient();
         int SaveDocument(DocumentMasterDto document);
         Task<List<DocumentMasterDto>> FetchDocuments(DateTime toDate, DateTime fromDate);
-        DocumentMasterDto GetDocumentByID(int documentID);
+        Task<DocumentMasterDto> GetDocumentByID(int documentID);
         bool DeleteDocumentByID(int documentID);
         Task<List<DocumentMasterDto>> GetAllDocuments();
         Task<List<DocumentMasterDto>> GetDocumentByUserID(int userId);

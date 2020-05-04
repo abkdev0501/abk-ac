@@ -85,14 +85,14 @@
                             <label>From</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="FromDate" class="form-control" value="@(((DateTime)ViewBag.FromDate).ToString("MM/dd/yyyy"))" readonly>
+                                <input type="text" id="FromDate" class="form-control" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
                             <label>To</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="ToDate" class="form-control" value="@(((DateTime)ViewBag.ToDate).ToString("MM/dd/yyyy"))" readonly>
+                                <input type="text" id="ToDate" class="form-control" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
@@ -111,8 +111,10 @@
                                     <th style="width:5%;">DueDate</th>
                                     <th style="width:10%;">Status</th>
                                     <th style="width:10%;">User comment</th>
-                                    <th style="width:10%;">Created On</th>
-                                    <th style="width:9%;"></th>
+                                    <th style="width:5%;">Chargeable</th>
+                                    <th style="width:5%;">Created On</th>
+                                    <th style="width:5%;"></th>
+                                    <th style="width:5%;"></th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -190,13 +192,35 @@
                             return '<button class="btn btn-success notika-btn-danger waves-effect">'+data.StatusString+'</button>';
                     }
                 },
-                { "data": "UserComment" },
+               { "data": "UserComment" },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                        if (data.IsChargeble) {
+                            return 'Chargeble';
+                        }
+                        else {
+                             return 'No';
+                        }
+                    }
+                },
                 { "data": "CreatedOnString" },
                 {
                     "orderable": false,
                     "data": null,
                     "render": function (data, type, full) {
-                            return '<button class="btn waves-effect" onclick="AddUpdateTask(' + data.TaskId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                            return '<button class="btn waves-effect " onclick="AddUpdateTask(' + data.TaskId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                    }
+               },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                            return '<div class="dialog-pro dialog">' +
+                            '<button class="btn btn-info" onclick="DeleteTask(' + data.TaskId + ')" id="sa-warning">'+
+                            '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                            '</button> </div>';
                     }
                 }
            ],
@@ -231,6 +255,34 @@
 
         function downloadPayment(id) {
             window.open("/home/GenerateReciept/"+id);
+        }
+
+         function DeleteTask(taskId) {
+            swal({
+			title: "Are you sure?",
+			text: "You will not be able to recover this task",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonText: "Delete",
+            }).then(function () {
+                $("#loading").show();
+                $.ajax({
+                    url: '@Url.Action("DeleteTask", "Task")',
+                    type: "POST",
+                    data: { taskId: taskId },
+                    cache: false,
+                    success: function (response) {
+                        table.ajax.reload();
+                        $("#loading").hide();
+			            swal("Deleted!", "Task has been deleted.", "success");
+                    },
+                    error: function (error) {
+                        $("#loading").hide();
+                        Notification('', 'Internal error occured, Please try again', 'danger');
+                    }
+                });
+		});
+
         }
     </script>
 }

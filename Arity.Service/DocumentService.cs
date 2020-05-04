@@ -22,7 +22,7 @@ namespace Arity.Service
             _dbContext = new RMNEntities();
         }
 
-        
+
 
         /// <summary> 
         /// Fetch document list from database
@@ -75,7 +75,7 @@ namespace Arity.Service
                         Status = (DocumentStatus)documentMaster.Status,
                         IsActive = documentMaster.IsActive,
                         FileName = documentMaster.FileName
-        }).FirstOrDefault();
+                    }).FirstOrDefault();
         }
 
         public int SaveDocument(DocumentMasterDto document)
@@ -96,7 +96,7 @@ namespace Arity.Service
                     documentMaster.IsActive = document.IsActive;
                     _dbContext.DocumentMasters.Add(documentMaster);
                 }
-                if(document.DocumentId > 0)
+                if (document.DocumentId > 0)
                 {
                     documentMaster = _dbContext.DocumentMasters.Where(_ => _.DocumentId == document.DocumentId).FirstOrDefault();
                     documentMaster.Name = document.Name;
@@ -105,8 +105,8 @@ namespace Arity.Service
                     documentMaster.ModifiedOn = DateTime.Now;
                     documentMaster.ModifiedBy = Convert.ToInt32(SessionHelper.UserId);
                     documentMaster.Status = (int)document.Status;
-                    if(document.FileName != null) 
-                    documentMaster.FileName = document.FileName;
+                    if (document.FileName != null)
+                        documentMaster.FileName = document.FileName;
                     documentMaster.IsActive = document.IsActive;
                 }
                 _dbContext.SaveChanges();
@@ -124,7 +124,7 @@ namespace Arity.Service
             try
             {
                 _dbContext.DocumentMasters.Remove(_dbContext.DocumentMasters.Where(_ => _.DocumentId == documentID).FirstOrDefault());
-                //_dbContext.SaveChanges();
+                _dbContext.SaveChanges();
                 return true;
             }
             catch (Exception ex)
@@ -148,12 +148,7 @@ namespace Arity.Service
                         CreatedOn = data.CreatedOn,
                         StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
                         ClientName = user.FullName
-                    }).OrderBy(_=>_.ClientId).ToList();
-        }
-
-        DocumentMasterDto IDocumentService.GetDocumentByID(int documentID)
-        {
-            throw new NotImplementedException();
+                    }).OrderBy(_ => _.ClientId).ToList();
         }
 
         public async Task<List<DocumentMasterDto>> GetDocumentByUserID(int userId)

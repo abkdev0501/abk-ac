@@ -1,0 +1,127 @@
+﻿@using Arity.Data.Helpers;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Notification";
+
+}
+
+<div class="breadcomb-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="breadcomb-list">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="breadcomb-wp">
+                                <div class="breadcomb-icon">
+                                    <i class="notika-icon notika-form"></i>
+                                </div>
+                                <div class="breadcomb-ctn">
+                                    <h2>Your Notes</h2>
+                                    <p>List of notes</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+                            <div class="breadcomb-report">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Table area Start-->
+<div class="data-table-area" style="margin-top:25px;height:100%">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="data-table-list">
+                    <div class="basic-tb-hd">
+                        <h2>Notes List</h2>
+                        <p>Below are List of Notes.</p>
+                    </div>
+                    <div class="date-filter">
+                    </div>
+                    <div class="table-responsive">
+                        <table id="tblCompany" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width:90%;">Notes</th>
+                                    <th style="width:10%;" align="center">Complete</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+            $("#liMaster").addClass("active");
+            $("#liHome").removeClass("active");
+        table =  $('#tblCompany').DataTable({
+            "ajax": function (data, callback, settings) {
+                $.ajax({
+                    url: '@Url.Action("LoadNotes","Master")',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                    },
+                    beforeSend: function (xhrObj) {
+                        $("#loading").show();
+                    }
+                    })
+                    .done(function (data, textStatus, jqXHR) {
+                        callback(data);
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        Notification('Error! ', ''+errorThrown+'', 'danger');
+                    })
+                    .always(function (data, textStatus, jqXHR) {
+                        $("#loading").hide();
+                    });
+            },
+            "language": {
+                "emptyTable": "No notes found"
+            },
+            dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        title: 'Excel',
+                        text:'Export to excel'
+                    }
+                ],
+           "columns": [
+                { "data": "Message" },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                        if(data.IsComplete)
+                            return '<i class="notika-icon notika-checked" aria-hidden="true"></i>';
+                        else
+                            return '<i class="notika-icon notika-close" aria-hidden="true"></i>';
+                    }
+                }
+            ],
+            "order": [[0]]
+        });
+
+         $("#btnFilterGrid").click(function () {
+                 table.ajax.reload();
+        });
+    });
+    </script>
+}
+
+

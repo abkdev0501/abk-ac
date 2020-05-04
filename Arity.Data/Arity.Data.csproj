@@ -67,6 +67,7 @@
     <Compile Include="Dto\TrackingInformation.cs" />
     <Compile Include="Dto\DocumentMasterDto.cs" />
     <Compile Include="Dto\UserDTO.cs" />
+    <Compile Include="Dto\NotificationDTO.cs" />
     <Compile Include="Dto\UsersDto.cs" />
     <Compile Include="Entity\Client_Particular_Mapping.cs" />
     <Compile Include="Entity\Company_Client_Mapping.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Entity\InvoiceReciept.cs" />
     <Compile Include="Entity\InvoiceTracking.cs" />
     <Compile Include="Entity\Particular.cs" />
+    <Compile Include="Entity\Notification.cs" />
     <Compile Include="Entity\RecieptDetail.cs" />
     <Compile Include="Entity\Role.cs" />
     <Compile Include="Entity\Task.cs" />

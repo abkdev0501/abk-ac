@@ -12,5 +12,6 @@ namespace Arity.Service.Contract
         Task<TaskDTO> GetTask(int id);
         Task AddUpdateTask(TaskDTO task);
         Task<List<TaskDTO>> GetAll(int userId, int typeId);
+        Task DeleteTask(int taskId);
     }
 }

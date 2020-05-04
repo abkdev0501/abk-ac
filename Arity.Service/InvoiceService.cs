@@ -136,7 +136,7 @@ namespace Arity.Service
                         select new InvoiceEntry()
                         {
                             Amount = _dbContext.InvoiceParticulars.Where(_ => _.InvoiceId == invoice.Id).Sum(_ => (decimal?)_.Amount) ?? 0,
-                            CreatedDateString = invoice.CreatedDate.ToString("MM/dd/yyyy"),
+                            CreatedDateString = invoice.CreatedDate.ToString("dd/MM/yyyy"),
                             UpdatedDate = invoice.UpdatedDate,
                             InvoiceNumber = invoice.Invoice_Number,
                             InvoiceId = invoice.Id,
@@ -153,7 +153,7 @@ namespace Arity.Service
                         select new InvoiceEntry()
                         {
                             Amount = _dbContext.InvoiceParticulars.Where(_ => _.InvoiceId == invoice.Id).Sum(_ => (decimal?)_.Amount) ?? 0,
-                            CreatedDateString = invoice.CreatedDate.ToString("MM/dd/yyyy"),
+                            CreatedDateString = invoice.CreatedDate.ToString("dd/MM/yyyy"),
                             UpdatedDate = invoice.UpdatedDate,
                             InvoiceNumber = invoice.Invoice_Number,
                             InvoiceId = invoice.Id,
@@ -172,7 +172,7 @@ namespace Arity.Service
                     select new InvoiceEntry()
                     {
                         Amount = invoiceParticular.Amount,
-                        CreatedDateString = invoiceParticular.CreatedDate.ToString("MM/dd/yyyy"),
+                        CreatedDateString = invoiceParticular.CreatedDate.ToString("dd/MM/yyyy"),
                         SFParticulars = particular.ParticularSF,
                         FFParticulars = particular.ParticularFF,
                         InvoiceParticularId = invoiceParticular.Id,
@@ -286,7 +286,7 @@ namespace Arity.Service
                         TrackingId = tracking.id,
                         InvoiceId = tracking.InvoiceId,
                         Comment = tracking.Comment,
-                        CreatedAt = tracking.CreatedAt.Value.ToString("MM/dd/yyyy"),
+                        CreatedAt = tracking.CreatedAt.Value.ToString("dd/MM/yyyy"),
                         CreatedBy = tracking.CreatedBy,
                         AddedBy = user.FullName
                     }).ToList();

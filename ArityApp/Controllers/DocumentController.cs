@@ -43,7 +43,7 @@ namespace ArityApp.Controllers
                 ViewBag.Client = new SelectList(await _documentService.GetClient(), "Id", "FullName");
                 if (documentID > 0)
                 {
-                    documentDetail = _documentService.GetDocumentByID(documentID);
+                    documentDetail = await _documentService.GetDocumentByID(documentID);
                     //var fileName = string.
                     //documentDetail.ALreadyUploadedFile = Directory.GetFiles(folderPath, documentDetail.DocumentId + );
 

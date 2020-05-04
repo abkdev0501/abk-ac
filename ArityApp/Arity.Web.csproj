@@ -185,6 +185,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\DocumentController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LandingController.cs" />
     <Compile Include="Controllers\MasterController.cs" />
     <Compile Include="Controllers\ParticularController.cs" />
     <Compile Include="Controllers\TaskController.cs" />
@@ -228,6 +229,7 @@
     <Content Include="Content\fonts\notika-icon.svg" />
     <Content Include="Content\images\details_close.png" />
     <Content Include="Content\images\details_open.png" />
+    <Content Include="Content\images\landingpage.jpg" />
     <Content Include="Content\images\select.png" />
     <Content Include="Content\images\sort_asc.png" />
     <Content Include="Content\images\sort_asc_disabled.png" />
@@ -397,8 +399,6 @@
     <Content Include="Views\Home\_ReceiptEntry.cshtml" />
     <Content Include="Views\Home\_profile.cshtml" />
     <Content Include="Views\Home\_InvoiceEntry.cshtml" />
-    <Content Include="Views\Home\_DropFiles.cshtml" />
-    <Content Include="Views\Home\_changePassword.cshtml" />
     <Content Include="Views\Particular\Index.cshtml" />
     <Content Include="Views\Partial\_Invoice.cshtml" />
     <Content Include="Views\Particular\_AddParticular.cshtml" />
@@ -416,6 +416,10 @@
     <Content Include="Views\Master\ManageClient.cshtml" />
     <Content Include="Views\Document\Index.cshtml" />
     <Content Include="Views\Document\_UploadDocument.cshtml" />
+    <Content Include="Views\Landing\Index.cshtml" />
+    <Content Include="Views\Master\NotificationMaster.cshtml" />
+    <Content Include="Views\Master\_NotificationMasterWizard.cshtml" />
+    <Content Include="Views\Master\NotesMaster.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

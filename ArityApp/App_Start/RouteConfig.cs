@@ -73,9 +73,26 @@ namespace ArityApp
           );
 
             routes.MapRoute(
+             name: "login",
+             url: "login",
+             defaults: new { controller = "Account", action = "Login", id = UrlParameter.Optional }
+         );
+            
+            routes.MapRoute(
+             name: "notification",
+             url: "notification",
+             defaults: new { controller = "Master", action = "NotificationMaster", id = UrlParameter.Optional }
+         ); 
+            routes.MapRoute(
+             name: "notes",
+             url: "notes",
+             defaults: new { controller = "Master", action = "NotesMaster", id = UrlParameter.Optional }
+         );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Account", action = "Login", id = UrlParameter.Optional }
+                defaults: new { controller = "Landing", action = "Index", id = UrlParameter.Optional }
             );
         }
     }
