@@ -26,5 +26,10 @@ namespace Arity.Data.Dto
         public long ClientId { get; set; }
         public DateTime RecieptDate { get; set; }
         public int CreatedBy { get; set; }
+        public string Remarks { get; set; }
+        public string CompanyName { get; set; }
+        public string ClientName { get; set; }
+        public string GroupName { get; set; }
+        public string AddedBy { get; set; }
     }
 }

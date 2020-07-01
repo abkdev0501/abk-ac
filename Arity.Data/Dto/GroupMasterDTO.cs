@@ -13,5 +13,6 @@ namespace Arity.Data.Dto
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
         public string AddedByName { get; set; }
+        public bool IsAsociatedWithClient { get; set; }
     }
 }

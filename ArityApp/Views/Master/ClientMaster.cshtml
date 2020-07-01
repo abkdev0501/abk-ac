@@ -55,14 +55,14 @@
                             <label>From</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="FromDate" class="form-control" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="FromDate" class="form-control bk-date" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
                             <label>To</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="ToDate" class="form-control" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="ToDate" class="form-control bk-date" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
@@ -81,8 +81,10 @@
                                     <th style="width:10%;">Phone</th>
                                     <th style="width:10%;">Pincode</th>
                                     <th style="width:10%;">Role</th>
+                                    <th style="width:10%;">Accountant</th>
                                     <th style="width:10%;">Status</th>
-                                    <th style="width:9%;">Update</th>
+                                    <th style="width:9%;"></th>
+                                    <th style="width:5%;"></th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -105,42 +107,42 @@
         {
                 @:Notification('', '@TempData["Success"]', 'sucess');
         }
-       table =  $('#tblClient').DataTable({
+        table = $('#tblClient').DataTable({
             "ajax": function (data, callback, settings) {
                 $.ajax({
                     url: '@Url.Action("LoadClient","Master")',
                     type: "GET",
                     dataType: "json",
                     data: {
-                        from: $("#FromDate").val(),
-                        to: $("#ToDate").val()
+                        from: "" + $("#FromDate").val() + "",
+                        to: "" + $("#ToDate").val() + ""
                     },
                     beforeSend: function (xhrObj) {
                         $("#loading").show();
                     }
-                    })
+                })
                     .done(function (data, textStatus, jqXHR) {
                         callback(data);
                     })
                     .fail(function (jqXHR, textStatus, errorThrown) {
-                        Notification('Error! ', ''+errorThrown+'', 'danger');
+                        Notification('Error! ', '' + errorThrown + '', 'danger');
                     })
                     .always(function (data, textStatus, jqXHR) {
                         $("#loading").hide();
                     });
             },
             "language": {
-                "emptyTable": "No users found"
-           },
+                "emptyTable": "No clients found"
+            },
             dom: 'Bfrtip',
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        title: 'Excel',
-                        text:'Export to excel'
-                    }
-                ],
-           "columns": [
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    title: 'Excel',
+                    text: 'Export to excel'
+                }
+            ],
+            "columns": [
                 { "data": "FullName" },
                 { "data": "Username" },
                 { "data": "Address" },
@@ -148,21 +150,44 @@
                 { "data": "PhoneNumber" },
                 { "data": "Pincode" },
                 { "data": "UserType" },
-                { "data": "Active" },
+                { "data": "AccountantName" },
                 {
                     "orderable": false,
                     "data": null,
                     "render": function (data, type, full) {
-                        if(data.CreatedBy == @SessionHelper.UserTypeId)
-                            return '<button class="btn waves-effect" onclick="AddUpdateClient(' + data.Id + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
-                        else if(@((int)Arity.Service.Core.UserType.MasterAdmin) === @SessionHelper.UserTypeId)
+                        if (data.Active)
+                            return 'TRUE';
+                        else
+                            return 'FALSE';
+                    }
+                },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                        if (data.CreatedBy == @SessionHelper.UserTypeId || @((int)Arity.Service.Core.UserType.MasterAdmin) === @SessionHelper.UserTypeId)
                             return '<button class="btn waves-effect" onclick="AddUpdateClient(' + data.Id + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
                         else
                             return '';
                     }
+                },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                        if (data.CreatedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) ) {
+                            return '<div class="dialog-pro dialog">' +
+                                '<button class="btn btn-info" onclick="DeleteClient(' + data.Id + ')" id="sa-warning">' +
+                                '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                                '</button> </div>';
+                        }
+                        else {
+                            return "";
+                        }
+                    }
                 }
             ],
-            "order": []
+            "order": [[0,"asc"]]
        });
 
          $("#btnFilterGrid").click(function () {
@@ -173,6 +198,34 @@
         function AddUpdateClient(id) {
             $("#loading").show();
             location.href = 'master/manageclient/'+ (id >0 ? id:'');
+        }
+
+        function DeleteClient(clientId) {
+            swal({
+			title: "Are you sure?",
+			text: "You will not be able to recover this client",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonText: "Delete",
+            }).then(function () {
+                $("#loading").show();
+                $.ajax({
+                    url: '@Url.Action("DeleteUser", "Home")',
+                    type: "POST",
+                    data: { userId: clientId },
+                    cache: false,
+                    success: function (response) {
+                        table.ajax.reload();
+                        $("#loading").hide();
+			            swal("Deleted!", "Client has been deleted.", "success");
+                    },
+                    error: function (error) {
+                        $("#loading").hide();
+                        Notification('', 'Internal error occured, Please try again', 'danger');
+                    }
+                });
+		});
+
         }
 
     </script>

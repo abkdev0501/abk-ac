@@ -59,7 +59,8 @@
                                     <th style="width:15%;">Head</th>
                                     <th style="width:10%;">Prefix</th>
                                     <th style="width:10%;">Status</th>
-                                    <th style="width:5%;">Update</th>
+                                    <th style="width:5%;"></th>
+                                    <th style="width:5%;"></th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -148,6 +149,22 @@
                     "render": function (data, type, full) {
                             return '<button class="btn waves-effect" onclick="AddEditCompany(' + data.Id + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
                     }
+                },
+                {
+                    "orderable": false,
+                    "data": null,
+                   "render": function (data, type, full) {
+
+                       if (data.IsAvailableForDelete) {
+                           return '<div class="dialog-pro dialog">' +
+                               '<button class="btn btn-info" onclick="DeleteCompany(' + data.Id + ')" id="sa-warning">' +
+                               '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                               '</button> </div>';
+                       }
+                       else {
+                           return '';
+                       }
+                    }
                 }
             ],
             "order": [[0, "asc"]]
@@ -175,7 +192,34 @@
                     Notification('', 'Something went wrong, Please try again', 'danger');
             },
         });
-    }
+        }
+
+        function DeleteCompany(id) {
+            swal({
+			title: "Are you sure?",
+			text: "You will not be able to recover this company",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonText: "Delete",
+            }).then(function () {
+                $("#loading").show();
+                $.ajax({
+                    url: '@Url.Action("DeleteCompany", "Master")',
+                    type: "POST",
+                    data: { companyId: id },
+                    cache: false,
+                    success: function (response) {
+                        table.ajax.reload();
+                        $("#loading").hide();
+			            swal("Deleted!", "Company has been deleted.", "success");
+                    },
+                    error: function (error) {
+                        $("#loading").hide();
+                        Notification('', 'Internal error occured, Please try again', 'danger');
+                    }
+                });
+		});
+        }
     </script>
 }
 

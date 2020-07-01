@@ -15,9 +15,10 @@ namespace Arity.Service
     public class AccountService : IAccountService
     {
         private readonly RMNEntities _dbContext;
-        public AccountService()
+
+        public AccountService(RMNEntities rMNEntities)
         {
-            _dbContext = new RMNEntities();
+            _dbContext = rMNEntities;
         }
 
         public async Task AddUpadate(UsersDto user)
@@ -133,13 +134,14 @@ namespace Arity.Service
                         Email = user.Email,
                         Active = user.Active,
                         UserTypeId = user.UserTypeId,
-                        CreatedBy = user.CreatedBy
+                        CreatedBy = user.CreatedBy,
+                        AccountantName = user.AccountantName
                     }).ToList();
         }
 
         public async Task<List<UsersDto>> GetAllUsers()
         {
-            return (from user in _dbContext.Users
+            return await (from user in _dbContext.Users
                     join type in _dbContext.UserTypes on user.UserTypeId equals type.Id
                     select new UsersDto
                     {
@@ -155,7 +157,13 @@ namespace Arity.Service
                         Active = user.Active,
                         UserTypeId = user.UserTypeId,
                         CreatedBy = user.CreatedBy
-                    }).ToList();
+                    }).ToListAsync();
+        }
+
+        public async Task RemoveUser(int userId)
+        {
+            _dbContext.Users.Remove(await _dbContext.Users.FirstOrDefaultAsync(_ => _.Id == userId));
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<IList<UserType>> GetAllUserType()
@@ -181,6 +189,9 @@ namespace Arity.Service
                         Active = user.Active,
                         CreatedBy = user.CreatedBy,
                         Password = user.Password,
+                        AccountantMobile = user.AccountantMobile,
+                        AccountantName = user.AccountantName,
+                        CommodityName = user.CommodityName,
                         CompanyIds = _dbContext.Company_Client_Mapping.Where(_ => _.UserId == user.Id)?.Select(_ => _.CompanyId ?? 0)?.ToArray()
                     }).FirstOrDefault();
             if (id > 0)
@@ -193,5 +204,5 @@ namespace Arity.Service
             return await _dbContext.Users.FirstOrDefaultAsync(_ => _.Username == username && _.Password == password && _.Active == true);
         }
     }
-} 
+}
 

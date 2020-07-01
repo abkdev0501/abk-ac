@@ -14,5 +14,6 @@ namespace Arity.Service.Contract
         Task<UsersDto> GetUser(int id);
         Task<IList<UserType>> GetAllUserType();
         Task AddUpadate(UsersDto user);
+        Task RemoveUser(int userId);
     }
 }

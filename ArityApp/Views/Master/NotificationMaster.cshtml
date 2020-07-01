@@ -4,7 +4,6 @@
     ViewBag.Title = "Notification";
 
 }
-
 <div class="breadcomb-area">
     <div class="container">
         <div class="row">
@@ -60,6 +59,7 @@
                                     <th style="width:10%;">On Broadcast Date</th>
                                     <th style="width:10%;">Off Broadcast Date</th>
                                     <th style="width:5%;" align="center">Complete</th>
+                                    <th style="width:5%;">Added By</th>
                                     <th style="width:5%;"></th>
                                     <th style="width:5%;"></th>
                                 </tr>
@@ -140,11 +140,12 @@
                     "data": null,
                     "render": function (data, type, full) {
                         if(data.IsComplete)
-                            return '<i class="notika-icon notika-checked" aria-hidden="true"></i>';
+                            return 'TRUE';
                         else
-                            return '<i class="notika-icon notika-close" aria-hidden="true"></i>';
+                            return 'FALSE';
                     }
                 },
+                { "data": "CreatedByName" },
                 {
                     "orderable": false,
                     "data": null,

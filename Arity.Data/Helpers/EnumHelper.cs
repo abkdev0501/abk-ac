@@ -45,7 +45,8 @@
         {
             RECEIVED = 1,
             SENT = 2,
-            SUBMITTED = 3
+            SUBMITTED = 3,
+            Other =4
         }
         public enum DocumentType
         {
@@ -69,14 +70,24 @@
 
         public enum BusinessType
         {
-            Partnership = 1,
-            Proprietorship = 2
+            Manufacturer = 1,
+            Wholesaler = 2,
+            Retailer=3
         }
 
         public enum NotificationType
         {
             Notification = 1,
-            Notes = 2
+            Notes = 2,
+            News = 3
+        }
+
+        public enum BusinessStatus
+        {
+            Partnership = 1,
+            Proprietorship = 2,
+            Partner_Proprietor=3,
+            Partnership_Ratios=4
         }
     }
 }

@@ -1,25 +1,23 @@
 ﻿using Arity.Service.Contract;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Arity.Data.Entity;
 using System.Web.Mvc;
-using Arity.Service;
 using Arity.Data.Dto;
 using System.IO;
-using Arity.AutoMapper;
-using static System.Net.WebRequestMethods;
 
 namespace ArityApp.Controllers
 {
     public class DocumentController : Controller
     {
+        private readonly IDocumentService _documentService;
 
-
-        private IDocumentService _documentService;
-
+        public DocumentController(IDocumentService documentService)
+        {
+            _documentService = documentService;
+        }
 
         // GET: Document
         public ActionResult Index()
@@ -34,9 +32,6 @@ namespace ArityApp.Controllers
         [HttpGet]
         public async Task<ActionResult> UploadDocument(int documentID)
         {
-            _documentService = new DocumentService();
-            string folderPath = Server.MapPath("~/Content/Documents");
-
             var documentDetail = new DocumentMasterDto();
             try
             {
@@ -44,14 +39,10 @@ namespace ArityApp.Controllers
                 if (documentID > 0)
                 {
                     documentDetail = await _documentService.GetDocumentByID(documentID);
-                    //var fileName = string.
-                    //documentDetail.ALreadyUploadedFile = Directory.GetFiles(folderPath, documentDetail.DocumentId + );
-
                 }
             }
-            catch (Exception ex)
+            catch
             {
-
                 throw;
             }
             return PartialView("_UploadDocument", documentDetail);
@@ -63,7 +54,6 @@ namespace ArityApp.Controllers
             try
             {
                 #region declaration
-                _documentService = new DocumentService();
                 var documentMaster = new DocumentMaster();
                 var documentMasterDto = new DocumentMasterDto();
                 string folderPath = Server.MapPath("~/Content/Documents");
@@ -81,7 +71,7 @@ namespace ArityApp.Controllers
                     if (document.DocumentId == 0 && documentFile != null && documentFile.ContentLength > 0)
                     {
                         document.FileName = documentFile.FileName;
-                        documentMaster.DocumentId = _documentService.SaveDocument(document);
+                        documentMaster.DocumentId = await _documentService.SaveDocument(document);
                         documentFile.SaveAs(folderPath + "/" + documentMaster.DocumentId + "_" + Path.GetFileName(documentFile.FileName));
                         ViewBag.SuccessMsg = "Document Uploaded successfully";
                     }
@@ -92,7 +82,7 @@ namespace ArityApp.Controllers
 
                             //Save document Detail and file in db
                             document.FileName = documentFile.FileName;
-                            documentMaster.DocumentId = _documentService.SaveDocument(document);
+                            documentMaster.DocumentId = await _documentService.SaveDocument(document);
                             string oldFile = directoryDetail.GetFiles("*" + document.DocumentId + "*.*").FirstOrDefault().Name;
 
                             if (System.IO.File.Exists(folderPath + "/" + oldFile))
@@ -104,7 +94,7 @@ namespace ArityApp.Controllers
                         }
                         else
                         {
-                            documentMaster.DocumentId = _documentService.SaveDocument(document);
+                            documentMaster.DocumentId = await _documentService.SaveDocument(document);
                             ViewBag.SuccessMsg = "Document updated successfully";
                         }
                     }
@@ -114,6 +104,7 @@ namespace ArityApp.Controllers
             catch (Exception ex)
             {
                 ViewBag.ErrorMsg = "Error occured to upload document";
+                throw ex;
             }
             ViewBag.FromDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01));
             ViewBag.ToDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month,
@@ -128,29 +119,26 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> DeleteDocument(int? documentID)
         {
-            _documentService = new DocumentService();
-
             try
             {
                 _documentService.DeleteDocumentByID(documentID??0);
                 
             }
-            catch (Exception ex)
+            catch
             {
             }
             return RedirectToAction("Index");
         }
 
-        public async Task<JsonResult> LoadDocuments(DateTime from, DateTime to)
+        public async Task<JsonResult> LoadDocuments(string from, string to)
         {
-            _documentService = new DocumentService();
+            DateTime fromDate = Convert.ToDateTime(from);
+            DateTime toDate = Convert.ToDateTime(to);
+            toDate = toDate + new TimeSpan(23, 59, 59);
+            fromDate = fromDate + new TimeSpan(00, 00, 1);
 
-            to = to + new TimeSpan(23, 59, 59);
-            from = from + new TimeSpan(00, 00, 1);
-
-            var List = await _documentService.FetchDocuments(to, from);
+            var List = await _documentService.FetchDocuments(toDate, fromDate);
             return Json(new { data = List }, JsonRequestBehavior.AllowGet);
-
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace Arity.Data.Dto
@@ -7,6 +8,7 @@ namespace Arity.Data.Dto
     {
         public int TaskId { get; set; }
         public int TaskUserId { get; set; }
+        [DataType(DataType.MultilineText)]
         public string TaskName { get; set; }
         public string Description { get; set; }
         public int CreatedBy { get; set; }
@@ -31,5 +33,7 @@ namespace Arity.Data.Dto
         public int AddedBy { get; set; }
         public string AddedByName { get; set; }
         public string ClientName { get; set; }
+        public string CreatedByString { get; set; }
+        public decimal? ChargeAmount { get; set; }
     }
 }

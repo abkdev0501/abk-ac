@@ -1,5 +1,6 @@
 ﻿using Arity.Data.Dto;
 using Arity.Service;
+using Arity.Service.Contract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,12 @@ namespace ArityApp.Controllers
     [Authorize]
     public class ParticularController : Controller
     {
-        ParticularServices _particularServices = new ParticularServices();
+        private readonly IParticularServices _particularServices;
 
+        public ParticularController(IParticularServices particularServices)
+        {
+            _particularServices = particularServices;
+        }
 
         // GET: Particular
         //Listing page for Particulars 
@@ -24,11 +29,13 @@ namespace ArityApp.Controllers
             return View();
         }
 
-        public async Task<JsonResult> LoadParticulars(DateTime from, DateTime to)
+        public async Task<JsonResult> LoadParticulars(string from, string to)
         {
-            to = to + new TimeSpan(23, 59, 59);
-            from = from + new TimeSpan(00, 00, 1);
-            var List = await _particularServices.FetchParticular(to, from);
+            var fromDate = Convert.ToDateTime(from);
+            var toDate = Convert.ToDateTime(to);
+            toDate = toDate + new TimeSpan(23, 59, 59);
+            fromDate = fromDate + new TimeSpan(00, 00, 1);
+            var List = await _particularServices.FetchParticular(toDate, fromDate);
             return Json(new { data = List }, JsonRequestBehavior.AllowGet);
 
         }
@@ -57,7 +64,7 @@ namespace ArityApp.Controllers
             {
                 _particularServices.AddParticular(parti);
             }
-            catch (Exception ex)
+            catch
             {
 
             }

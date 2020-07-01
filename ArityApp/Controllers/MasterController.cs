@@ -3,6 +3,7 @@ using Arity.Data.Helpers;
 using Arity.Service;
 using Arity.Service.Contract;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -12,8 +13,15 @@ namespace ArityApp.Controllers
     [Authorize]
     public class MasterController : Controller
     {
-        private IMasterService _masterService;
-        private IInvoiceService _invoiceService;
+        private readonly IMasterService _masterService;
+        private readonly IInvoiceService _invoiceService;
+
+        public MasterController(IMasterService masterService,
+            IInvoiceService invoiceService)
+        {
+            _masterService = masterService;
+            _invoiceService = invoiceService;
+        }
 
         #region Company
         /// <summary>
@@ -31,7 +39,6 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> LoadCompany()
         {
-            _masterService = new MasterService();
             var companies = await _masterService.GetAllCompany();
             return Json(new { data = companies }, JsonRequestBehavior.AllowGet);
         }
@@ -42,7 +49,6 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> AddCompany(int id)
         {
-            _masterService = new MasterService();
             var company = await _masterService.GetCompanyById(id);
             if (company == null)
                 company = new CompanyDto();
@@ -66,11 +72,31 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> AddCompany(CompanyDto company)
         {
-            _masterService = new MasterService();
             await _masterService.AddUpdateCompany(company);
 
             return Json(true, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Delete company
+        /// </summary>
+        /// <returns></returns>
+        /// 
+        [HttpPost]
+        public async Task<ActionResult> DeleteCompany(int companyId)
+        {
+            try
+            {
+                await _masterService.DeleteCompany(companyId);
+
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         #endregion
 
         #region Group
@@ -91,11 +117,11 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _masterService = new MasterService();
+                
                 var groups = await _masterService.GetAllGroup();
                 return Json(new { data = groups }, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch 
             {
                 throw;
             }
@@ -107,7 +133,7 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> AddGroup(int id)
         {
-            _masterService = new MasterService();
+            
             var groupMaster = await _masterService.GetGroupById(id);
             if (groupMaster == null)
                 groupMaster = new GroupMasterDTO();
@@ -121,12 +147,12 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> AddGroup(GroupMasterDTO groupMaster)
         {
-            _masterService = new MasterService();
+            
             await _masterService.AddUpdateGroup(groupMaster);
 
             return Json(true, JsonRequestBehavior.AllowGet);
         }
-        
+
         /// <summary>
         /// Delete group
         /// </summary>
@@ -134,7 +160,7 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> DeleteGroup(int groupId)
         {
-            _masterService = new MasterService();
+            
             await _masterService.DeleteGroup(groupId);
 
             return Json(true, JsonRequestBehavior.AllowGet);
@@ -157,17 +183,19 @@ namespace ArityApp.Controllers
         /// Get all clients
         /// </summary>
         /// <returns></returns>
-        public async Task<ActionResult> LoadClient(DateTime from, DateTime to)
+        public async Task<ActionResult> LoadClient(string from, string to)
         {
             try
             {
-                _masterService = new MasterService();
-                to = to + new TimeSpan(23, 59, 59);
-                from = from + new TimeSpan(00, 00, 1);
-                var users = await _masterService.GetAllClient(from, to);
+                
+                DateTime fromDate = Convert.ToDateTime(from);
+                DateTime toDate = Convert.ToDateTime(to);
+                toDate = toDate + new TimeSpan(23, 59, 59);
+                fromDate = fromDate + new TimeSpan(00, 00, 1);
+                var users = await _masterService.GetAllClient(fromDate, toDate);
                 return Json(new { data = users }, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -179,13 +207,25 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> ManageClient(int? id)
         {
-            _masterService = new MasterService();
-            _invoiceService = new InvoiceService();
+            
             var clientMaster = await _masterService.GetClientById(id ?? 0);
             if (clientMaster == null)
                 clientMaster = new UsersDto();
+            var companies = await _invoiceService.GetCompany();
+            var particulars = await _invoiceService.GetParticular();
+            clientMaster.Companies = companies.Select(c => new CompanyDto
+            {
+                Id = c.Id,
+                CompanyName = c.CompanyName
+            }).ToList();
 
-            ViewBag.Companies = new MultiSelectList(await _invoiceService.GetCompany(), "Id", "CompanyName", clientMaster.CompanyIds);
+            clientMaster.Particulars = particulars.Select(p => new ParticularDto
+            {
+                Id = Convert.ToInt32(p.Id),
+                ParticularFF = p.ParticularFF
+            }).ToList();
+
+            ViewBag.Companies = new MultiSelectList(companies, "Id", "CompanyName", clientMaster.CompanyIds);
             ViewBag.Consultant = new SelectList(await _masterService.GetAllConsultant(), "ConsultantId", "Name", clientMaster.ConsultantId);
             ViewBag.Groups = new SelectList(await _masterService.GetAllGroups(), "GroupId", "Name", clientMaster.GroupId);
             ViewBag.BusinessType = new SelectList(Enum.GetValues(typeof(EnumHelper.BusinessType))
@@ -195,6 +235,14 @@ namespace ArityApp.Controllers
                    Id = ((int)t),
                    Name = t.ToString()
                }), "Id", "Name", clientMaster.BusinessType);
+            ViewBag.BusinessStatus = new SelectList(Enum.GetValues(typeof(EnumHelper.BusinessStatus))
+               .Cast<EnumHelper.BusinessStatus>()
+               .Select(t => new
+               {
+                   Id = t.ToString(),
+                   Name = t.ToString()
+               }), "Id", "Name", clientMaster.BusinessStatus);
+
             return View(clientMaster);
         }
 
@@ -203,7 +251,7 @@ namespace ArityApp.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> ManageClient(UsersDto usersDto)
+        public async Task<ActionResult> ManageClient(UsersDto usersDto, FormCollection fn)
         {
             try
             {
@@ -214,13 +262,101 @@ namespace ArityApp.Controllers
                     && !string.IsNullOrEmpty(usersDto.Address)
                     && !string.IsNullOrEmpty(usersDto.City))
                 {
-                    _masterService = new MasterService();
+
+                    var services = new List<ServiceTypes>();
+                    var bankDetails = new List<BankDetail>();
+                    var additionalDetails = new List<GodownDetail>();
+                    int retryCount = 0;
+                    for (int i = 0; i <= 9999; i++)
+                    {
+
+                        if (fn["particularId" + i] == null || fn["companyId" + i] == "")
+                            retryCount += 1;
+                        else
+                            retryCount = 0;
+
+                        if (retryCount > 5)
+                            break;
+
+                        if (retryCount == 0)
+                        {
+                            int.TryParse(fn["particularId" + i], out int ParticularId);
+                            int.TryParse(fn["companyId" + i], out int CompanyId);
+                            int.TryParse(fn["txtRate" + i], out int Rate);
+                            services.Add(new ServiceTypes
+                            {
+                                Id = i,
+                                ParticularId = ParticularId,
+                                CompanyId = CompanyId,
+                                Rate = Rate
+                            });
+                        }
+                    }
+                    retryCount = 0;
+                    for (int i = 0; i <= 9999; i++)
+                    {
+
+                        if (fn["txtAName" + i] == null || fn["txtAName" + i] == "")
+                            retryCount += 1;
+                        else
+                            retryCount = 0;
+
+                        if (retryCount > 5)
+                            break;
+
+                        if (retryCount == 0)
+                        {
+                            DateTime.TryParse(fn["txtAOpen" + i], out DateTime OpenDate);
+                            DateTime.TryParse(fn["txtAOpen" + i], out DateTime CloseDate);
+                            additionalDetails.Add(new GodownDetail
+                            {
+                                Id = i,
+                                Name = fn["txtAName" + i],
+                                Address = fn["txtAAddress" + i],
+                                Open = OpenDate != DateTime.MinValue ? OpenDate : (DateTime?)null,
+                                Close = CloseDate != DateTime.MinValue ? CloseDate : (DateTime?)null
+                            });
+                        }
+                    }
+                    retryCount = 0;
+                    for (int i = 0; i <= 9999; i++)
+                    {
+
+                        if (fn["txtBName" + i] == null || fn["txtBName" + i] == "")
+                            retryCount += 1;
+                        else
+                            retryCount = 0;
+
+                        if (retryCount > 5)
+                            break;
+
+                        if (retryCount == 0)
+                        {
+                            DateTime.TryParse(fn["txtBOpen" + i], out DateTime OpenDate);
+                            DateTime.TryParse(fn["txtBClose" + i], out DateTime CloseDate);
+                            bankDetails.Add(new BankDetail
+                            {
+                                Id = i,
+                                Name = fn["txtBName" + i],
+                                Address = fn["txtBAddress" + i],
+                                AccountNo = fn["txtBAccountNo" + i],
+                                Open = OpenDate != DateTime.MinValue ? OpenDate : (DateTime?)null,
+                                Close = CloseDate != DateTime.MinValue ? CloseDate : (DateTime?)null
+                            });
+                        }
+                    }
+
+                    usersDto.Services = services.Count() > 0 ? services : null;
+                    usersDto.BankDetails = bankDetails.Count() > 0 ? bankDetails : null;
+                    usersDto.AdditionlPlaces = additionalDetails.Count() > 0 ? additionalDetails : null;
+
+                    
                     await _masterService.AddUpdateClient(usersDto);
                     TempData["Success"] = usersDto.Id > 0 ? "Client updated successfully" : "Client added successfully";
                     return RedirectToAction("ClientMaster");
                 }
             }
-            catch (Exception ex)
+            catch 
             {
             }
             ViewBag.ErrorMsg = "client not added";
@@ -246,11 +382,11 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _masterService = new MasterService();
+                
                 var notifications = await _masterService.GetAllNotification();
                 return Json(new { data = notifications }, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch 
             {
                 throw;
             }
@@ -262,7 +398,7 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> AddNotification(int id)
         {
-            _masterService = new MasterService();
+            
             var notificationMaster = await _masterService.GetNotificationById(id);
             if (notificationMaster == null)
                 notificationMaster = new NotificationDTO { OnBroadcastDateTime = DateTime.Now, OffBroadcastDateTime = DateTime.Now };
@@ -279,12 +415,12 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> AddNotification(NotificationDTO notification)
         {
-            _masterService = new MasterService();
+            
             await _masterService.AddUpdateNotification(notification);
 
             return Json(true, JsonRequestBehavior.AllowGet);
-        } 
-        
+        }
+
         /// <summary>
         /// Delete Notification
         /// </summary>
@@ -292,7 +428,7 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> DeleteNotification(int notificationId)
         {
-            _masterService = new MasterService();
+            
             await _masterService.DeleteNotification(notificationId);
 
             return Json(true, JsonRequestBehavior.AllowGet);
@@ -315,15 +451,148 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _masterService = new MasterService();
+                
                 var notes = await _masterService.GetAllNotes(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId));
                 return Json(new { data = notes }, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch 
             {
                 throw;
             }
         }
+        #endregion
+
+        #region Commodity Master
+        /// <summary>
+        /// Landing page of Commodity master
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult CommodityMaster()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Get all CommodityMaster
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> LoadCommodityMaster()
+        {
+            
+            var commodities = await _masterService.GetAllCommodities();
+            return Json(new { data = commodities }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Add/Update CommodityMaster
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> AddCommodityMaster(int id)
+        {
+            
+            var commodity = await _masterService.GetCommodityById(id);
+            if (commodity == null)
+                commodity = new Arity.Data.Entity.CommodityMaster() { EFDate = DateTime.Now };
+
+            return PartialView("_CommodityWizard", commodity);
+        }
+
+        /// <summary>
+        /// Add/Update Commodity
+        /// </summary>
+        /// <returns></returns>
+        /// 
+        [HttpPost]
+        public async Task<ActionResult> AddCommodityMaster(Arity.Data.Entity.CommodityMaster commodity)
+        {
+            
+            await _masterService.AddUpdateCommodity(commodity);
+
+            return Json(true, JsonRequestBehavior.AllowGet);
+        }
+        #endregion
+
+        #region Consultants
+        /// <summary>
+        /// Landing page of Consultants master
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult Consultants()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Get all Consultants
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> LoadConsultants()
+        {
+            
+            var consultants = await _masterService.GetAllConsultants();
+            return Json(new { data = consultants }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Add/Update CommodityMaster
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> AddConsultant(int id)
+        {
+            
+            var consultant = await _masterService.GetConsultantById(id);
+            if (consultant == null)
+                consultant = new ConsultantDTO();
+
+            return PartialView("_ConsultantWizard", consultant);
+        }
+
+        /// <summary>
+        /// Add/Update consultant
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult> AddConsultant(ConsultantDTO consultant)
+        {
+            
+            await _masterService.AddUpdateConsultant(consultant);
+
+            return Json(true, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Remove consultant
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult> DeleteConsultant(int id)
+        {
+            try
+            {
+                
+                await _masterService.RemoveConsultant(id);
+
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Select Commodities for client
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> SelectCommodities()
+        {
+            
+            var commodities = await _masterService.GetAllCommodities();
+            ViewBag.Commodities = new SelectList(commodities, "Id", "Name");
+            return PartialView("_SelectConsultantwizard", commodities);
+        }
+
         #endregion
     }
 }

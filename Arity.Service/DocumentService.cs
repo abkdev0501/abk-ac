@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using static Arity.Data.Helpers.EnumHelper;
 
@@ -17,9 +16,9 @@ namespace Arity.Service
     {
         private readonly RMNEntities _dbContext;
 
-        public DocumentService()
+        public DocumentService(RMNEntities rMNEntities)
         {
-            _dbContext = new RMNEntities();
+            _dbContext = rMNEntities;
         }
 
 
@@ -32,21 +31,48 @@ namespace Arity.Service
         /// <returns></returns>
         public async Task<List<DocumentMasterDto>> FetchDocuments(DateTime toDate, DateTime fromDate)
         {
-            return (from data in _dbContext.DocumentMasters.ToList()
-                    join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
-                    where data.CreatedOn >= fromDate && data.CreatedOn <= toDate
-                    select new DocumentMasterDto()
-                    {
-                        DocumentId = data.DocumentId,
-                        Name = data.Name,
-                        ClientId = data.ClientId,
-                        DocumentTypeName = Enum.GetName(typeof(DocumentType), data.DocumentType),
-                        IsActive = data.IsActive,
-                        CreatedBy = data.CreatedBy,
-                        CreatedOn = data.CreatedOn,
-                        StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
-                        ClientName = user.FullName
-                    }).ToList();
+            if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
+            {
+                return (from data in _dbContext.DocumentMasters.ToList()
+                        join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
+                        join createdBy in _dbContext.Users.ToList() on data.CreatedBy equals createdBy.Id
+                        where data.CreatedOn >= fromDate && data.CreatedOn <= toDate && data.ClientId == Convert.ToInt32(SessionHelper.UserId)
+                        select new DocumentMasterDto()
+                        {
+                            DocumentId = data.DocumentId,
+                            Name = data.Name,
+                            ClientId = data.ClientId,
+                            DocumentTypeName = Enum.GetName(typeof(DocumentType), data.DocumentType),
+                            IsActive = data.IsActive,
+                            CreatedBy = data.CreatedBy,
+                            CreatedOn = data.CreatedOn,
+                            CreatedByString = createdBy.FullName,
+                            AddedBy = Convert.ToInt32(createdBy.UserTypeId),
+                            StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
+                            ClientName = user.FullName,
+                            UserName = user.Username
+                        }).ToList();
+            }
+            else
+                return (from data in _dbContext.DocumentMasters.ToList()
+                        join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
+                        join createdBy in _dbContext.Users.ToList() on data.CreatedBy equals createdBy.Id
+                        where data.CreatedOn >= fromDate && data.CreatedOn <= toDate
+                        select new DocumentMasterDto()
+                        {
+                            DocumentId = data.DocumentId,
+                            Name = data.Name,
+                            ClientId = data.ClientId,
+                            DocumentTypeName = Enum.GetName(typeof(DocumentType), data.DocumentType),
+                            IsActive = data.IsActive,
+                            CreatedBy = data.CreatedBy,
+                            CreatedOn = data.CreatedOn,
+                            CreatedByString = createdBy.FullName,
+                            AddedBy = Convert.ToInt32(createdBy.UserTypeId),
+                            StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
+                            ClientName = user.FullName,
+                            UserName = user.Username
+                        }).ToList();
         }
 
         /// <summary>
@@ -61,7 +87,6 @@ namespace Arity.Service
 
         public async Task<DocumentMasterDto> GetDocumentByID(int documentID)
         {
-            DocumentMasterDto document = new DocumentMasterDto();
             return (from documentMaster
                     in _dbContext.DocumentMasters.Where(_ => _.DocumentId == documentID)
                     select new DocumentMasterDto()
@@ -78,7 +103,7 @@ namespace Arity.Service
                     }).FirstOrDefault();
         }
 
-        public int SaveDocument(DocumentMasterDto document)
+        public async Task<int> SaveDocument(DocumentMasterDto document)
         {
             DocumentMaster documentMaster = new DocumentMaster();
             try
@@ -109,12 +134,11 @@ namespace Arity.Service
                         documentMaster.FileName = document.FileName;
                     documentMaster.IsActive = document.IsActive;
                 }
-                _dbContext.SaveChanges();
+               await _dbContext.SaveChangesAsync();
 
             }
-            catch (Exception ex)
+            catch 
             {
-
             }
             return documentMaster.DocumentId;
         }
@@ -127,7 +151,7 @@ namespace Arity.Service
                 _dbContext.SaveChanges();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -155,7 +179,7 @@ namespace Arity.Service
         {
             return (from data in _dbContext.DocumentMasters.ToList()
                     join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
-                    where data.CreatedBy == userId
+                    where data.ClientId == userId
                     select new DocumentMasterDto()
                     {
                         DocumentId = data.DocumentId,

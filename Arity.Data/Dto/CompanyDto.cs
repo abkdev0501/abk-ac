@@ -12,5 +12,6 @@ namespace Arity.Data.Dto
         public string Type { get; set; }
         public int? PreferedColor { get; set; }
         public string Prefix { get; set; }
+        public bool IsAvailableForDelete { get; set; }
     }
 }

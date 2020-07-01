@@ -59,6 +59,18 @@ namespace ArityApp
               url: "company",
               defaults: new { controller = "Master", action = "Company", id = UrlParameter.Optional }
           );
+            
+            routes.MapRoute(
+              name: "commodity",
+              url: "commodity",
+              defaults: new { controller = "Master", action = "CommodityMaster", id = UrlParameter.Optional }
+          ); 
+            
+            routes.MapRoute(
+              name: "consultant",
+              url: "consultant",
+              defaults: new { controller = "Master", action = "Consultants", id = UrlParameter.Optional }
+          );
 
             routes.MapRoute(
               name: "group",

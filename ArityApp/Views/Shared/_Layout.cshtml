@@ -77,6 +77,8 @@
     <script src="/Content/js/vendor/modernizr-2.8.3.min.js"></script>
     <link href="/Content/css/dialog/sweetalert2.min.css" rel="stylesheet" />
     <link href="/Content/css/dialog/dialog.css" rel="stylesheet" />
+
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet" />
     <style>
         .no-rights {
             pointer-events: none;
@@ -124,117 +126,64 @@
                         <nav id="dropdown">
                             <ul class="mobile-menu-nav">
                                 <li>
-                                    <a data-toggle="collapse" data-target="#Charts" href="#">Home</a>
-                                    <ul class="collapse dropdown-header-top">
-                                        <li><a href="index.html">Dashboard One</a></li>
-                                        <li><a href="index-2.html">Dashboard Two</a></li>
-                                        <li><a href="index-3.html">Dashboard Three</a></li>
-                                        <li><a href="index-4.html">Dashboard Four</a></li>
-                                        <li><a href="analytics.html">Analytics</a></li>
-                                        <li><a href="widgets.html">Widgets</a></li>
-                                    </ul>
+                                    <a href="/dashboard"> Home</a>
                                 </li>
                                 <li>
-                                    <a data-toggle="collapse" data-target="#demoevent" href="#">Email</a>
-                                    <ul id="demoevent" class="collapse dropdown-header-top">
-                                        <li><a href="inbox.html">Inbox</a></li>
-                                        <li><a href="view-email.html">View Email</a></li>
-                                        <li><a href="compose-email.html">Compose Email</a></li>
-                                    </ul>
+                                    <a href="/invoice">Invoice</a>
                                 </li>
                                 <li>
-                                    <a data-toggle="collapse" data-target="#democrou" href="#">Interface</a>
-                                    <ul id="democrou" class="collapse dropdown-header-top">
-                                        <li><a href="animations.html">Animations</a></li>
-                                        <li><a href="google-map.html">Google Map</a></li>
-                                        <li><a href="data-map.html">Data Maps</a></li>
-                                        <li><a href="code-editor.html">Code Editor</a></li>
-                                        <li><a href="image-cropper.html">Images Cropper</a></li>
-                                        <li><a href="wizard.html">Wizard</a></li>
-                                    </ul>
+                                    <a href="/receipt">Receipt</a>
+                                </li>
+
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin || Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                                {
+                                    <li>
+                                        <a data-toggle="collapse" data-target="#demolibra" href="#">Masters</a>
+                                        <ul id="demolibra" class="collapse dropdown-header-top">
+                                            <li>
+                                                <a href="\particular">Particulars</a>
+                                            </li>
+                                            <li>
+                                                <a href="\company">Companies</a>
+                                            </li>
+                                            <li>
+                                                <a href="\group">Groups</a>
+                                            </li>
+                                            <li>
+                                                <a href="\notification">Notifications</a>
+                                            </li>
+                                            <li>
+                                                <a href="\commodity">Commodity</a>
+                                            </li>
+                                            <li>
+                                                <a href="\consultant">Consultant</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a data-toggle="collapse" data-target="#demo" href="#">Users</a>
+                                        <ul id="demo" class="collapse dropdown-header-top">
+                                            <li>
+                                                <a href="/user">Users</a>
+                                            </li>
+                                            <li>
+                                                <a href="/client">Client</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                }
+                                <li>
+                                    <a href="/task">Task</a>
                                 </li>
                                 <li>
-                                    <a data-toggle="collapse" data-target="#demolibra" href="#">Charts</a>
-                                    <ul id="demolibra" class="collapse dropdown-header-top">
-                                        <li><a href="flot-charts.html">Flot Charts</a></li>
-                                        <li><a href="bar-charts.html">Bar Charts</a></li>
-                                        <li><a href="line-charts.html">Line Charts</a></li>
-                                        <li><a href="area-charts.html">Area Charts</a></li>
-                                    </ul>
+                                    <a href="/Document/Index">Document</a>
                                 </li>
-                                <li>
-                                    <a data-toggle="collapse" data-target="#demodepart" href="#">Tables</a>
-                                    <ul id="demodepart" class="collapse dropdown-header-top">
-                                        <li><a href="normal-table.html">Normal Table</a></li>
-                                        <li><a href="data-table.html">Data Table</a></li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <a data-toggle="collapse" data-target="#demo" href="#">Forms</a>
-                                    <ul id="demo" class="collapse dropdown-header-top">
-                                        <li><a href="form-elements.html">Form Elements</a></li>
-                                        <li><a href="form-components.html">Form Components</a></li>
-                                        <li><a href="form-examples.html">Form Examples</a></li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <a data-toggle="collapse" data-target="#Miscellaneousmob" href="#">App views</a>
-                                    <ul id="Miscellaneousmob" class="collapse dropdown-header-top">
-                                        <li>
-                                            <a href="notification.html">Notifications</a>
-                                        </li>
-                                        <li>
-                                            <a href="alert.html">Alerts</a>
-                                        </li>
-                                        <li>
-                                            <a href="modals.html">Modals</a>
-                                        </li>
-                                        <li>
-                                            <a href="buttons.html">Buttons</a>
-                                        </li>
-                                        <li>
-                                            <a href="tabs.html">Tabs</a>
-                                        </li>
-                                        <li>
-                                            <a href="accordion.html">Accordion</a>
-                                        </li>
-                                        <li>
-                                            <a href="dialog.html">Dialogs</a>
-                                        </li>
-                                        <li>
-                                            <a href="popovers.html">Popovers</a>
-                                        </li>
-                                        <li>
-                                            <a href="tooltips.html">Tooltips</a>
-                                        </li>
-                                        <li>
-                                            <a href="dropdown.html">Dropdowns</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <a data-toggle="collapse" data-target="#Pagemob" href="#">Pages</a>
-                                    <ul id="Pagemob" class="collapse dropdown-header-top">
-                                        <li>
-                                            <a href="contact.html">Contact</a>
-                                        </li>
-                                        <li>
-                                            <a href="invoice.html">Invoice</a>
-                                        </li>
-                                        <li>
-                                            <a href="typography.html">Typography</a>
-                                        </li>
-                                        <li>
-                                            <a href="color.html">Color</a>
-                                        </li>
-                                        <li>
-                                            <a href="login-register.html">Login Register</a>
-                                        </li>
-                                        <li>
-                                            <a href="404.html">404 Page</a>
-                                        </li>
-                                    </ul>
-                                </li>
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
+                                {
+                                    <li>
+                                        <a href="/notes">Notes</a>
+                                    </li>
+                                }
                             </ul>
                         </nav>
                     </div>
@@ -263,16 +212,16 @@
                             <li id="liMaster">
                                 <a data-toggle="tab" href="#Master"><i class="notika-icon notika-app"></i> Masters</a>
                             </li>
-                            <li id="liTask">
-                                <a href="/task"><i class="notika-icon notika-form"></i> Task</a>
-                            </li>
                             <li id="liUser">
                                 <a data-toggle="tab" href="#User"><i class="notika-icon notika-support"></i> Users</a>
                             </li>
-                            <li id="liDoc">
-                                <a href="/Document/Index"><i class="notika-icon notika-support"></i>Document</a>
-                            </li>
                         }
+                        <li id="liTask">
+                            <a href="/task"><i class="notika-icon notika-form"></i> Task</a>
+                        </li>
+                        <li id="liDoc">
+                            <a href="/Document/Index"><i class="notika-icon notika-windows"></i>Document</a>
+                        </li>
                         @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
                         {
                             <li id="liNotes">
@@ -297,6 +246,12 @@
                                     <li>
                                         <a href="\notification">Notifications</a>
                                     </li>
+                                    <li>
+                                        <a href="\commodity">Commodity</a>
+                                    </li>
+                                    <li>
+                                        <a href="\consultant">Consultant</a>
+                                    </li>
                                 </ul>
                             </div>
                             <div id="User" class="tab-pane notika-tab-menu-bg animated flipInX">
@@ -320,7 +275,22 @@
 
     @RenderBody()
 
+    <div class="modal animated fade" id="modalUserProfile" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-large">
+            <div class="modal-content">
+                <div class="modal-header" style="margin-bottom:35px;">
+                    <h3>Your Profile</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
 
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Start Footer area-->
     <div class="footer-copyright-area">
         <div class="container">
@@ -397,8 +367,8 @@
     <!-- plugins JS
         ============================================ -->
     <script src="/Content/js/plugins.js"></script>
-    <script src="/Scripts/datapicker/bootstrap-datepicker.js"></script>
-    <script src="/Scripts/datapicker/datepicker-active.js"></script>
+    <script src="/Content/js/datapicker/bootstrap-datepicker.js"></script>
+    <script src="/Content/js/datapicker/datepicker-active.js"></script>
 
     <!-- bootstrap select JS
       ============================================ -->
@@ -419,10 +389,22 @@
 
     <script src="/Content/js/dialog/dialog-active.js"></script>
     <script src="/Content/js/dialog/sweetalert2.min.js"></script>
+    <script src="/Scripts/jquery.easy-ticker.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
     @RenderSection("scripts", required: false)
     <script>
         $(document).ready(function ()
         {
+               $('.bk-date').datepicker({
+                    todayBtn: "linked",
+                    keyboardNavigation: false,
+                    forceParse: false,
+                    calendarWeeks: true,
+                    autoclose: true,
+                    format: "dd/mm/yyyy"
+                });
+
             $(".dt-button.buttons-pdf.buttons-html5").addClass("btn btn-default notika-btn-default waves-effect");
             $(".dt-button.buttons-pdf.buttons-html5").removeClass("dt-button buttons-pdf buttons-html5");
 
@@ -439,7 +421,22 @@
                        location.href = "/account/login";
                 },
                 error: function (error) {
-                    Notification('', 'Something went wrong, use different username', 'danger');
+                    Notification('', 'Something went wrong', 'danger');
+                }
+               });
+        });
+             $("#btnProfile").click(function () {
+               $.ajax({
+                url: '@Url.Action("GetUserProfiles", "account")',
+                dataType: "HTML",
+                type: "GET",
+                contentType: 'application/json; charset=utf-8',
+                   success: function (response) {
+                        $('#modalUserProfile .modal-body').html(response);
+                        $('#modalUserProfile').modal('show');
+                },
+                error: function (error) {
+                    Notification('', 'Something went wrong', 'danger');
                 }
             });
         });
@@ -448,6 +445,7 @@
             $(".close").trigger("click");
         });
         });
+
 
         function validateEmail(email) {
             var re = /^(([^<>()\[\]\\.,;:\s@@"]+(\.[^<>()\[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

@@ -1,0 +1,140 @@
+﻿@model Arity.Data.Dto.ConsultantDTO
+
+<form>
+    @Html.HiddenFor(_ => _.ConsultantId)
+    @Html.HiddenFor(_ => _.CreatedBy)
+    @Html.HiddenFor(_ => _.CreatedOn)
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Name<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Name, new { @class = "form-control input-sm", placeholder = "Enter name", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Address<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Address, new { @class = "form-control input-sm", placeholder = "Enter address", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">City<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.City, new { @class = "form-control input-sm", placeholder = "Enter city" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Mobile<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Mobile, new { @class = "form-control input-sm", placeholder = "Enter mobile" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Notes<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Notes, new { @class = "form-control input-sm", placeholder = "Enter notes" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="width:100%;text-align:center;padding: 25px 0 5px;">
+        <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnConsultant">@(Model.ConsultantId > 0 ? "Update" : "Add")</button>
+        <button type="button" class="btn btn-default notika-btn-default waves-effect" id="btnCancel">Cancel</button>
+    </div>
+</form>
+
+<script>
+    $(".date").datepicker({
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true,
+                format: "dd/mm/yyyy"
+            });
+    $('#btnConsultant').on('click', function () {
+        var isValid = true;
+        if ($("#Name").val() == null || $("#Name").val() == "") {
+            Notification('', 'Please enter name', 'danger');
+            isValid = false;
+        }
+      
+        if (isValid) {
+            var data = JSON.stringify({
+            "consultant": {
+                "Name": $("#Name").val(),
+                "Address": $("#Address").val(),
+                "City": $("#City").val(),
+                "Mobile": $("#Mobile").val(),
+                "Notes": $("#Notes").val(),
+                "CreatedBy": $("#CreatedBy").val(),
+                "CreatedOn": $("#CreatedOn").val(),
+                "ConsultantId": $("#ConsultantId").val()
+                }
+            });
+
+            $('#loading').show();
+            $.ajax({
+                url: '@Url.Action("AddConsultant", "Master")',
+                type: 'post',
+                data: data,
+                contentType: 'application/json; charset=utf-8',
+                success: function () {
+                    $("#loading").hide();
+                        if (@Model.ConsultantId <= 0) {
+                            Notification('', 'Consultant added successfuly', 'success');
+                        }
+                        else {
+                            Notification('', 'Consultant updated successfuly', 'success');
+                        }
+                        table.ajax.reload();
+                        $("#modalConsultant").modal('toggle');
+                },
+                failure: function () {
+                    Notification('', 'Something went wrong, Please try again', 'danger');
+                }
+            });
+        }
+    })
+</script>

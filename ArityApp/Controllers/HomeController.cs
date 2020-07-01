@@ -19,13 +19,29 @@ namespace ArityApp.Controllers
     public class HomeController : Controller
     {
         #region Global Variables
-        private IAccountService _accountService;
-        private IInvoiceService _invoiceService;
-        private IPaymentService _paymentService;
-        private ITaskService _taskService;
-        private IDocumentService _documentService;
-        private IMasterService _masterService;
+        private readonly IAccountService _accountService;
+        private readonly IInvoiceService _invoiceService;
+        private readonly IPaymentService _paymentService;
+        private readonly ITaskService _taskService;
+        private readonly IDocumentService _documentService;
+        private readonly IMasterService _masterService;
+
         #endregion
+
+        public HomeController(IAccountService accountService,
+           IInvoiceService invoiceService,
+           IPaymentService paymentService,
+           ITaskService taskService,
+           IDocumentService documentService,
+           IMasterService masterService)
+        {
+            _accountService = accountService;
+            _invoiceService = invoiceService;
+            _paymentService = paymentService;
+            _taskService = taskService;
+            _documentService = documentService;
+            _masterService = masterService;
+        }
 
         #region Invoice
         public ActionResult Index()
@@ -39,17 +55,18 @@ namespace ArityApp.Controllers
         /// Load list of invoice by from and to date
         /// </summary>
         /// <returns></returns>
-        public async Task<JsonResult> LoadInvoiceHistory(DateTime from, DateTime to)
+        public async Task<JsonResult> LoadInvoiceHistory(string from, string to)
         {
             try
             {
-                _invoiceService = new InvoiceService();
-                to = to + new TimeSpan(23, 59, 59);
-                from = from + new TimeSpan(00, 00, 1);
-                var invoiceList = await _invoiceService.GetAllInvoice(from, to);
+                DateTime toDate = Convert.ToDateTime(to);
+                DateTime fromDate = Convert.ToDateTime(from);
+                toDate = toDate + new TimeSpan(23, 59, 59);
+                fromDate = fromDate + new TimeSpan(00, 00, 1);
+                var invoiceList = await _invoiceService.GetAllInvoice(fromDate, toDate);
                 return Json(new { data = invoiceList }, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
                 return Json(new { data = new List<InvoiceEntry>() }, JsonRequestBehavior.AllowGet);
             }
@@ -63,10 +80,9 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _invoiceService = new InvoiceService();
                 return Json(await _invoiceService.GetAllInvoiceParticulars(invoiceId), JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
                 return Json(new { data = new List<InvoiceEntry>() }, JsonRequestBehavior.AllowGet);
             }
@@ -80,7 +96,6 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _invoiceService = new InvoiceService();
                 var invoiceEntry = new InvoiceEntry();
                 if (id != null)
                     invoiceEntry = await _invoiceService.GetInvoice(id ?? 0);
@@ -93,18 +108,40 @@ namespace ArityApp.Controllers
                     invoiceEntry.ClientId = invoiceDetails != null ? invoiceDetails.ClientId : 0;
                     invoiceEntry.CompanyId = invoiceDetails != null ? invoiceDetails.CompanyId : 0;
                     invoiceEntry.InvoiceDate = invoiceDetails != null && invoiceDetails.InvoiceDate != default ? invoiceDetails.InvoiceDate : DateTime.Now;
+                    invoiceEntry.Remarks = invoiceDetails != null ? invoiceDetails.Remarks : string.Empty;
                 }
                 else
                     invoiceEntry.InvoiceId = default(int);
                 ViewBag.Company = new SelectList(await _invoiceService.GetCompany(), "Id", "CompanyName", invoiceEntry.CompanyId);
                 ViewBag.Client = new SelectList(await _invoiceService.GetClient(Convert.ToInt32(invoiceEntry.CompanyId)), "Id", "FullName", invoiceEntry.ClientId);
                 ViewBag.Particular = new SelectList(await _invoiceService.GetParticular(), "Id", "ParticularFF", invoiceEntry.ParticularId);
+                ViewBag.Year = new SelectList(GetYear(), "Key", "Value", invoiceEntry.Year);
                 return PartialView("_InvoiceEntry", invoiceEntry);
             }
             catch
             {
                 throw;
             }
+        }
+
+        private Dictionary<string, string> GetYear()
+        {
+            var years = new Dictionary<string, string>();
+            for (int i = 5; i > 0; i--)
+            {
+                years.Add(
+                    Convert.ToInt32(DateTime.Now.Year.ToString().Substring(1)) - i + "/" + ((Convert.ToInt32(DateTime.Now.Year.ToString().Substring(1)) - i) + 1),
+                    Convert.ToInt32(DateTime.Now.Year.ToString().Substring(1)) - i + "/" + ((Convert.ToInt32(DateTime.Now.Year.ToString().Substring(1)) - i) + 1));
+            }
+
+            for (int i = 0; i < 5; i++)
+            {
+                if (!years.ContainsKey(Convert.ToInt32(DateTime.Now.Year.ToString().Substring(1)) - i + "/" + ((Convert.ToInt32(DateTime.Now.Year.ToString().Substring(1)) - i) + 1)))
+                    years.Add(
+                        Convert.ToInt32(DateTime.Now.Year.ToString().Substring(1)) - i + "/" + ((Convert.ToInt32(DateTime.Now.Year.ToString().Substring(1)) - i) + 1),
+                        Convert.ToInt32(DateTime.Now.Year.ToString().Substring(1)) - i + "/" + ((Convert.ToInt32(DateTime.Now.Year.ToString().Substring(1)) - i) + 1));
+            }
+            return years;
         }
 
         /// <summary>
@@ -116,11 +153,11 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _invoiceService = new InvoiceService();
-                await _invoiceService.AddUpdateInvoiceEntry(Convert.ToInt32(SessionHelper.UserId), invoiceEntry);
-                return Json(true, JsonRequestBehavior.AllowGet);
+                var id = await _invoiceService.AddUpdateInvoiceEntry(Convert.ToInt32(SessionHelper.UserId), invoiceEntry);
+                var invoice = await _invoiceService.GetInvoiceSingle(id);
+                return Json(invoice, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -134,11 +171,10 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _invoiceService = new InvoiceService();
                 await _invoiceService.DeleteInvoiceParticularEntry(id);
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -152,7 +188,6 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _invoiceService = new InvoiceService();
                 return Json(await _invoiceService.GetClient(companyId), JsonRequestBehavior.AllowGet);
             }
             catch
@@ -169,7 +204,6 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _invoiceService = new InvoiceService();
                 return Json(await _invoiceService.GetTrackingInformation(invoiceId), JsonRequestBehavior.AllowGet);
             }
             catch
@@ -187,13 +221,12 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _invoiceService = new InvoiceService();
                 var trackingDetails = await _invoiceService.GetTrackingInformationById(invoiceTrackingId);
                 if (trackingDetails == null)
                     trackingDetails = new TrackingInformation { InvoiceId = invoiceId };
                 return PartialView("_InvoiceTracking", trackingDetails);
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -208,7 +241,6 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _invoiceService = new InvoiceService();
                 return Json(await _invoiceService.AddTrackingInformation(trackingInformation), JsonRequestBehavior.AllowGet);
             }
             catch
@@ -225,7 +257,6 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _invoiceService = new InvoiceService();
                 return Json(await _invoiceService.RemoveInvoiceTracking(trackingId), JsonRequestBehavior.AllowGet);
             }
             catch
@@ -237,16 +268,14 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _invoiceService = new InvoiceService();
-             await _invoiceService.DeleteInvoiceById(invoiceId);
-                return Json(true,JsonRequestBehavior.AllowGet);
+                await _invoiceService.DeleteInvoiceById(invoiceId);
+                return Json(true, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
 
                 throw;
             }
-            return Json(true, JsonRequestBehavior.AllowGet);
         }
 
         #endregion
@@ -267,17 +296,19 @@ namespace ArityApp.Controllers
         /// Load payment list by from and to date
         /// </summary>
         /// <returns></returns>
-        public async Task<JsonResult> LoadPaymentHistory(DateTime from, DateTime to)
+        public async Task<JsonResult> LoadPaymentHistory(string from, string to)
         {
             try
             {
-                _paymentService = new PaymentService();
-                to = to + new TimeSpan(23, 59, 59);
-                from = from + new TimeSpan(00, 00, 1);
-                var receiptList = await _paymentService.GetAllReceipts(from, to);
+                DateTime fromDate = Convert.ToDateTime(from);
+                DateTime toDate = Convert.ToDateTime(to);
+
+                toDate = toDate + new TimeSpan(23, 59, 59);
+                fromDate = fromDate + new TimeSpan(00, 00, 1);
+                var receiptList = await _paymentService.GetAllReceipts(fromDate, toDate);
                 return Json(new { data = receiptList }, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
                 return Json(new { data = new List<ReceiptDto>() }, JsonRequestBehavior.AllowGet);
             }
@@ -290,8 +321,6 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _paymentService = new PaymentService();
-                _invoiceService = new InvoiceService();
                 var receiptDto = new ReceiptDto();
                 if (id != null)
                     receiptDto = await _paymentService.GetReceipt(id ?? 0);
@@ -302,24 +331,22 @@ namespace ArityApp.Controllers
                 ViewBag.Company = new SelectList(await _invoiceService.GetCompany(), "Id", "CompanyName", receiptDto.CompanyId);
                 ViewBag.Client = new SelectList(await _invoiceService.GetClient(Convert.ToInt32(receiptDto.CompanyId)), "Id", "FullName", receiptDto.ClientId);
 
-                ViewBag.Invoice = new MultiSelectList(await _invoiceService.GetInvoiceByClientandCompany(Convert.ToInt32(receiptDto.CompanyId), Convert.ToInt32(receiptDto.ClientId)), "InvoiceId", "InvoiceNumber", receiptDto.InvoiceIds);
+                ViewBag.Invoice = new MultiSelectList(await _invoiceService.GetInvoiceByClientandCompany(Convert.ToInt32(receiptDto.CompanyId), Convert.ToInt32(receiptDto.ClientId), id), "InvoiceId", "InvoiceNumber", receiptDto.InvoiceIds);
                 return PartialView("_ReceiptEntry", receiptDto);
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
         }
 
-
         public async Task<JsonResult> GetInvoiceByClientAndCompany(int companyId, int clientId)
         {
             try
             {
-                _invoiceService = new InvoiceService();
-                return Json(await _invoiceService.GetInvoiceByClientandCompany(companyId, clientId), JsonRequestBehavior.AllowGet);
+                return Json(await _invoiceService.GetInvoiceByClientandCompany(companyId, clientId, null), JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -329,12 +356,11 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _invoiceService = new InvoiceService();
                 return Json(await _invoiceService.GetInvoiceAmountTotal(invoices), JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
-                throw;
+                return Json(0, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -347,11 +373,29 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _paymentService = new PaymentService();
                 await _paymentService.AddUpdateReceiptEntry(receiptEntry);
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Remove receipt from db
+        /// </summary>
+        /// <param name="receiptId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<JsonResult> DeleteReceipt(int receiptId)
+        {
+            try
+            {
+                await _paymentService.DeleteReceipt(receiptId);
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+            catch
             {
                 throw;
             }
@@ -385,7 +429,6 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task GenerateInvoice(string id)
         {
-            _invoiceService = new InvoiceService();
             ExcelPackage Ep = new ExcelPackage();
             ExcelWorksheet Sheet = Ep.Workbook.Worksheets.Add("Invoice");
             int currentCell = 1;
@@ -397,170 +440,183 @@ namespace ArityApp.Controllers
                 var companyDetail = await _invoiceService.GetCompanyDetailById(Convert.ToInt32(invoicDetails.InvoiceEntry.CompanyId));
 
                 #region Excel set
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Value = companyDetail.CompanyName;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.Font.Size = 16;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.Fill.BackgroundColor.SetColor(GetColor(companyDetail.PreferedColor ?? 0));
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Value = companyDetail.CompanyName;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Font.Size = 16;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Fill.BackgroundColor.SetColor(GetColor(companyDetail.PreferedColor ?? 0));
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.White);
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Value = companyDetail.Type;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.Font.Size = 12;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.Fill.BackgroundColor.SetColor(GetColor(companyDetail.PreferedColor ?? 0));
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Value = companyDetail.Type;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Font.Size = 12;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Fill.BackgroundColor.SetColor(GetColor(companyDetail.PreferedColor ?? 0));
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.White);
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Value = companyDetail.Address;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Value = companyDetail.Address;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                 currentCell++;
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}", currentCell)].Value = "Bill No.";
-                Sheet.Cells[string.Format("A{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("B{0}", currentCell)].Value = invoicDetails.InvoiceEntry.InvoiceNumber;
+                Sheet.Cells[string.Format("B{0}", currentCell)].Value = "Bill No.";
+                Sheet.Cells[string.Format("B{0}", currentCell)].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("C{0}", currentCell)].Value = companyDetail.Prefix + "-" + invoicDetails.InvoiceEntry.InvoiceNumber;
+                Sheet.Cells[string.Format("C{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+
+
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Value = "INVOICE";
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.Font.UnderLine = true;
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.Font.Size = 12;
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.Fill.BackgroundColor.SetColor(GetColor(companyDetail.PreferedColor ?? 0));
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.White);
+
+                Sheet.Cells[string.Format("H{0}", currentCell)].Value = "Date:";
+                Sheet.Cells[string.Format("I{0}", currentCell)].Value = invoicDetails.InvoiceEntry.InvoiceDate.ToString("dd/MM/yyyy");
+                Sheet.Column(9).Width = 12.30;
+                Sheet.Cells[string.Format("I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                currentCell++;
+                currentCell++;
+                currentCell++;
+
+                Sheet.Cells[string.Format("B{0}", currentCell)].Value = "Name:";
+                Sheet.Cells[string.Format("B{0}", currentCell)].Style.Font.Bold = true;
                 Sheet.Cells[string.Format("B{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
 
-
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Value = "INVOICE";
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.Font.UnderLine = true;
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.Font.Size = 12;
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.Fill.BackgroundColor.SetColor(GetColor(companyDetail.PreferedColor ?? 0));
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.White);
-
-                Sheet.Cells[string.Format("G{0}", currentCell)].Value = "Date:";
-                Sheet.Cells[string.Format("H{0}", currentCell)].Value = invoicDetails.InvoiceEntry.InvoiceDate.ToString("dd/MM/yyyy");
-                Sheet.Cells[string.Format("H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                Sheet.Cells[string.Format("C{0}:I{0}", currentCell)].Value = invoicDetails.InvoiceEntry.FullName;
+                Sheet.Cells[string.Format("C{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format("C{0}:I{0}", currentCell)].Merge = true;
                 currentCell++;
+
+                Sheet.Cells[string.Format("B{0}", currentCell)].Value = "Address:";
+                Sheet.Cells[string.Format("B{0}", currentCell)].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("B{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+
+                Sheet.Cells[string.Format("C{0}:I{0}", currentCell)].Value = invoicDetails.InvoiceEntry.Address;
+                Sheet.Cells[string.Format("C{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format("C{0}:I{0}", currentCell)].Merge = true;
                 currentCell++;
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}", currentCell)].Value = "Name:";
-                Sheet.Cells[string.Format("A{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("A{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Value = "Particulars";
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
 
-                Sheet.Cells[string.Format("B{0}:H{0}", currentCell)].Value = invoicDetails.InvoiceEntry.FullName;
-                Sheet.Cells[string.Format("B{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-                Sheet.Cells[string.Format("B{0}:H{0}", currentCell)].Merge = true;
-                currentCell++;
-
-                Sheet.Cells[string.Format("A{0}", currentCell)].Value = "Address:";
-                Sheet.Cells[string.Format("A{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("A{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-
-                Sheet.Cells[string.Format("B{0}:H{0}", currentCell)].Value = invoicDetails.InvoiceEntry.Address;
-                Sheet.Cells[string.Format("B{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-                Sheet.Cells[string.Format("B{0}:H{0}", currentCell)].Merge = true;
-                currentCell++;
-                currentCell++;
-
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Value = "Particulars";
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Value = "Amount";
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Value = "Amount";
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
                 currentCell++;
 
                 for (int i = currentCell; i < (invoicDetails.Particulars.Count() + currentCell); i++)
                 {
-                    Sheet.Cells[string.Format("A{0}:F{0}", i)].Value = string.Format("{0} Fees For F.Y.{1}", invoicDetails.Particulars[i - currentCell].FFParticulars, invoicDetails.Particulars[i - currentCell].Year);
-                    Sheet.Cells[string.Format("A{0}:F{0}", i)].Merge = true;
-                    Sheet.Cells[string.Format("A{0}:F{0}", i)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-                    Sheet.Cells[string.Format("A{0}:F{0}", i)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    Sheet.Cells[string.Format("B{0}:G{0}", i)].Value = string.Format("{0} Fees For F.Y.{1}", invoicDetails.Particulars[i - currentCell].FFParticulars, invoicDetails.Particulars[i - currentCell].Year);
+                    Sheet.Cells[string.Format("B{0}:G{0}", i)].Merge = true;
+                    Sheet.Cells[string.Format("B{0}:G{0}", i)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                    Sheet.Cells[string.Format("B{0}:G{0}", i)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    Sheet.Cells[string.Format("B{0}:G{0}", i)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
 
-                    Sheet.Cells[string.Format("G{0}:H{0}", i)].Value = invoicDetails.Particulars[i - currentCell].Amount;
-                    Sheet.Cells[string.Format("G{0}:H{0}", i)].Merge = true;
-                    Sheet.Cells[string.Format("G{0}:H{0}", i)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
-                    Sheet.Cells[string.Format("G{0}:H{0}", i)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                    Sheet.Cells[string.Format("H{0}:I{0}", i)].Value = invoicDetails.Particulars[i - currentCell].Amount;
+                    Sheet.Cells[string.Format("H{0}:I{0}", i)].Merge = true;
+                    Sheet.Cells[string.Format("H{0}:I{0}", i)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                    Sheet.Cells[string.Format("H{0}:I{0}", i)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
                 }
 
                 currentCell = (invoicDetails.Particulars.Count() + currentCell);
                 for (int i = currentCell; i < currentCell + (invoicDetails.Particulars.Count() <= 5 ? 3 : 1); i++)
                 {
-                    Sheet.Cells[string.Format("A{0}:F{0}", i)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                    Sheet.Cells[string.Format("A{0}:F{0}", i)].Merge = true;
-                    Sheet.Cells[string.Format("G{0}:H{0}", i)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                    Sheet.Cells[string.Format("G{0}:H{0}", i)].Merge = true;
+                    Sheet.Cells[string.Format("B{0}:G{0}", i)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    Sheet.Cells[string.Format("B{0}:G{0}", i)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                    Sheet.Cells[string.Format("B{0}:G{0}", i)].Merge = true;
+                    Sheet.Cells[string.Format("H{0}:I{0}", i)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                    Sheet.Cells[string.Format("H{0}:I{0}", i)].Merge = true;
                 }
 
                 currentCell = currentCell + (invoicDetails.Particulars.Count() <= 5 ? 3 : 1);
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}:E{0}", currentCell)].Value = "Amount Chargeable (in words)";
-                Sheet.Cells[string.Format("A{0}:E{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("A{0}:E{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Value = "Amount Chargeable (in words)";
+                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
 
-                Sheet.Cells[string.Format("F{0}", currentCell)].Value = "Total";
-                Sheet.Cells[string.Format("F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("G{0}", currentCell)].Value = "Total";
+                Sheet.Cells[string.Format("G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
 
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Value = invoicDetails.Particulars.Sum(_ => _.Amount);
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Value = invoicDetails.Particulars.Sum(_ => _.Amount);
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Value = "Rupees " + CurrencyConvertor.NumberToWords(Convert.ToInt32(invoicDetails.Particulars.Sum(_ => _.Amount))) + " Only";
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Value = "Rupees " + CurrencyConvertor.NumberToWords(Convert.ToInt32(invoicDetails.Particulars.Sum(_ => _.Amount))) + " Only";
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Value = "";
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Value = "";
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}", currentCell)].Value = "For F.Y.";
-                Sheet.Cells[string.Format("A{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("B{0}", currentCell)].Value = "For F.Y.";
+                Sheet.Cells[string.Format("B{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("B{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
 
-                Sheet.Cells[string.Format("B{0}:H{0}", currentCell)].Value = invoicDetails.Particulars.FirstOrDefault().Year;
-                Sheet.Cells[string.Format("B{0}:H{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("B{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-                Sheet.Cells[string.Format("B{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                Sheet.Cells[string.Format("B{0}:H{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("C{0}:I{0}", currentCell)].Value = invoicDetails.Particulars?.FirstOrDefault()?.Year;
+                Sheet.Cells[string.Format("C{0}:I{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("C{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format("C{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                Sheet.Cells[string.Format("C{0}:I{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
                 currentCell += 5;
 
-                Sheet.Cells[string.Format("F{0}:H{0}", currentCell)].Value = "Authorized Signatory";
-                Sheet.Cells[string.Format("F{0}:H{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("F{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("G{0}:I{0}", currentCell)].Value = "Authorized Signatory";
+                Sheet.Cells[string.Format("G{0}:I{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("G{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                 #endregion
 
-                currentCell += 10;
+                currentCell += 5;
+
+                Sheet.Row(currentCell - 1).PageBreak = true;
+                Sheet.Column(currentCell).PageBreak = true;
 
             }
 
@@ -581,10 +637,8 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task GenerateReciept(string id)
         {
-            _invoiceService = new InvoiceService();
-            _paymentService = new PaymentService();
             ExcelPackage Ep = new ExcelPackage();
-            ExcelWorksheet Sheet = Ep.Workbook.Worksheets.Add("Invoice");
+            ExcelWorksheet Sheet = Ep.Workbook.Worksheets.Add("Receipt");
             int currentCell = 1;
 
 
@@ -592,182 +646,205 @@ namespace ArityApp.Controllers
             foreach (var receiptId in receiptIds)
             {
                 var receiptDetails = await _paymentService.GetReceipt(Convert.ToInt32(receiptId));
-                var companyDetail = await _invoiceService.GetCompanyDetailById(Convert.ToInt32(receiptDetails.Invoices.FirstOrDefault().CompanyId));
+                var companyDetail = await _invoiceService.GetCompanyDetailById(Convert.ToInt32(receiptDetails.CompanyId));
 
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Value = companyDetail.CompanyName;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Value = companyDetail.CompanyName;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Style.Font.Size = 16;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Style.Fill.BackgroundColor.SetColor(GetColor(companyDetail.PreferedColor ?? 0));
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                Sheet.Cells[string.Format("I{0}", currentCell)].Value = "";
+                Sheet.Cells[string.Format("I{0}", currentCell)].Style.Font.Bold = true;
+                currentCell++;
+
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Value = companyDetail.Type;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Style.Font.Size = 12;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.Black);
+                Sheet.Cells[string.Format("I{0}", currentCell)].Value = "";
+                Sheet.Cells[string.Format("I{0}", currentCell)].Style.Font.Bold = true;
+                currentCell++;
+
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Value = companyDetail.Address;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("C{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("I{0}", currentCell)].Value = "";
+                Sheet.Cells[string.Format("I{0}", currentCell)].Style.Font.Bold = true;
+                currentCell++;
+                currentCell++;
+
+                Sheet.Cells[string.Format("B{0}", currentCell)].Value = "Rpt No.";
+                Sheet.Cells[string.Format("B{0}", currentCell)].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("C{0}", currentCell)].Value = companyDetail.Prefix + "-" + receiptDetails.RecieptNo;
+                Sheet.Cells[string.Format("C{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+
+
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Value = "RECEIPT";
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.Font.Size = 12;
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.Fill.BackgroundColor.SetColor(GetColor(companyDetail.PreferedColor ?? 0));
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("E{0}:F{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.White);
+
+                Sheet.Cells[string.Format("H{0}", currentCell)].Value = "Date:";
+                Sheet.Cells[string.Format("H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format("I{0}", currentCell)].Value = receiptDetails.RecieptDate.ToString("dd/MM/yyyy");
+                Sheet.Column(9).Width = 12.30;
+                Sheet.Column(8).Width = 9.30;
+                Sheet.Cells[string.Format("I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                currentCell++;
+                currentCell++;
+
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Value = "Particulars";
                 Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Font.Size = 16;
                 Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Fill.BackgroundColor.SetColor(GetColor(companyDetail.PreferedColor ?? 0));
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Value = "Amount";
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
                 currentCell++;
 
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Value = companyDetail.Type;
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Font.Size = 12;
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.Black);
+                Sheet.Cells[string.Format(string.Format("B{0}:G{0}", currentCell), currentCell)].Value = !string.IsNullOrEmpty(receiptDetails.ClientName) ? receiptDetails.ClientName : receiptDetails.Invoices.FirstOrDefault()?.FullName ?? string.Empty;
+                Sheet.Cells[string.Format(string.Format("B{0}:G{0}", currentCell), currentCell)].Merge = true;
+                Sheet.Cells[string.Format(string.Format("B{0}:G{0}", currentCell), currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format(string.Format("B{0}:G{0}", currentCell), currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format(string.Format("B{0}:G{0}", currentCell), currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Value = receiptDetails.TotalAmount;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
                 currentCell++;
 
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Value = companyDetail.Address;
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                currentCell++;
-                currentCell++;
-
-                Sheet.Cells[string.Format("A{0}", currentCell)].Value = "Rpt No.";
-                Sheet.Cells[string.Format("A{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("B{0}", currentCell)].Value = receiptDetails.RecieptNo;
+                Sheet.Cells[string.Format("B{0}", currentCell)].Value = "Against Ref.";
+                Sheet.Cells[string.Format("B{0}", currentCell)].Style.Font.Bold = true;
+                Sheet.Column(2).Width = 13.30;
+                Sheet.Cells[string.Format("B{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
                 Sheet.Cells[string.Format("B{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
 
-
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Value = "RECEIPT";
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.Font.Size = 12;
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.Fill.BackgroundColor.SetColor(GetColor(companyDetail.PreferedColor ?? 0));
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                Sheet.Cells[string.Format("D{0}:E{0}", currentCell)].Style.Font.Color.SetColor(System.Drawing.Color.White);
-
-                Sheet.Cells[string.Format("G{0}", currentCell)].Value = "Date:";
-                Sheet.Cells[string.Format("G{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-                Sheet.Cells[string.Format("H{0}", currentCell)].Value = receiptDetails.RecieptDate.ToString("dd/MM/yyyy");
-                Sheet.Cells[string.Format("H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
-                currentCell++;
-                currentCell++;
-
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Value = "Particulars";
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Value = "Amount";
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                currentCell++;
-
-                Sheet.Cells[string.Format(string.Format("A{0}:F{0}", currentCell), currentCell)].Value = receiptDetails.Invoices.FirstOrDefault().FullName;
-                Sheet.Cells[string.Format(string.Format("A{0}:F{0}", currentCell), currentCell)].Merge = true;
-                Sheet.Cells[string.Format(string.Format("A{0}:F{0}", currentCell), currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-                Sheet.Cells[string.Format(string.Format("A{0}:F{0}", currentCell), currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Value = receiptDetails.TotalAmount;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                currentCell++;
-
-                Sheet.Cells[string.Format("A{0}", currentCell)].Value = "Against Ref.";
-                Sheet.Cells[string.Format("A{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("A{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-
-                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Value = string.Join("&", receiptDetails.Invoices.Select(_ => _.InvoiceNumber));
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("C{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("C{0}:G{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("C{0}:G{0}", currentCell)].Value = string.Join("&", receiptDetails.Invoices.Select(_ => _.InvoiceNumber));
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
 
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Value = receiptDetails.BankName + " " + receiptDetails.ChequeNumber;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Value = receiptDetails.BankName + " " + receiptDetails.ChequeNumber;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Value = "Discount";
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Value = "Discount";
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
                 if (receiptDetails.Discount > 0)
-                    Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Value = receiptDetails.Discount;
+                    Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Value = receiptDetails.Discount;
                 else
-                    Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Value = "";
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
+                    Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Value = "";
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
                 currentCell++;
 
                 #region Line Break
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:F{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:G{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
                 currentCell++;
                 #endregion
 
-                Sheet.Cells[string.Format("A{0}", currentCell)].Value = "Against F.Y.";
-                Sheet.Cells[string.Format("A{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("A{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format("B{0}", currentCell)].Value = "Against F.Y.";
+                Sheet.Cells[string.Format("B{0}", currentCell)].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("B{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format("B{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
 
-                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("C{0}:G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("C{0}:G{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("C{0}:G{0}", currentCell)].Value = receiptDetails.Year;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
+                currentCell++;
+
+                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Value = "Amount Received (in words)";
                 Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Value = receiptDetails.Year;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B{0}:F{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+
+                Sheet.Cells[string.Format("G{0}", currentCell)].Value = "Total";
+                Sheet.Cells[string.Format("G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("G{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("G{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("G{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Value = receiptDetails.TotalAmount - receiptDetails.Discount;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("H{0}:I{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
                 currentCell++;
 
-                Sheet.Cells[string.Format("A{0}:E{0}", currentCell)].Value = "Amount Received (in words)";
-                Sheet.Cells[string.Format("A{0}:E{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("A{0}:E{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-                Sheet.Cells[string.Format("A{0}:E{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:E{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("A{0}:E{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-
-                Sheet.Cells[string.Format("F{0}", currentCell)].Value = "Total";
-                Sheet.Cells[string.Format("F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("F{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("F{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("F{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Value = receiptDetails.TotalAmount - receiptDetails.Discount;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Font.Bold = true;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                Sheet.Cells[string.Format("G{0}:H{0}", currentCell)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                currentCell++;
-
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Value = "Rupees " + CurrencyConvertor.NumberToWords(Convert.ToInt32(receiptDetails.TotalAmount - receiptDetails.Discount)) + " Only";
-                Sheet.Cells[string.Format("A{0}:H{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Value = "Rupees " + CurrencyConvertor.NumberToWords(Convert.ToInt32(receiptDetails.TotalAmount - receiptDetails.Discount)) + " Only";
+                Sheet.Cells[string.Format("B{0}:I{0}", currentCell)].Merge = true;
 
                 currentCell += 5;
 
-                Sheet.Cells[string.Format("F{0}:H{0}", currentCell)].Value = "Authorized Signatory";
-                Sheet.Cells[string.Format("F{0}:H{0}", currentCell)].Merge = true;
-                Sheet.Cells[string.Format("F{0}:H{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                Sheet.Cells[string.Format("G{0}:I{0}", currentCell)].Value = "Authorized Signatory";
+                Sheet.Cells[string.Format("G{0}:I{0}", currentCell)].Merge = true;
+                Sheet.Cells[string.Format("G{0}:I{0}", currentCell)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
 
-                currentCell += 10;
+                currentCell += 5;
+
+                Sheet.Row(currentCell - 1).PageBreak = true;
+                Sheet.Column(11).PageBreak = true;
             }
 
             using (var memoryStream = new MemoryStream())
@@ -783,7 +860,6 @@ namespace ArityApp.Controllers
 
         public async Task<ActionResult> GeneratePDF(string id)
         {
-            _invoiceService = new InvoiceService();
             StringBuilder invoiceTemplate = new StringBuilder();
             var invoiceIds = id.TrimEnd(',').Split(',').ToList<string>();
             foreach (var invoiceId in invoiceIds)
@@ -816,8 +892,6 @@ namespace ArityApp.Controllers
 
         public async Task<ActionResult> GenerateReceiptPDF(string id)
         {
-            _invoiceService = new InvoiceService();
-            _paymentService = new PaymentService();
             StringBuilder invoiceTemplate = new StringBuilder();
             var receiptIds = id.TrimEnd(',').Split(',').ToList<string>();
             foreach (var receiptId in receiptIds)
@@ -856,8 +930,7 @@ namespace ArityApp.Controllers
 
         public async Task SampleInvoiceCreateFile()
         {
-            _invoiceService = new InvoiceService();
-            _invoiceService.GetAllCompanyWithClients();
+            await _invoiceService.GetAllCompanyWithClients();
 
             ExcelPackage Ep = new ExcelPackage();
             ExcelWorksheet Sheet = Ep.Workbook.Worksheets.Add("Create Invoice");
@@ -890,7 +963,7 @@ namespace ArityApp.Controllers
                 Response.Flush();
                 Response.End();
             }
-            
+
         }
 
         #endregion
@@ -904,19 +977,19 @@ namespace ArityApp.Controllers
             return View();
         }
 
-        public async Task<JsonResult> LoadUsers(DateTime from, DateTime to)
+        public async Task<JsonResult> LoadUsers(string from, string to)
         {
             try
             {
-                _accountService = new AccountService();
-                to = to + new TimeSpan(23, 59, 59);
-                from = from + new TimeSpan(00, 00, 1);
-                var users = await _accountService.GetAllUsers(from, to);
+                DateTime fromDate = Convert.ToDateTime(from);
+                DateTime toDate = Convert.ToDateTime(to);
+                toDate = toDate + new TimeSpan(23, 59, 59);
+                fromDate = fromDate + new TimeSpan(00, 00, 1);
+                var users = await _accountService.GetAllUsers(fromDate, toDate);
                 return Json(new { data = users }, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
-                var tt = ex.InnerException;
                 return Json(new { data = new List<UsersDto>() }, JsonRequestBehavior.AllowGet);
             }
         }
@@ -929,8 +1002,6 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _invoiceService = new InvoiceService();
-                _accountService = new AccountService();
                 var userDto = new UsersDto();
                 if (id != null)
                     userDto = await _accountService.GetUser(id ?? 0);
@@ -948,9 +1019,8 @@ namespace ArityApp.Controllers
                 // ViewBag.Companies = new MultiSelectList(await _invoiceService.GetCompany(), "Id", "CompanyName", userDto.CompanyIds);
                 return PartialView("_UserWizard", userDto);
             }
-            catch (Exception ex)
+            catch
             {
-                var tt = ex.InnerException;
                 throw;
             }
         }
@@ -964,18 +1034,34 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _accountService = new AccountService();
                 await _accountService.AddUpadate(user);
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
-                var tt = ex.InnerException;
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// remove User entry
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult> DeleteUser(int userId)
+        {
+            try
+            {
+                await _accountService.RemoveUser(userId);
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
                 throw;
             }
         }
         #endregion
-         
+
         #region Dashboard
         /// <summary>
         /// Dashboard landing page
@@ -992,54 +1078,31 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<JsonResult> GetAllTask()
         {
-            _taskService = new TaskService();
             var tasks = await _taskService.GetAll(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId));
             return Json(tasks, JsonRequestBehavior.AllowGet);
         }
-        
+
         /// <summary>
         /// Get current user notification
         /// </summary>
         /// <returns></returns>
-        public async Task<JsonResult> GetAllNotification()
+        public async Task<JsonResult> GetAllNotification(int type)
         {
-            _masterService = new MasterService();
-            var notification = await _masterService.GetAllNotification(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId));
+            var notification = await _masterService.GetAllNotification(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId), type);
             return Json(notification, JsonRequestBehavior.AllowGet);
-        }
-
-        /// <summary>
-        /// Fetch documents from db
-        /// </summary>
-        /// <returns></returns>
-        public async Task<JsonResult>GetDocumentList()
-        {
-            _documentService = new DocumentService();
-            var DocumentList = new List<DocumentMasterDto>();
-
-            if (SessionHelper.UserTypeId == (int)EnumHelper.UserType.Master)
-            {
-                DocumentList = await _documentService.GetAllDocuments();
-            }
-            if (SessionHelper.UserTypeId == (int)EnumHelper.UserType.User)
-            {
-                DocumentList = await _documentService.GetDocumentByUserID((int)SessionHelper.UserId);
-            }
-            return Json(DocumentList, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult DownloadDocument(int documentID)
         {
             try
             {
-                _documentService = new DocumentService();
                 var documnet = _documentService.GetDocumentByID(documentID).Result;
-                string folderPath = Server.MapPath("~/Content/Documents/"+documentID+"_"+documnet.FileName);
+                string folderPath = Server.MapPath("~/Content/Documents/" + documentID + "_" + documnet.FileName);
                 byte[] fileBytes = System.IO.File.ReadAllBytes(@folderPath);
                 string fileName = documnet.FileName;
                 return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
             }
-            catch (Exception ex)
+            catch
             {
                 return Content("Some error occurred during download file. Please contact support team.");
             }
@@ -1051,7 +1114,7 @@ namespace ArityApp.Controllers
         /// 404 page 
         /// </summary>
         /// <returns></returns>
-        public async Task<ActionResult> NotFound()
+        public ActionResult NotFound()
         {
             return View();
         }
@@ -1114,7 +1177,7 @@ namespace ArityApp.Controllers
                 font - size: .813em;
                 color: #222;
     background - color: #fff;
-	margin: 3 % 15 % 3 % 15 %;
+	margin: 3 % 18 % 3 % 18 %;
             }
 
             h1, h2, h3, h4, h5 {
@@ -1269,7 +1332,7 @@ border-left:1px solid;
                 font - size: .813em;
                 color: #222;
     background - color: #fff;
-	margin: 3 % 15 % 3 % 15 %;
+	margin: 3 % 18 % 3 % 18 %;
             }
 
             h1, h2, h3, h4, h5 {

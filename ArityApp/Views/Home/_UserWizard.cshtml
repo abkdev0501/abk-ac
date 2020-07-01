@@ -2,16 +2,11 @@
 @using Arity.Data.Helpers;
 @{
 
-    string IsAllowed()
-    {
-        if (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.MasterAdmin)
-            return "";
-
-        if (Model.Id > 0 && Model.CreatedBy != SessionHelper.UserTypeId)
-            return "no-rights";
-        return "denied";
-    }
+    var IsAllowed = (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.MasterAdmin) ? "" :
+     (Model.Id > 0 && Model.CreatedBy != SessionHelper.UserTypeId) ?
+        "no-rights" : "denied";
 }
+
 <style>
     .chosen-container {
         width: 100% !important;
@@ -124,7 +119,7 @@
                         @Html.TextBoxFor(_ => _.Username, new { @class = "form-control input-sm", placeholder = "Enter username" })
                     </div>
                 </div>
-                @if (Model.Id <= 0 || string.IsNullOrEmpty(IsAllowed()))
+                @if (Model.Id <= 0 || string.IsNullOrEmpty(IsAllowed))
                 {
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                         <label class="hrzn-fm">Password<span style="color:red;vertical-align:text-bottom;">*</span></label>
@@ -208,7 +203,7 @@
                 Notification('', 'Please enter user type', 'danger');
                 isValid = false;
         }
-            @if (Model.Id <= 0 || string.IsNullOrEmpty(IsAllowed()))
+            @if (Model.Id <= 0 || string.IsNullOrEmpty(IsAllowed))
                     {
                     @:if ($("#Password").val() == null || $("#Password").val() == "") {
                         @:Notification('', 'Please enter password', 'danger');
@@ -264,7 +259,7 @@
                 },
                 error: function (error) {
                     $("#loading").hide();
-                    Notification('', 'Something went wrong, use different username', 'danger');
+                    Notification('', 'Username already exist', 'danger');
                 }
             });
         }

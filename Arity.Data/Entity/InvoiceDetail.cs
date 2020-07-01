@@ -16,5 +16,6 @@ namespace Arity.Data.Entity
         public long CompanyId { get; set; }
         public int CreatedBy { get; set; }
         public DateTime InvoiceDate { get; set; }
+        public string Remarks{ get; set; }
     }
-}
+}   

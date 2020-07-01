@@ -13,5 +13,6 @@ namespace Arity.Service.Contract
         Task<ReceiptDto> GetReceipt(int id);
         
         Task AddUpdateReceiptEntry(ReceiptDto receiptEntry);
+        Task DeleteReceipt(int receiptId);
     }
 }

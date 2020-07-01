@@ -8,15 +8,16 @@ using Arity.Data.Dto;
 using Arity.Data.Entity;
 using Arity.Data.Helpers;
 using Arity.Service.Contract;
+using Newtonsoft.Json;
 
 namespace Arity.Service
 {
     public class MasterService : IMasterService
     {
         private readonly RMNEntities _dbContext;
-        public MasterService()
+        public MasterService(RMNEntities rmnEntities)
         {
-            _dbContext = new RMNEntities();
+            _dbContext = rmnEntities;
         }
 
         #region Company
@@ -26,16 +27,17 @@ namespace Arity.Service
         /// <returns></returns>
         public async Task<List<CompanyDto>> GetAllCompany()
         {
-            return await (from company in _dbContext.Company_master
-                          select new CompanyDto
-                          {
-                              CompanyName = company.CompanyName,
-                              Address = company.Address,
-                              Id = company.Id,
-                              Prefix = company.Prefix,
-                              Type = company.Type,
-                              IsActive = company.IsActive ?? false
-                          }).ToListAsync();
+            return (from company in _dbContext.Company_master
+                    select new CompanyDto
+                    {
+                        CompanyName = company.CompanyName,
+                        Address = company.Address,
+                        Id = company.Id,
+                        Prefix = company.Prefix,
+                        Type = company.Type,
+                        IsActive = company.IsActive ?? false,
+                        IsAvailableForDelete = !(_dbContext.InvoiceDetails.Any(_ => _.CompanyId == company.Id))
+                    }).ToList();
         }
 
         /// <summary>
@@ -90,6 +92,16 @@ namespace Arity.Service
             await _dbContext.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Delete company
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public async Task DeleteCompany(int companyId)
+        {
+            _dbContext.Company_master.Remove(_dbContext.Company_master.Where(_ => _.Id == companyId).FirstOrDefault());
+            await _dbContext.SaveChangesAsync();
+        }
 
         #endregion
 
@@ -103,7 +115,8 @@ namespace Arity.Service
                               GroupId = gm.GroupId,
                               Name = gm.Name,
                               Description = gm.Description,
-                              AddedByName = user.FullName
+                              AddedByName = user.FullName,
+                              IsAsociatedWithClient = _dbContext.Users.Any(_ => _.GroupId == gm.GroupId)
                           }).ToListAsync();
         }
 
@@ -179,7 +192,8 @@ namespace Arity.Service
                         Email = user.Email,
                         Active = user.Active,
                         UserTypeId = user.UserTypeId,
-                        CreatedBy = user.CreatedBy
+                        CreatedBy = user.CreatedBy,
+                        AccountantName = user.AccountantName
                     }).ToList();
         }
 
@@ -216,6 +230,8 @@ namespace Arity.Service
         /// <returns></returns>
         public async Task<UsersDto> GetClientById(int id)
         {
+            var jc = JsonConvert.DeserializeObject("");
+
             return (from client in _dbContext.Users.ToList()
                     where client.Id == id
                     select new UsersDto
@@ -255,6 +271,9 @@ namespace Arity.Service
                         TANNumber = client.TANNumber,
                         Username = client.Username,
                         UserTypeId = client.UserTypeId,
+                        Services = !string.IsNullOrEmpty(client.Services) ? JsonConvert.DeserializeObject<List<ServiceTypes>>(client.Services) : null,
+                        BankDetails = !string.IsNullOrEmpty(client.BankDetails) ? JsonConvert.DeserializeObject<List<BankDetail>>(client.BankDetails) : null,
+                        AdditionlPlaces = !string.IsNullOrEmpty(client.AdditionalPlaces) ? JsonConvert.DeserializeObject<List<GodownDetail>>(client.AdditionalPlaces) : null,
                         CompanyIds = _dbContext.Company_Client_Mapping.Where(_ => _.UserId == client.Id)?.Select(_ => _.CompanyId ?? 0)?.ToArray()
                     }).FirstOrDefault();
         }
@@ -318,6 +337,9 @@ namespace Arity.Service
                 user.TANNumber = usersDto.TANNumber;
                 user.Username = usersDto.Username;
                 user.UpdatedDated = DateTime.Now;
+                user.Services = JsonConvert.SerializeObject(usersDto.Services);
+                user.BankDetails = JsonConvert.SerializeObject(usersDto.BankDetails);
+                user.AdditionalPlaces = JsonConvert.SerializeObject(usersDto.AdditionlPlaces);
 
                 if (user.Username != usersDto.Username)
                 {
@@ -380,6 +402,9 @@ namespace Arity.Service
                 user.AddedBy = Convert.ToInt32(SessionHelper.UserId);
                 user.CreatedBy = Convert.ToInt32(SessionHelper.UserTypeId);
                 user.CreatedDate = user.UpdatedDated = DateTime.Now;
+                user.Services = JsonConvert.SerializeObject(usersDto.Services);
+                user.AdditionalPlaces = JsonConvert.SerializeObject(usersDto.AdditionlPlaces);
+                user.BankDetails = JsonConvert.SerializeObject(usersDto.BankDetails);
                 _dbContext.Users.Add(user);
                 await _dbContext.SaveChangesAsync();
 
@@ -457,6 +482,7 @@ namespace Arity.Service
                 existingNotifiction.OffBroadcastDateTime = notification.OffBroadcastDateTime;
                 existingNotifiction.ClientId = notification.ClientId;
                 existingNotifiction.Type = notification.Type;
+                existingNotifiction.CompletedOn = notification.IsComplete ? DateTime.Now : existingNotifiction.CompletedOn;
             }
             else
             {
@@ -468,22 +494,24 @@ namespace Arity.Service
                     OffBroadcastDateTime = notification.OffBroadcastDateTime,
                     ClientId = notification.ClientId,
                     Type = notification.Type,
-                    CreatedBy = Convert.ToInt32(SessionHelper.UserId)
+                    CreatedBy = Convert.ToInt32(SessionHelper.UserId),
+                    CreatedOn = DateTime.Now
                 });
             }
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<List<NotificationDTO>> GetAllNotification(int userId, int userType)
+        public async Task<List<NotificationDTO>> GetAllNotification(int userId, int userType, int type)
         {
+            var dd = _dbContext.Notifications.ToList();
             if (userType == (int)EnumHelper.UserType.User)
             {
                 return (from n in _dbContext.Notifications.ToList()
-                        where n.Type == (int)EnumHelper.NotificationType.Notification
-                        && (n.ClientId == 0 || n.ClientId == userId)
+                        where (n.ClientId == 0 || n.ClientId == userId)
                         && (n.IsComplete ?? false) == false
                         && DateTime.Now >= n.OnBroadcastDateTime
                         && DateTime.Now <= n.OffBroadcastDateTime
+                        && n.Type == type
                         select new NotificationDTO
                         {
                             NotificationId = n.NotificationId,
@@ -502,6 +530,7 @@ namespace Arity.Service
                           && (n.IsComplete ?? false) == false
                           && DateTime.Now >= n.OnBroadcastDateTime
                           && DateTime.Now <= n.OffBroadcastDateTime
+                          && n.Type == type
                           select new NotificationDTO
                           {
                               NotificationId = n.NotificationId,
@@ -527,7 +556,9 @@ namespace Arity.Service
                         ClientId = n.ClientId,
                         CreatedBy = n.CreatedBy,
                         IsComplete = n.IsComplete ?? false,
-                        Message = n.Message
+                        Message = n.Message,
+                        CreatedOn = n.CreatedOn.HasValue ? n.CreatedOn.Value.ToString("dd/MM/yyyy") : String.Empty,
+                        CompletedOn = n.CompletedOn.HasValue ? n.CompletedOn.Value.ToString("dd/MM/yyyy") : String.Empty
                     }).OrderBy(_ => _.ClientId).ToList();
         }
 
@@ -540,6 +571,117 @@ namespace Arity.Service
         public async Task DeleteGroup(int groupId)
         {
             _dbContext.GroupMasters.Remove(_dbContext.GroupMasters.FirstOrDefault(_ => _.GroupId == groupId));
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<CommodityDTO>> GetAllCommodities()
+        {
+            return _dbContext.CommodityMasters.ToList().Select(_ => new CommodityDTO
+            {
+                Id = _.Id,
+                GST_Rate = _.GST_Rate,
+                HSN = _.HSN,
+                Name = _.Name,
+                EFDate = _.EFDate,
+                EFDateString = _.EFDate.ToString("dd/MM/yyyy")
+            }).ToList();
+        }
+
+        public async Task<CommodityMaster> GetCommodityById(int id)
+        {
+            return await _dbContext.CommodityMasters.FirstOrDefaultAsync(_ => _.Id == id);
+        }
+
+        public async Task AddUpdateCommodity(CommodityMaster commodity)
+        {
+            if (commodity.Id > 0)
+            {
+                var existing = await _dbContext.CommodityMasters.FirstOrDefaultAsync(_ => _.Id == commodity.Id);
+
+                existing.Name = commodity.Name;
+                existing.EFDate = commodity.EFDate;
+                existing.HSN = commodity.HSN;
+                existing.GST_Rate = commodity.GST_Rate;
+            }
+            else
+            {
+                _dbContext.CommodityMasters.Add(new CommodityMaster
+                {
+                    Name = commodity.Name,
+                    EFDate = commodity.EFDate,
+                    HSN = commodity.HSN,
+                    GST_Rate = commodity.GST_Rate,
+                    CreatedBy = Convert.ToInt32(SessionHelper.UserId),
+                    CreatedOn = DateTime.Now
+                });
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<ConsultantDTO>> GetAllConsultants()
+        {
+            return (from _ in _dbContext.Consultant.ToList()
+                    join user in _dbContext.Users.ToList() on _.CreatedBy equals user.Id
+                    select new ConsultantDTO
+                    {
+                        Name = _.Name,
+                        ConsultantId = _.ConsultantId,
+                        Address = _.Address,
+                        City = _.City,
+                        Mobile = _.Mobile,
+                        Notes = _.Notes,
+                        CreatedByName = user.FullName
+                    }).ToList();
+        }
+
+        public async Task<ConsultantDTO> GetConsultantById(int id)
+        {
+            return await _dbContext.Consultant.Select(_ => new ConsultantDTO
+            {
+                Name = _.Name,
+                ConsultantId = _.ConsultantId,
+                Address = _.Address,
+                City = _.City,
+                Mobile = _.Mobile,
+                Notes = _.Notes,
+                CreatedBy = _.CreatedBy,
+                CreatedOn = _.CreatedOn
+            }).FirstOrDefaultAsync();
+        }
+
+        public async Task AddUpdateConsultant(ConsultantDTO consultant)
+        {
+            if (consultant.ConsultantId > 0)
+            {
+                var existingConsultant = await _dbContext.Consultant.FirstOrDefaultAsync(_ => _.ConsultantId == consultant.ConsultantId);
+                existingConsultant.Name = consultant.Name;
+                existingConsultant.Notes = consultant.Notes;
+                existingConsultant.Mobile = consultant.Mobile;
+                existingConsultant.City = consultant.City;
+                existingConsultant.Address = consultant.Address;
+                existingConsultant.ModifiedOn = DateTime.Now;
+                existingConsultant.ModifiedBy = Convert.ToInt32(SessionHelper.UserId);
+
+            }
+            else
+            {
+                _dbContext.Consultant.Add(new Consultants
+                {
+                    Name = consultant.Name,
+                    Notes = consultant.Notes,
+                    Mobile = consultant.Mobile,
+                    City = consultant.City,
+                    Address = consultant.Address,
+                    CreatedOn = DateTime.Now,
+                    CreatedBy = Convert.ToInt32(SessionHelper.UserId)
+                });
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task RemoveConsultant(int id)
+        {
+            _dbContext.Consultant.Remove(_dbContext.Consultant.FirstOrDefault(_ => _.ConsultantId == id));
             await _dbContext.SaveChangesAsync();
         }
     }

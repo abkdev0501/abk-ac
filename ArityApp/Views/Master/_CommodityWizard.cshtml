@@ -1,0 +1,127 @@
+﻿@model Arity.Data.Entity.CommodityMaster
+
+<form>
+    @Html.HiddenFor(_ => _.Id)
+    @Html.HiddenFor(_ => _.CreatedBy)
+    @Html.HiddenFor(_ => _.CreatedOn)
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Name<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Name, new { @class = "form-control input-sm", placeholder = "Enter name", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">HSN<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.HSN, new { @class = "form-control input-sm", placeholder = "Enter HSN", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">GST Rate<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.GST_Rate, new { @class = "form-control input-sm", placeholder = "Enter GST Rate" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">EFDate<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBox("EFDate",Model.EFDate.ToString("dd/MM/yyyy"), new { @class = "form-control input-sm date", placeholder = "Enter EFDate" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="width:100%;text-align:center;padding: 25px 0 5px;">
+        <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnCommodity">@(Model.Id > 0 ? "Update" : "Add")</button>
+        <button type="button" class="btn btn-default notika-btn-default waves-effect" id="btnCancel">Cancel</button>
+    </div>
+</form>
+
+<script>
+    $(".date").datepicker({
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true,
+                format: "dd/mm/yyyy"
+            });
+    $('#btnCommodity').on('click', function () {
+        var isValid = true;
+        if ($("#Name").val() == null || $("#Name").val() == "") {
+            Notification('', 'Please enter name', 'danger');
+            isValid = false;
+        }
+        else if ($("#EFDate").val() == null || $("#EFDate").val() == "") {
+            Notification('', 'Please date', 'danger');
+            isValid = false;
+        }
+        if (isValid) {
+            var data = JSON.stringify({
+            "commodity": {
+                "Name": $("#Name").val(),
+                "HSN": $("#HSN").val(),
+                "GST_Rate": $("#GST_Rate").val(),
+                "EFDate": $("#EFDate").val(),
+                "CreatedBy": $("#CreatedBy").val(),
+                "CreatedOn": $("#CreatedOn").val(),
+                "Id": $("#Id").val()
+                }
+            });
+
+            $('#loading').show();
+            $.ajax({
+                url: '@Url.Action("AddCommodityMaster", "Master")',
+                type: 'post',
+                data: data,
+                contentType: 'application/json; charset=utf-8',
+                success: function () {
+                    $("#loading").hide();
+                        if (@Model.Id <= 0) {
+                            Notification('', 'Commodity added successfuly', 'success');
+                        }
+                        else {
+                            Notification('', 'Commodity updated successfuly', 'success');
+                        }
+                        table.ajax.reload();
+                        $("#modalCommodity").modal('toggle');
+                },
+                failure: function () {
+                    Notification('', 'Something went wrong, Please try again', 'danger');
+                }
+            });
+        }
+    })
+</script>

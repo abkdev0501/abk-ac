@@ -1,0 +1,53 @@
+﻿@model List<Arity.Data.Dto.CommodityDTO>
+
+<form>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Commodity<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.DropDownList("CommodityId", ViewBag.Commodities as SelectList, "--select commodity--", new { @class = "form-control input-sm chosen" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="width:100%;text-align:center;padding: 25px 0 5px;">
+        <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnSelectCommodity">Select</button>
+        <button type="button" class="btn btn-default notika-btn-default waves-effect" id="btnCancel">Cancel</button>
+    </div>
+</form>
+
+<script>
+
+    var commodities = [];
+
+    @foreach (var item in Model)
+    {
+        @:commodities.push({ Name:"@item.Name",Id:@item.Id,GST_Rate:@item.GST_Rate,HSN:"@item.HSN",EFDate:"@item.EFDate" });
+    }
+
+    $('#btnSelectCommodity').on('click', function () {
+        var isValid = true;
+        if ($("#CommodityId").val() == null || $("#CommodityId").val() == "") {
+            Notification('', 'Please select commodity', 'danger');
+            isValid = false;
+        }
+
+        if (isValid) {
+            $.each(commodities, function (i, data) {
+                if (data.Id == $("#CommodityId").val()) {
+                    $("#CommodityName").val(data.Name);
+                    $("#CommodityHSN").val(data.HSN);
+                    $("#GSTRate").val(data.GST_Rate);
+                    $("#ApplicableRate").val(data.EFDate);
+                }
+            });
+            $('#modalConsultant').modal('hide');
+        }
+    })
+</script>

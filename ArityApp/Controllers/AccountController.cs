@@ -2,6 +2,7 @@
 using Arity.Data.Helpers;
 using Arity.Service;
 using Arity.Service.Contract;
+using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -11,10 +12,14 @@ namespace ArityApp.Controllers
 {
     public class AccountController : Controller
     {
-        IAccountService _accountService;
-        public AccountController()
+        private readonly IAccountService _accountService;
+        private readonly ILoggerService _loggerService;
+
+
+        public AccountController(IAccountService accountService, ILoggerService loggerService)
         {
-            _accountService = new AccountService();
+            _accountService = accountService;
+            _loggerService = loggerService;
         }
 
         // GET: Account
@@ -35,16 +40,29 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> Login(User user)
         {
+            string path = Server.MapPath("~/Content/Logs/UserLog.txt");
             if (!string.IsNullOrEmpty(user.Password) && !string.IsNullOrEmpty(user.Username))
             {
-                _accountService = new AccountService();
-                var pass = Functions.Decrypt("vPTOB971cL9xYBuyKAx12g==");
                 var validUser = await _accountService.Login(user.Username, Functions.Encrypt(user.Password));
                 if (validUser != null)
                 {
                     FormsAuthentication.SetAuthCookie(validUser.Username, false);
                     SessionHelper.UserId = validUser.Id;
                     SessionHelper.UserTypeId = validUser.UserTypeId;
+
+                    // Logging user details
+                    Task.Run(() =>
+                    {
+                        _loggerService.LogAsync(JsonConvert.SerializeObject(new UserDTO
+                        {
+                            UserId = Convert.ToInt32(validUser.Id),
+                            FullName = validUser.FullName,
+                            UserType = Enum.GetName(typeof(EnumHelper.UserType), Convert.ToInt32(validUser.UserTypeId)),
+                            LoginAt = DateTime.Now,
+                            IpAddress = Request.UserHostAddress
+                        }), path);
+                    });
+
                     return RedirectToAction("Dashboard", "Home");
                 }
                 ViewBag.Message = "Invalid Credential";
@@ -54,48 +72,28 @@ namespace ArityApp.Controllers
         }
 
         /// <summary>
-        /// Reset password method from where we send email to reset password with link
-        /// </summary>
-        /// <param name="EmailID"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult> ForgotPassword(string EmailID)
-        {
-
-            try
-            {
-                //string emailBody = string.Empty;
-                //string ResetLink = string.Empty;
-                //_vendorServices = new VendorServices();
-                //var forgotPasswordData = await _vendorServices.ForgotPassword(EmailID);
-                //if (forgotPasswordData != null)
-                //{
-                //    ResetLink = ConfigurationManager.AppSettings["URL"] + "Account/Resetpassword/" + Functions.Encrypt_QueryString(forgotPasswordData.UserId.ToString());
-
-                //    emailBody = System.IO.File.ReadAllText(System.Web.HttpContext.Current.Server.MapPath("~/Content/Template/ResetPasswordTemplate.html"));
-                //    emailBody = emailBody.Replace("###ResetLink###", ResetLink).Replace("###Name###", forgotPasswordData.FirstName + "  " + forgotPasswordData.LastName);
-
-                //    await _vendorServices.SendEmail(EmailID, ConfigurationManager.AppSettings["ResetPassword"], emailBody);
-                //    return Json(new { Status = true }, JsonRequestBehavior.AllowGet);
-                //}
-                return Json(new { Status = false }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
-
-
-
-        /// <summary>
         /// Logout method from where loggedin user can logged out
         /// </summary>
         /// <returns></returns>
-        public async Task<ActionResult> Logout()
+        [Authorize]
+        public ActionResult Logout()
         {
             FormsAuthentication.SignOut(); // it will clear the session at the end of request
             return Json(true, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Get user details
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        public async Task<ActionResult> GetUserProfiles()
+        {
+            var details = await _accountService.GetUser(Convert.ToInt32(SessionHelper.UserId));
+            if (details != null)
+                details.Password = string.Empty;
+
+            return PartialView("_UserProfile", details);
         }
     }
 }

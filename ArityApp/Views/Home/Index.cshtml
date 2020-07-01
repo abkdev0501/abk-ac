@@ -5,18 +5,18 @@
 }
 
 <style>
-    td.details-control {
+    /*td.details-control {
         background: url('/Content/images/details_open.png') no-repeat center center;
         cursor: pointer;
-    }
+    }*/
 
     .date-filter .filter-date-button {
         width: 14%;
     }
 
-    tr.shown td.details-control {
+    /*tr.shown td.details-control {
         background: url('/Content/images/details_close.png') no-repeat center center;
-    }
+    }*/
 
     .child-heading {
         padding-left: 5%;
@@ -40,7 +40,7 @@
                                         <i class="notika-icon notika-form"></i>
                                     </div>
                                     <div class="breadcomb-ctn">
-                                        <h2>Add Invice in bulk</h2>
+                                        <h2>Add Invoice in bulk</h2>
                                         <p>Sample file to Create invoices</p>
                                     </div>
                                 </div>
@@ -150,6 +150,9 @@
                     <div class="basic-tb-hd">
                         <h2>Invoice History</h2>
                         <p>Below are invoice history.</p>
+                        <p style="display:none;border:1px dashed #00c292;" id="amount-div">
+                            <span style="display:block;"><b>Total Amount : <span class="total-amount"></span></b></span>
+                        </p>
                     </div>
 
                     <div class="date-filter">
@@ -157,14 +160,14 @@
                             <label>From</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="FromDate" class="form-control" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="FromDate" class="form-control bk-date" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
                             <label>To</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="ToDate" class="form-control" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="ToDate" class="form-control bk-date" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
@@ -190,17 +193,21 @@
                                         <th style="width:5%;"></th>
                                     }
                                     <th style="width:5%;"><input type="checkbox" class="chkSelectAll" /></th>
-                                    <th style="width:10%;">Invoice#</th>
+                                    <th style="width:5%;">Invoice#</th>
                                     <th style="width:20%;">Name</th>
                                     <th style="width:20%;">Address</th>
+                                    <th style="width:15%;">Company</th>
                                     <th style="width:10%;">Total Amount</th>
                                     <th style="width:7%;">Date</th>
+                                    <th style="width:7%;">Year</th>
                                     @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                     {
+                                        <th style="width:7%;">Group</th>
+                                        <th style="width:7%;">Added By</th>
                                         <th style="width:5%;">Add Entry</th>
                                         <th style="width:5%;">Tracking</th>
+                                        <th style="width:5%;">Delete</th>
                                     }
-                                    <th style="width:5%;">Delete</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -223,10 +230,12 @@
                     url: '@Url.Action("LoadInvoiceHistory","Home")',
                     type: "GET",
                     dataType: "json",
-                    data: {
-                        from: $("#FromDate").val(),
-                        to: $("#ToDate").val()
-                    },
+                    data: {from:""+$("#FromDate").val()+"",to:""+$("#ToDate").val()+""},
+                    //data: {
+                    //    from: $("#FromDate").val(),
+                    //    to: $("#ToDate").val()
+                    //},
+                    contentType: 'application/json; charset=utf-8',
                     beforeSend: function (xhrObj) {
                         $("#loading").show();
                     }
@@ -244,7 +253,14 @@
             "language": {
                 "emptyTable": "No invoice found"
             },
-
+            dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        title: 'Excel',
+                        text:'Export to excel'
+                    }
+                ],
             "columns": [
                 {
                     "className": 'details-control',
@@ -270,43 +286,50 @@
                     "orderable": false,
                     "data": null,
                     "render": function (data, type, full) {
-                        return '<input type="checkbox" class="chkSelect" data-id="'+data.InvoiceId+'" data-toggle="tooltip" \>';
+                        return '<input type="checkbox" class="chkSelect" data-id="'+data.InvoiceId+'" data-total="'+data.Amount+'" data-toggle="tooltip" \>';
                     }
                },
                 { "data": "InvoiceNumber" },
                 { "data": "FullName" },
                 { "data": "Address" },
+                { "data": "CompanyName" },
                 { "data": "Amount" },
                 { "data": "CreatedDateString" },
+                { "data": "Year" },
+
 
                 @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                 {
+                    @:{ "data": "GroupName" },
+                    @:{ "data": "CreatedByString" },
         @:{
             @:"orderable": false,
             @:"data": null,
-            @: "render": function(data, type, full) {
-            @: return '<button class="btn waves-effect" onclick="AddUpdateInvoiceEntry(0,' + data.InvoiceId + ')"><i class="fa fa-plus-circle" aria-hidden="true"></i></button>';
+            @: "render": function (data, type, full) {
+            @: if (data.AddedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) ) { return '<button class="btn waves-effect" onclick="AddUpdateInvoiceEntry(0,' + data.InvoiceId + ')"><i class="fa fa-plus-circle" aria-hidden="true"></i></button>' } else { return ""; };
             @:}
         @:},
         @: {
             @:"orderable": false,
             @:"data": null,
-            @:"render": function(data, type, full) {
-            @:return '<button class="btn waves-effect" onclick="AddUpdateInvoiceTracking(0,' + data.InvoiceId + ')"><i class="fa fa-commenting-o" aria-hidden="true"></i></button>';
+            @:"render": function (data, type, full) {
+            @: if (data.AddedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) ) { return '<button class="btn waves-effect" onclick="AddUpdateInvoiceTracking(0,' + data.InvoiceId + ')"><i class="fa fa-commenting-o" aria-hidden="true"></i></button>'; } else { return ""; }
               @:}
         @:},
+        @:{
+        @:"orderable": false,
+        @:"data": null,
+        @:"render": function (data, type, full) { console.log(data.AddedBy);
+        @:    if (data.AddedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) ) { return '<div class="dialog-pro dialog">' +
+        @:                    '<button class="btn btn-info" onclick="DeleteInvoice(' + data.InvoiceId + ')" id="sa-warning">'+
+        @:                    '<i class="fa fa-trash" aria-hidden="true"></i>' +
+        @:                    '</button> </div>'; }
+        @:    else { return ''; }
+        @:      }
+        @:}
 
 }
-                {
-             "orderable": false,
-             "data": null,
-                    "render": function (data, type, full) {
-                        return '<div class="dialog-pro dialog">' +
-                            '<button class="btn btn-info" onclick="DeleteInvoice(' + data.InvoiceId + ')" id="sa-warning">'+
-                            '<i class="fa fa-trash" aria-hidden="true"></i>' +
-                            '</button> </div>';
-                    }
-                }
+
             ],
             "order": [[5, "desc"]]
        });
@@ -356,12 +379,23 @@
             {
                 $(this).prop("checked",$(".chkSelectAll").is(":checked"));
             });
+            CalculateTotal();
+        });
 
+        $("body").on("change",".chkSelect",function () {
+            CalculateTotal();
         });
     });
 
+        function getDateTime() {
+            return {
+                 from: $("#FromDate").val(),
+                 to: $("#ToDate").val()
+            }
+        }
+
         function format(invoice) {
-          var html = '<div class="child-heading">All particulars information</div><table cellpadding="5" cellspacing="0" border="0" style="margin-left:5%;width:90%;    border: 1px solid #eee;margin-bottom: 2%;"><tr><th>Name</th><th>Ammount</th><th>Year</th><th>Date</th><th></th><th></th></tr>';
+          var html = '<div class="child-heading">All particulars information</div><table cellpadding="5" cellspacing="0" border="0" style="margin-left:5%;width:90%;    border: 1px solid #eee;margin-bottom: 2%;"><tr><th>Name</th><th>Ammount</th><th>Year</th><th>Date</th><th>Added by</th><th></th><th></th></tr>';
              $.ajax({
                         url: "@Url.Action("GetInvoiceParticulars", "Home")",
                         method: "GET",
@@ -372,7 +406,7 @@
                         if (response != null) {
                             if (response.length <= 0) {
                                 html += '<tr>' +
-                                    '<td colspan="4" align="center">Particulars not found</td>' +
+                                    '<td colspan="5" align="center">Particulars not found</td>' +
                                     '</tr>';
                             }
                             else {
@@ -384,22 +418,18 @@
 
                                     @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                     {
-                                        @:if (data.CreatedBy == @SessionHelper.UserTypeId)
+                                        @:if (data.AddedBy == @SessionHelper.UserTypeId || @((int)Arity.Service.Core.UserType.MasterAdmin) === @SessionHelper.UserTypeId)
                                         @: {
-                                          @:html += '<td>' + data.CreatedDateString + '</td><td><i style="cursor:pointer;" class="fa fa-edit" onclick="AddUpdateInvoiceEntry(' + data.InvoiceParticularId + ',' + data.InvoiceId + ')"></i></td><td><i style="cursor:pointer;" class="fa fa-trash" onclick="RemvoeParticulars(' + data.InvoiceParticularId + ')"></i></td>';
+                                          @:html += '<td>' + data.CreatedDateString + '</td><td>'+data.CreatedByString+'</td><td><i style="cursor:pointer;" class="fa fa-edit" onclick="AddUpdateInvoiceEntry(' + data.InvoiceParticularId + ',' + data.InvoiceId + ')"></i></td><td><i style="cursor:pointer;" class="fa fa-trash" onclick="RemvoeParticulars(' + data.InvoiceParticularId + ')"></i></td>';
                                         @:}
-                                        @:else if (@((int)Arity.Service.Core.UserType.MasterAdmin) === @SessionHelper.UserTypeId)
+                                        @:else
                                         @: {
-                                          @:html += '<td>' + data.CreatedDateString + '</td><td><i style="cursor:pointer;" class="fa fa-edit" onclick="AddUpdateInvoiceEntry(' + data.InvoiceParticularId + ',' + data.InvoiceId + ')"></i></td><td><i style="cursor:pointer;" class="fa fa-trash" onclick="RemvoeParticulars(' + data.InvoiceParticularId + ')"></i></td>';
-                                        @:}
-                                         @:else
-                                        @: {
-                                          @:html += '<td colspan="3">' + data.CreatedDateString + '</td>';
+                                          @:html += '<td>' + data.CreatedDateString + '</td><td colspan="3">'+data.CreatedByString+'</td>';
                                         @:}
 
                                         }
                                     else {
-                                         @:html += '<td colspan="3">' + data.CreatedDateString + '</td>';
+                                         @:html += '<td>' + data.CreatedDateString + '</td><td colspan="3">'+data.CreatedByString+'</td>';
                                     }
                                     html +='</tr>';
                                     });
@@ -425,7 +455,7 @@
                         if (response != null) {
                             if (response.length <= 0) {
                                 html += '<tr>' +
-                                    '<td colspan="4" align="center">No logs found</td>' +
+                                    '<td colspan="5" align="center">No logs found</td>' +
                                     '</tr>';
                             }
                             else {
@@ -520,6 +550,27 @@
 		});
 
         }
+
+           function CalculateTotal() {
+            var total = 0;
+            var isChecked = false;
+            $(".chkSelect").each(function ()
+            {
+                if ($(this).is(":checked")) {
+                    total = total + parseFloat($(this).attr("data-total"));
+                    isChecked = true;
+                }
+            });
+
+            if (isChecked) {
+                $("#amount-div").show();
+                $(".total-amount").html(total);
+            }
+            else {
+                $("#amount-div").hide();
+            }
+
+        }
     </script>
 }
 
@@ -589,7 +640,7 @@
             });
         }
 
-         function RemvoeTracking(trackingId) {
+        function RemvoeTracking(trackingId) {
             if (confirm("Are you sure you want to delete this log?")) {
                 $("#loading").show();
             $.ajax({

@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "Document";
 }
- 
+
 <div class="breadcomb-area">
     <div class="container">
         <div class="row">
@@ -15,14 +15,17 @@
                                     <i class="notika-icon notika-form"></i>
                                 </div>
                                 <div class="breadcomb-ctn">
-                                    <h2>Upload Document</h2>
+                                    <h2>Documents</h2>
                                     <p>List of Documents</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
                             <div class="breadcomb-report">
-                                <button id="btnAddInvoiceEntry" onclick="UploadDocument(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i>Add</button>
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                {
+                                    <button id="btnAddInvoiceEntry" onclick="UploadDocument(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i>Add</button>
+                                }
                             </div>
                         </div>
                     </div>
@@ -49,14 +52,14 @@
                             <label>From</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="FromDate" class="form-control" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="FromDate" class="form-control bk-date" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
                             <label>To</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="ToDate" class="form-control" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="ToDate" class="form-control bk-date" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
@@ -71,14 +74,17 @@
                                     @*<th style="width:0%,">documentID</th>*@
                                     <th style="width:20%;">Document Name</th>
                                     <th style="width:20%;">Client Name</th>
+                                    <th style="width:10%;">User Name</th>
                                     <th style="width:20%;">Document Type</th>
                                     <th style="width:20%;" align="center">Status</th>
-                                    <th style="width:20%;" align="center">Active</th>
-                                    <th style="width:20%;">Update</th>
-                                    @if (SessionHelper.UserId == (long)Arity.Data.Helpers.EnumHelper.UserRole.Master)
+                                    <th style="width:10%;" align="center">Active</th>
+                                    <th style="width:20%;" align="center">Created by</th>
+                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                     {
-                                        <th style="width:20%;">Delete</th>
+                                        <th style="width:10%;"></th>
+                                        <th style="width:10%;"></th>
                                     }
+                                    <th style="width:10%;"></th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -126,7 +132,8 @@
     }
 
     <script>
-
+        $("#liDoc").addClass("active");
+       $("#liHome").removeClass("active");
         //Load document List
         $(document).ready(function () {
             table = $('#tblDocument').DataTable({
@@ -136,8 +143,8 @@
                         type: "GET",
                         dataType: "json",
                         data: {
-                            from: $("#FromDate").val(),
-                            to: $("#ToDate").val()
+                            from: ""+$("#FromDate").val()+"",
+                            to: ""+$("#ToDate").val()+""
                         },
                         beforeSend: function (xhrObj) {
                             $("#loading").show();
@@ -160,6 +167,7 @@
                     //{ "data": "DocumentId" },
                     { "data": "Name" },
                     { "data": "ClientName" },
+                    { "data": "UserName" },
                     { "data": "DocumentTypeName" },
                     { "data": "StatusName" },
                     {
@@ -172,26 +180,44 @@
                                 return '<i class="notika-icon notika-close" aria-hidden="true"></i>';
                         }
                     },
-                    {
-                        "orderable": false,
-                        "data": null,
-                        "render": function (data, type, full) {
-                            return '<button class="btn waves-effect" onclick="UploadDocument(' + data.DocumentId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
-                        }
-                    },
+                    { "data": "CreatedByString" },
+
              @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                 {
                     @:{
-                    @:    "orderable": false,
-                    @:    "data": null,
-                    @:    "render": function (data, type, full) {
-                                
-                    @:            return '<div class="dialog-pro dialog"> <button class="btn btn-info" id="sa-warning" onclick="DeleteDocument(' + data.DocumentId + ')"><i class="fa fa-trash" aria-hidden="true"></i></button> </div>';
-                    @:    }
-                    @:}
+                    @:"orderable": false,
+                    @:"data": null,
+                    @:"render": function (data, type, full) { console.log(data.AddedBy);
+                    @:    if (data.AddedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) ) { return '<button class="btn waves-effect" onclick="UploadDocument(' + data.DocumentId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>'; }
+                    @:    else { return ''; }
+                    @:      }
+                    @:},
+                    @:{
+                    @:"orderable": false,
+                    @:"data": null,
+                    @:"render": function (data, type, full) { console.log(data.AddedBy);
+                    @:    if (data.AddedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) ) { return '<div class="dialog-pro dialog">' +
+                    @:                    '<button class="btn btn-info" onclick="DeleteDocument(' + data.DocumentId + ')" id="sa-warning">'+
+                    @:                    '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                    @:                    '</button> </div>'; }
+                    @:    else { return ''; }
+                    @:      }
+                    @:},
+                   
+                    }
+                 {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) { console.log(data.AddedBy);
+                        if (data.AddedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.User )) { return '' +
+                                        '<button class="btn btn-info" onclick="DownloadDocument(' + data.DocumentId + ')" id="sa-warning">'+
+                                        '<i class="notika-icon notika-down-arrow" aria-hidden="true"></i>' +
+                                        '</button>'; }
+                        else { return ''; }
+                          }
                     }
                 ],
-                "order": [[2, "desc"]]
+                "order": []
             });
 
          $("#btnFilterGrid").click(function () {
@@ -200,7 +226,6 @@
     });
 
 
-        //Upload DOcument Model pop up
         function UploadDocument(DocumentID) {
             console.log(DocumentID);
             $("#loading").show();
@@ -223,13 +248,12 @@
             });
         }
 
-        //Ajaxcall perform delete document
         function DeleteDocument(DocumentID) {
-            swal({   
-			title: "Are you sure?",   
-			text: "You will not be able to recover this imaginary file!",   
-			type: "warning",   
-			showCancelButton: true,   
+            swal({
+			title: "Are you sure?",
+			text: "You will not be able to recover this imaginary file!",
+			type: "warning",
+			showCancelButton: true,
 			confirmButtonText: "Yes, delete it!",
             }).then(function () {
             console.log(DocumentID);
@@ -242,7 +266,7 @@
                     success: function (response) {
                         table.ajax.reload();
                         $("#loading").hide();
-			            swal("Deleted!", "Your imaginary file has been deleted.", "success"); 
+			            swal("Deleted!", "Your imaginary file has been deleted.", "success");
                         Notification('', 'Document deleted succesfully', 'success');
                     },
                     error: function (error) {
@@ -251,10 +275,12 @@
                     }
                 });
 		});
-            
+
         }
 
-        
+        function DownloadDocument(docID) {
+            window.open("@Url.Action("DownloadDocument", "Home")?documentID="+docID);
+        }
 
     </script>
 }

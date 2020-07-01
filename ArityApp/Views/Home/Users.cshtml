@@ -23,7 +23,7 @@
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
                             <div class="breadcomb-report">
-                                @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
                                 {
                                     <button id="btnAddInvoiceEntry" onclick="AddUpdateUser(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
                                 }
@@ -72,14 +72,14 @@
                             <label>From</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="FromDate" class="form-control" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="FromDate" class="form-control bk-date" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
                             <label>To</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="ToDate" class="form-control" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="ToDate" class="form-control bk-date" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
@@ -99,7 +99,8 @@
                                     <th style="width:10%;">Pincode</th>
                                     <th style="width:10%;">Role</th>
                                     <th style="width:10%;">Status</th>
-                                    <th style="width:9%;">Update</th>
+                                    <th style="width:9%;"></th>
+                                    <th style="width:9%;"></th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -124,8 +125,8 @@
                     type: "GET",
                     dataType: "json",
                     data: {
-                        from: $("#FromDate").val(),
-                        to: $("#ToDate").val()
+                        from: ""+$("#FromDate").val()+"",
+                        to: ""+$("#ToDate").val()+""
                     },
                     beforeSend: function (xhrObj) {
                         $("#loading").show();
@@ -160,17 +161,39 @@
                 { "data": "PhoneNumber" },
                 { "data": "Pincode" },
                 { "data": "UserType" },
-                { "data": "Active" },
                 {
                     "orderable": false,
                     "data": null,
                     "render": function (data, type, full) {
-                        if(data.CreatedBy == @SessionHelper.UserTypeId)
-                            return '<button class="btn waves-effect" onclick="AddUpdateUser(' + data.Id + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
-                        else if(@((int)Arity.Service.Core.UserType.MasterAdmin) === @SessionHelper.UserTypeId)
+                        if (data.Active)
+                            return 'TRUE';
+                        else
+                            return 'FALSE';
+                    }
+                },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                       if(@((int)Arity.Service.Core.UserType.MasterAdmin) === @SessionHelper.UserTypeId)
                             return '<button class="btn waves-effect" onclick="AddUpdateUser(' + data.Id + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
                         else
                             return '';
+                    }
+                },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                        if (@Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) ) {
+                            return '<div class="dialog-pro dialog">' +
+                                '<button class="btn btn-info" onclick="DeleteUser(' + data.Id + ')" id="sa-warning">' +
+                                '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                                '</button> </div>';
+                        }
+                        else {
+                            return "";
+                        }
                     }
                 }
             ],
@@ -205,6 +228,34 @@
 
         function downloadPayment(id) {
             window.open("/home/GenerateReciept/"+id);
+        }
+
+        function DeleteUser(userId) {
+            swal({
+			title: "Are you sure?",
+			text: "You will not be able to recover this user",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonText: "Delete",
+            }).then(function () {
+                $("#loading").show();
+                $.ajax({
+                    url: '@Url.Action("DeleteUser", "Home")',
+                    type: "POST",
+                    data: { userId: userId },
+                    cache: false,
+                    success: function (response) {
+                        table.ajax.reload();
+                        $("#loading").hide();
+			            swal("Deleted!", "User has been deleted.", "success");
+                    },
+                    error: function (error) {
+                        $("#loading").hide();
+                        Notification('', 'Internal error occured, Please try again', 'danger');
+                    }
+                });
+		});
+
         }
     </script>
 }

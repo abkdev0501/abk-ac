@@ -54,14 +54,14 @@
                             <label>From</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="FromDate" class="form-control" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="FromDate" class="form-control bk-date" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
                             <label>To</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="ToDate" class="form-control" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="ToDate" class="form-control bk-date" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
@@ -106,7 +106,7 @@
     </div>
 </div>
 @section Scripts {
-  
+
     <script>
 
         $(document).ready(function () {
@@ -120,8 +120,8 @@
                     type: "GET",
                     dataType: "json",
                     data: {
-                        from: $("#FromDate").val(),
-                        to: $("#ToDate").val()
+                        from: ""+$("#FromDate").val()+"",
+                        to: ""+$("#ToDate").val()+""
                     },
                     beforeSend: function (xhrObj) {
                         $("#loading").show();

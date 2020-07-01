@@ -5695,3 +5695,7 @@ body.box-layout {
     .logo-on-login img {
         width: 20%;
     }
+.note-editable {
+    height:160px !important;
+}
+

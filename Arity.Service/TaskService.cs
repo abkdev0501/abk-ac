@@ -14,20 +14,24 @@ namespace Arity.Service
     public class TaskService : ITaskService
     {
         private readonly RMNEntities _dbContext;
-        public TaskService()
+        private readonly IInvoiceService _invoiceService;
+
+        public TaskService(RMNEntities rmnEntities, IInvoiceService invoiceService)
         {
-            _dbContext = new RMNEntities();
+            _dbContext = rmnEntities;
+            _invoiceService = invoiceService;
         }
 
         public async Task<List<TaskDTO>> GetAll(DateTime fromDate, DateTime toDate)
         {
-            if (SessionHelper.UserTypeId != (int)Arity.Service.Core.UserType.MasterAdmin)
+            var users = _dbContext.Users.ToList();
+            if (SessionHelper.UserTypeId == (int)Core.UserType.User)
             {
                 return (from task in _dbContext.Tasks.ToList()
                         join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
                         join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
                         join assignedTo in _dbContext.Users.ToList() on task.ClientId ?? 0 equals assignedTo.Id
-                        where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate && user.Id == SessionHelper.UserId
+                        where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate && assignedTo.Id == SessionHelper.UserId
                         select new TaskDTO
                         {
                             TaskId = task.Id,
@@ -38,12 +42,14 @@ namespace Arity.Service
                             TaskName = task.Name,
                             DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("dd/MM/yyyy") : "",
                             CreatedBy = userTask.CreatedBy,
+                            CreatedByString = users.FirstOrDefault(_ => _.Id == userTask.AddedBy).FullName,
                             CreatedOnString = userTask.CreatedOn.ToString("dd/MM/yyyy"),
                             UserName = user.FullName,
                             StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
                             StatusId = userTask.Status,
                             ClientName = assignedTo.FullName,
-                            IsChargeble = task.IsChargeble ?? false
+                            IsChargeble = task.IsChargeble ?? false,
+                            ChargeAmount = task.ChargeAmount
                         }).OrderBy(_ => _.StatusId).ToList();
             }
             else
@@ -64,12 +70,14 @@ namespace Arity.Service
                             TaskName = task.Name,
                             DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("dd/MM/yyyy") : "",
                             CreatedBy = userTask.CreatedBy,
+                            CreatedByString = users.FirstOrDefault(_ => _.Id == userTask.AddedBy).FullName,
                             CreatedOnString = userTask.CreatedOn.ToString("dd/MM/yyyy"),
                             UserName = user.FullName,
                             StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
                             StatusId = userTask.Status,
                             ClientName = assignedTo.FullName,
-                            IsChargeble = task.IsChargeble ?? false
+                            IsChargeble = task.IsChargeble ?? false,
+                            ChargeAmount = task.ChargeAmount
                         }).OrderBy(_ => _.StatusId).ToList();
             }
         }
@@ -97,7 +105,8 @@ namespace Arity.Service
                         CompletedOn = task.CompletedOn,
                         Priorities = task.Priorities,
                         Remarks = task.Remarks,
-                        IsChargeble = task.IsChargeble ?? false
+                        IsChargeble = task.IsChargeble ?? false,
+                        ChargeAmount = task.ChargeAmount
                     }).FirstOrDefault();
         }
 
@@ -117,6 +126,8 @@ namespace Arity.Service
                 existingTask.IsChargeble = task.IsChargeble;
                 existingTask.CompletedOn = task.CompletedOn;
                 existingTask.ModifiedOn = DateTime.Now;
+                existingTask.ChargeAmount = task.ChargeAmount;
+
 
                 var existingUserTask = await _dbContext.UserTasks.FirstOrDefaultAsync(_ => _.Id == task.TaskUserId);
                 existingUserTask.Status = task.StatusId;
@@ -124,6 +135,9 @@ namespace Arity.Service
                 existingUserTask.UserId = task.UserId;
                 existingUserTask.ModifiedOn = DateTime.Now;
                 existingUserTask.DueDate = task.DueDate;
+
+                if (task.IsChargeble && existingUserTask.Status != task.StatusId && task.StatusId == 1)
+                    await CreateInvoice(task);
 
                 await _dbContext.SaveChangesAsync();
 
@@ -143,6 +157,7 @@ namespace Arity.Service
                 taskDetail.Remarks = task.Remarks;
                 taskDetail.IsChargeble = task.IsChargeble;
                 taskDetail.CompletedOn = task.CompletedOn;
+                taskDetail.ChargeAmount = task.ChargeAmount;
                 _dbContext.Tasks.Add(taskDetail);
                 await _dbContext.SaveChangesAsync();
 
@@ -159,17 +174,25 @@ namespace Arity.Service
                     AddedBy = Convert.ToInt32(SessionHelper.UserId)
                 });
                 await _dbContext.SaveChangesAsync();
+
+                if (task.IsChargeble && task.StatusId == 1)
+                    await CreateInvoice(task);
             }
+        }
+
+        private async Task CreateInvoice(TaskDTO task)
+        {
+            //await _invoiceService.AddUpdateInvoiceEntry(task.com)
         }
 
         public async Task<List<TaskDTO>> GetAll(int userId, int typeId)
         {
-            if (typeId == (int)Arity.Service.Core.UserType.MasterAdmin)
+            if (typeId == (int)Arity.Service.Core.UserType.User)
                 return (from task in _dbContext.Tasks.ToList()
                         join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
                         join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
                         join client in _dbContext.Users.ToList() on (task.ClientId ?? 0) equals client.Id
-                        where userTask.CreatedOn >= Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01)) && task.Active == true
+                        where task.ClientId == userId && task.Active == true
                         select new TaskDTO
                         {
                             TaskId = task.Id,
@@ -185,30 +208,8 @@ namespace Arity.Service
                             ClientName = client.FullName,
                             Remarks = task.Remarks,
                             StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
-                            StatusId = userTask.Status
-                        }).OrderBy(_ => _.StatusId).ToList();
-            else if (typeId == (int)Arity.Service.Core.UserType.User)
-                return (from task in _dbContext.Tasks.ToList()
-                        join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
-                        join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
-                        join client in _dbContext.Users.ToList() on (task.ClientId ?? 0) equals client.Id
-                        where task.ClientId == userId  && task.Active == true
-                        select new TaskDTO
-                        {
-                            TaskId = task.Id,
-                            TaskUserId = userTask.Id,
-                            UserComment = userTask.Comment,
-                            UserId = userTask.UserId,
-                            Description = task.Description,
-                            TaskName = task.Name,
-                            DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("dd/MM/yyyy") : "",
-                            CreatedBy = userTask.CreatedBy,
-                            CreatedOnString = userTask.CreatedOn.ToString("dd/MM/yyyy"),
-                            UserName = user.FullName,
-                            ClientName = client.FullName,
-                            Remarks = task.Remarks,
-                            StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
-                            StatusId = userTask.Status
+                            StatusId = userTask.Status,
+                            ChargeAmount = task.ChargeAmount
                         }).OrderBy(_ => _.StatusId).ToList();
             else
                 return (from task in _dbContext.Tasks.ToList()
@@ -231,7 +232,8 @@ namespace Arity.Service
                             ClientName = client.FullName,
                             Remarks = task.Remarks,
                             StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
-                            StatusId = userTask.Status
+                            StatusId = userTask.Status,
+                            ChargeAmount = task.ChargeAmount
                         }).OrderBy(_ => _.StatusId).ToList();
         }
 

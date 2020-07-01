@@ -140,11 +140,17 @@
                {
                     "orderable": false,
                     "data": null,
-                    "render": function (data, type, full) {
+                   "render": function (data, type, full) {
+
+                       if (!data.IsAsociatedWithClient) {
                            return '<div class="dialog-pro dialog">' +
-                            '<button class="btn btn-info" onclick="DeleteGroup(' + data.GroupId + ')" id="sa-warning">'+
-                            '<i class="fa fa-trash" aria-hidden="true"></i>' +
-                            '</button> </div>';
+                               '<button class="btn btn-info" onclick="DeleteGroup(' + data.GroupId + ')" id="sa-warning">' +
+                               '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                               '</button> </div>';
+                       }
+                       else {
+                           return '';
+                       }
                     }
                 }
             ],

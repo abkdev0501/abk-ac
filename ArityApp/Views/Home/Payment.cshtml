@@ -5,15 +5,6 @@
 }
 
 <style>
-    td.details-control {
-        background: url('/Content/images/details_open.png') no-repeat center center;
-        cursor: pointer;
-    }
-
-    tr.shown td.details-control {
-        background: url('/Content/images/details_close.png') no-repeat center center;
-    }
-
     .date-filter .filter-date-button {
         width: 14%;
     }
@@ -79,6 +70,11 @@
                     <div class="basic-tb-hd">
                         <h2>Receipt History</h2>
                         <p>Below are receipt history.</p>
+                        <p style="display:none;border:1px dashed #00c292;" id="amount-div">
+                            <span style="display:block;"><b>Total Amount : <span class="total-amount"></span></b></span>
+                            <span style="display:block;"><b>Total Discount : <span class="total-discount"></span></b></span>
+                            <span style="display:block;"><b>Gross Amount : <span class="net-amount"></span></b></span>
+                        </p>
                     </div>
 
                     <div class="date-filter">
@@ -87,14 +83,14 @@
                             <label>From</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="FromDate" class="form-control" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="FromDate" class="form-control bk-date" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
                             <label>To</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="ToDate" class="form-control" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="ToDate" class="form-control bk-date" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
@@ -118,15 +114,20 @@
                                     <th style="width:5%;"><input type="checkbox" class="chkSelectAll" /></th>
                                     <th style="width:12%;">Invoice#</th>
                                     <th style="width:12%;">Receipt#</th>
+                                    <th style="width:12%;">Client</th>
+                                    <th style="width:12%;">Company</th>
                                     <th style="width:10%;">Discount</th>
                                     <th style="width:12%;">Total Amount</th>
                                     <th style="width:10%;">Date</th>
                                     <th style="width:10%;">Bank Name</th>
                                     <th style="width:10%;">Cheque#</th>
+                                    <th style="width:10%;">Group</th>
+                                    <th style="width:10%;">Added by</th>
                                     <th style="width:9%;">Status</th>
                                     @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                     {
-                                        <th style="width:9%;">Update</th>
+                                        <th style="width:9%;"></th>
+                                        <th style="width:9%;"></th>
                                     }
                                 </tr>
                             </thead>
@@ -151,8 +152,8 @@
                     type: "GET",
                     dataType: "json",
                     data: {
-                        from: $("#FromDate").val(),
-                        to: $("#ToDate").val()
+                        from: ""+$("#FromDate").val()+"",
+                        to: ""+$("#ToDate").val()+""
                     },
                     beforeSend: function (xhrObj) {
                         $("#loading").show();
@@ -171,30 +172,63 @@
             "language": {
                 "emptyTable": "No receipts found"
             },
+            dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        title: 'Excel',
+                        text:'Export to excel'
+                    }
+                ],
             "columns": [
                 {
                     "orderable": false,
                     "data": null,
                     "render": function (data, type, full) {
-                        return '<input type="checkbox" class="chkSelect" data-id="'+data.ReceiptId+'" data-toggle="tooltip" \>';
+                        return '<input type="checkbox" class="chkSelect" data-id="'+data.ReceiptId+'" data-total="'+data.TotalAmount+'" data-discount="'+data.Discount+'" data-toggle="tooltip" \>';
                     }
                },
                 { "data": "InvoiceNumbers" },
                 { "data": "RecieptNo" },
+                { "data": "ClientName" },
+                { "data": "CompanyName" },
                 { "data": "Discount" },
                 { "data": "TotalAmount" },
                 { "data": "CreatedDateString" },
                 { "data": "BankName" },
                 { "data": "ChequeNumber" },
-                { "data": "Status" },
+                { "data": "GroupName" },
+                { "data": "AddedBy" },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                        if (data.Status)
+                            return 'TRUE';
+                        else
+                            return 'FALSE';
+                    }
+                },
                 @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                 {
                     @:{
                     @:    "orderable": false,
                     @:    "data": null,
                     @:    "render": function (data, type, full) {
-                    @:            return '<button class="btn waves-effect" onclick="AddUpdatePaymentEntry(' + data.ReceiptId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                    @:           if (data.CreatedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) ) { return '<button class="btn waves-effect" onclick="AddUpdatePaymentEntry(' + data.ReceiptId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>'; }
+                    @:           else { return '';}
                     @:    }
+                    @:},
+                    @:{
+                    @:"orderable": false,
+                    @:"data": null,
+                    @:"render": function (data, type, full) {
+                    @:    if (data.CreatedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) ) { return '<div class="dialog-pro dialog">' +
+                    @:                    '<button class="btn btn-info" onclick="DeleteReceipt(' + data.ReceiptId + ')" id="sa-warning">'+
+                    @:                    '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                    @:                    '</button> </div>'; }
+                    @:    else { return ''; }
+                    @:      }
                     @:}
                     }
             ],
@@ -211,9 +245,37 @@
             {
                 $(this).prop("checked",$(".chkSelectAll").is(":checked"));
             });
+            CalculateTotal();
+         });
 
+        $("body").on("change",".chkSelect",function () {
+            CalculateTotal();
         });
-       });
+        });
+        function CalculateTotal() {
+            var total = 0;
+            var discounts = 0;
+            var isChecked = false;
+            $(".chkSelect").each(function ()
+            {
+                if ($(this).is(":checked")) {
+                    total = total + parseFloat($(this).attr("data-total"));
+                    discounts = discounts + parseFloat($(this).attr("data-discount"));
+                    isChecked = true;
+                }
+            });
+
+            if (isChecked) {
+                $("#amount-div").show();
+                $(".total-amount").html(total);
+                $(".total-discount").html(discounts);
+                $(".net-amount").html(total - discounts);
+            }
+            else {
+                $("#amount-div").hide();
+            }
+
+        }
 
         function downloadReciept() {
              var recieptIds = "";
@@ -267,6 +329,34 @@
                     Notification('', 'Something went wrong, Please try again', 'danger');
                 }
             });
+        }
+
+         function DeleteReceipt(ReceiptId) {
+            swal({
+			title: "Are you sure?",
+			text: "You will not be able to recover this receipt",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonText: "Delete",
+            }).then(function () {
+                $("#loading").show();
+                $.ajax({
+                    url: '@Url.Action("DeleteReceipt", "Home")',
+                    type: "POST",
+                    data: { receiptId: ReceiptId },
+                    cache: false,
+                    success: function (response) {
+                        table.ajax.reload();
+                        $("#loading").hide();
+			            swal("Deleted!", "Your Receipt has been deleted.", "success");
+                    },
+                    error: function (error) {
+                        $("#loading").hide();
+                        Notification('', 'Internal error occured, Please try again', 'danger');
+                    }
+                });
+		});
+
         }
     </script>
 }

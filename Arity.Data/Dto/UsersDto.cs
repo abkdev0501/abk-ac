@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Arity.Data.Dto
 {
@@ -43,5 +44,11 @@ namespace Arity.Data.Dto
         public string Rates { get; set; }
         public int AddedBy { get; set; }
         public string AddedByName { get; set; }
+
+        public List<ServiceTypes> Services { get; set; }
+        public List<CompanyDto> Companies { get; set; }
+        public List<ParticularDto> Particulars { get; set; }
+        public List<GodownDetail> AdditionlPlaces { get; set; }
+        public List<BankDetail> BankDetails { get; set; }
     }
 }

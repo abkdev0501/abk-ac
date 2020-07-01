@@ -43,5 +43,8 @@ namespace Arity.Data.Entity
         public string ServiceTypes { get; set; }
         public string Rates { get; set; }
         public int AddedBy { get; set; }
+        public string Services { get; set; }
+        public string BankDetails { get; set; }
+        public string AdditionalPlaces { get; set; }
     }
 }

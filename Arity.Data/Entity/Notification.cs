@@ -14,6 +14,8 @@ namespace Arity.Data.Entity
         public System.DateTime OffBroadcastDateTime { get; set; }
         public bool? IsComplete { get; set; }
         public int CreatedBy { get; set; }
+        public System.DateTime? CreatedOn { get; set; }
+        public System.DateTime? CompletedOn { get; set; }
 
     }
 }

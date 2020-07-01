@@ -3,15 +3,9 @@
 @{
     ViewBag.Title = "ManageClient";
 
-    string IsAllowed()
-    {
-        if (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.MasterAdmin)
-            return "";
-
-        if (Model.Id > 0 && Model.CreatedBy != SessionHelper.UserTypeId)
-            return "no-rights";
-        return "denied";
-    }
+    var IsAllowed = (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.MasterAdmin) ? "" :
+     (Model.Id > 0 && Model.CreatedBy != SessionHelper.UserTypeId) ?
+        "no-rights" : "denied";
 }
 
 <link rel="stylesheet" href="/Content/css/chosen/chosen.css">
@@ -60,7 +54,10 @@
                             <ul class="nav nav-tabs">
                                 <li class="active"><a data-toggle="tab" href="#home">Basic details</a></li>
                                 <li><a data-toggle="tab" href="#menu2">Important details</a></li>
+                                <li><a data-toggle="tab" href="#menu3">Service details</a></li>
                                 <li><a data-toggle="tab" href="#menu1">Other details</a></li>
+                                <li><a data-toggle="tab" href="#menu4">Additional details</a></li>
+                                <li><a data-toggle="tab" href="#menu5">Bank details</a></li>
                             </ul>
                             <div class="tab-content tab-custom-st">
                                 <div id="home" class="tab-pane fade in active">
@@ -82,7 +79,7 @@
                                                     </div>
                                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                                         <div class="nk-int-st">
-                                                            @Html.TextBoxFor(_ => _.Email, new { @class = "form-control input-sm", placeholder = "Enter email", @required = "required",@type="email" })
+                                                            @Html.TextBoxFor(_ => _.Email, new { @class = "form-control input-sm", placeholder = "Enter email", @required = "required", @type = "email" })
                                                         </div>
                                                     </div>
                                                 </div>
@@ -197,23 +194,6 @@
                                                             @Html.DropDownListFor(_ => _.GroupId, ViewBag.Groups as SelectList, "--select group--", new { @class = "form-control input-sm chosen" })
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                                                        <label class="hrzn-fm">Rates<span style="color:red;vertical-align:text-bottom;"></span></label>
-                                                    </div>
-                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                                        <div class="nk-int-st">
-                                                            @Html.TextBoxFor(_ => _.Rates, new { @class = "form-control input-sm", placeholder = "Enter rates" })
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-example-int form-horizental">
-                                            <div class="form-group">
-                                                <div class="row">
-
                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                                         <label class="hrzn-fm">Status<span style="color:red;vertical-align:text-bottom;"></span></label>
                                                     </div>
@@ -333,11 +313,35 @@
                                                     </div>
 
                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                                                        <label class="hrzn-fm">EFFDate<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                        <label class="hrzn-fm">GSTIN EFFDate<span style="color:red;vertical-align:text-bottom;"></span></label>
                                                     </div>
                                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                                         <div class="nk-int-st">
-                                                            @Html.TextBoxFor(_ => _.EFFDate, new { @class = "form-control input-sm date", placeholder = "Enter EFFDate", @readonly = "readonly" })
+                                                            @Html.TextBoxFor(_ => _.EFFDate, new { @class = "form-control input-sm date", placeholder = "Enter EFFDate" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-example-int form-horizental">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 ">
+                                                        <label class="hrzn-fm">Commodity Name<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 ">
+                                                        <div class="nk-int-st no-rights">
+                                                            @Html.TextBoxFor(_ => _.CommodityName, new { @class = "form-control input-sm", placeholder = "Enter commodity name" })
+                                                        </div>
+                                                        <span id="SelectComodity" style="color:darkblue;font-size:12px;font-weight:600;cursor:pointer;">Select commodity</span>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                        <label class="hrzn-fm">Commodity HSN<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 no-rights">
+                                                        <div class="nk-int-st">
+                                                            @Html.TextBoxFor(_ => _.CommodityHSN, new { @class = "form-control input-sm", placeholder = "Enter commodity HSN" })
                                                         </div>
                                                     </div>
                                                 </div>
@@ -350,47 +354,25 @@
                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                                         <label class="hrzn-fm">GST Rate<span style="color:red;vertical-align:text-bottom;"></span></label>
                                                     </div>
-                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 no-rights">
                                                         <div class="nk-int-st">
                                                             @Html.TextBoxFor(_ => _.GSTRate, new { @class = "form-control input-sm", placeholder = "Enter GST rate" })
                                                         </div>
                                                     </div>
 
                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                                                        <label class="hrzn-fm">Applicable Rate<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                        <label class="hrzn-fm">EFFDate<span style="color:red;vertical-align:text-bottom;"></span></label>
                                                     </div>
-                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 no-rights">
                                                         <div class="nk-int-st">
-                                                            @Html.TextBoxFor(_ => _.ApplicableRate, new { @class = "form-control input-sm", placeholder = "Enter applicable rate" })
+                                                            @Html.TextBoxFor(_ => _.ApplicableRate, new { @class = "form-control input-sm date", placeholder = "EFFDate" })
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="form-example-int form-horizental">
-                                            <div class="form-group">
-                                                <div class="row">
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                                                        <label class="hrzn-fm">Commodity Name<span style="color:red;vertical-align:text-bottom;"></span></label>
-                                                    </div>
-                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                                        <div class="nk-int-st">
-                                                            @Html.TextBoxFor(_ => _.CommodityName, new { @class = "form-control input-sm", placeholder = "Enter commodity name" })
-                                                        </div>
-                                                    </div>
 
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                                                        <label class="hrzn-fm">Commodity HSN<span style="color:red;vertical-align:text-bottom;"></span></label>
-                                                    </div>
-                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                                        <div class="nk-int-st">
-                                                            @Html.TextBoxFor(_ => _.CommodityHSN, new { @class = "form-control input-sm", placeholder = "Enter commodity HSN" })
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
 
                                         <div class="form-example-int form-horizental">
                                             <div class="form-group">
@@ -424,24 +406,9 @@
                                                     </div>
                                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                                         <div class="nk-int-st">
-                                                            @Html.TextBoxFor(_ => _.BusinessStatus, new { @class = "form-control input-sm", placeholder = "Enter business status" })
+                                                            @Html.DropDownListFor(_ => _.BusinessStatus, ViewBag.BusinessStatus as SelectList, "--select business status--", new { @class = "form-control input-sm chosen" })
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                                                        <label class="hrzn-fm">Service Types<span style="color:red;vertical-align:text-bottom;"></span></label>
-                                                    </div>
-                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                                        <div class="nk-int-st">
-                                                            @Html.TextBoxFor(_ => _.ServiceTypes, new { @class = "form-control input-sm", placeholder = "Enter service types" })
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-example-int form-horizental">
-                                            <div class="form-group">
-                                                <div class="row">
                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                                         <label class="hrzn-fm">Business Type<span style="color:red;vertical-align:text-bottom;"></span></label>
                                                     </div>
@@ -456,29 +423,386 @@
 
                                     </div>
                                 </div>
+                                <div id="menu3" class="tab-pane fade">
+                                    <div class="tab-ctn">
+                                        <div class="form-example-int form-horizental services">
+                                            @if (Model != null && Model.Services != null && Model.Services.Count() > 0)
+                                            {
+                                                for (int i = 0; i < Model.Services.Count; i++)
+                                                {
+
+                                                    <div class="form-group" id='service@(i)'>
+                                                        <div class="row">
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-md-offset-1 col-xs-12">
+                                                                <label class="hrzn-fm">Particular</label>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                                <div class="nk-int-st">
+                                                                    <select id='particularId@(i)' name='particularId@(i)'>
+                                                                        @if (Model.Particulars != null)
+                                                                        {
+                                                                            foreach (var item in Model.Particulars)
+                                                                            {
+                                                                                <option value="@item.Id" @(Model.Services[i].ParticularId == item.Id ? "selected" : "")>@item.ParticularFF</option>
+                                                                            }
+                                                                        }
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                                                <label class="hrzn-fm">Company<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                                <div class="nk-int-st">
+                                                                    <select id='companyId@(i)' name='companyId@(i)'>
+                                                                        @if (Model.Companies != null)
+                                                                        {
+                                                                            foreach (var item in Model.Companies)
+                                                                            {
+                                                                                <option value="@item.Id" @(Model.Services[i].CompanyId == item.Id ? "selected" : "")>@item.CompanyName</option>
+                                                                            }
+                                                                        }
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                                                <label class="hrzn-fm">Rate<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                                <div class="nk-int-st">
+                                                                    <input type="text" id='txtRate@(i)' name="txtRate@(i)" value="@Model.Services[i].Rate" class="form-control input-sm" placeholder="Enter TAN number" />
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                                                <label class="hrzn-fm remove" style="color:red" data-id='@i'> X</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+
+                                        </div>
+                                        <span style="padding-left:9%;color:darkblue;cursor:pointer;" class="add-new-service">+ Add Service...</span>
+                                    </div>
+                                </div>
+
+                                <div id="menu4" class="tab-pane fade">
+                                    <div class="tab-ctn">
+                                        <div class="form-example-int form-horizental additionalPlace">
+                                            @if (Model != null && Model.AdditionlPlaces != null && Model.AdditionlPlaces.Count() > 0)
+                                            {
+                                                for (int i = 0; i < Model.AdditionlPlaces.Count; i++)
+                                                {
+
+                                                    <div class="form-group" id='additionalPlace@(i)'>
+                                                        <div class="row">
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                                                <label class="hrzn-fm">Name</label>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                                <div class="nk-int-st">
+                                                                    <input type="text" id='txtAName@(i)' name="txtAName@(i)" value="@Model.AdditionlPlaces[i].Name" class="form-control input-sm" placeholder="Enter name" />
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                                                <label class="hrzn-fm">Address<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                                <div class="nk-int-st">
+                                                                    <input type="text" id='txtAAddress@(i)' name="txtAddress@(i)" value="@Model.AdditionlPlaces[i].Address" class="form-control input-sm" placeholder="Enter address" />
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                                                <label class="hrzn-fm">Open<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                                <div class="nk-int-st">
+                                                                    <input type="text" id='txtAOpen@(i)' name="txtAOpen@(i)" value="@(Model.AdditionlPlaces[i].Open.HasValue ? Model.AdditionlPlaces[i].Open.Value.ToString("dd/MM/yyyy"):null)" class="form-control input-sm bk-date" />
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                                                <label class="hrzn-fm">Close<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                                <div class="nk-int-st">
+                                                                    <input type="text" id='txtAClose@(i)' style="width: 112px;display:inline-block;" name="txtAClose@(i)" value="@(Model.AdditionlPlaces[i].Close.HasValue ? Model.AdditionlPlaces[i].Close.Value.ToString("dd/MM/yyyy"):null)" class="form-control input-sm bk-date" />
+                                                                    <label class="remove-additional" style="color:red;padding-left:20px;cursor:pointer;" data-id='@i'> X</label>
+                                                                </div>
+                                                            </div>
+                                                            <div >
+                                                               
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+
+                                        </div>
+                                        <span style="padding-left:9%;color:darkblue;cursor:pointer;" class="add-new-additionalPlace">+ Add Place...</span>
+                                    </div>
+                                </div>
+
+                                <div id="menu5" class="tab-pane fade">
+                                    <div class="tab-ctn">
+                                        <div class="form-example-int form-horizental bankDetail">
+                                            @if (Model != null && Model.BankDetails != null && Model.BankDetails.Count() > 0)
+                                            {
+                                                for (int i = 0; i < Model.BankDetails.Count; i++)
+                                                {
+
+                                                    <div class="form-group" id='bankDetail@(i)'>
+                                                        <div class="row">
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                                                <label class="hrzn-fm">Name</label>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                                <div class="nk-int-st">
+                                                                    <input type="text" id='txtBName@(i)' name="txtBName@(i)" value="@Model.BankDetails[i].Name" class="form-control input-sm" placeholder="Enter name" />
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                                                <label class="hrzn-fm">Address<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                                <div class="nk-int-st">
+                                                                    <input type="text" id='txtBAddress@(i)' name="txtBAddress@(i)" value="@Model.BankDetails[i].Address" class="form-control input-sm" placeholder="Enter address" />
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                                                <label class="hrzn-fm">A/C No<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                                <div class="nk-int-st">
+                                                                    <input type="text" id='txtBAccountNo@(i)' name="txtBAccountNo@(i)" value="@Model.BankDetails[i].AccountNo" class="form-control input-sm" placeholder="Enter account number" />
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                                                <label class="hrzn-fm">Open<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                                <div class="nk-int-st">
+                                                                    <input type="text" id='txtBOpen@(i)' name="txtBOpen@(i)" value="@(Model.BankDetails[i].Open.HasValue ? Model.BankDetails[i].Open.Value.ToString("dd/MM/yyyy"):null)" class="form-control input-sm bk-date" />
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                                                <label class="hrzn-fm">Close<span style="color:red;vertical-align:text-bottom;"></span></label>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                                                <div class="nk-int-st">
+                                                                    <input type="text" id='txtBClose@(i)' style="width:155px;" name="txtBClose@(i)" value="@(Model.BankDetails[i].Close.HasValue ? Model.BankDetails[i].Close.Value.ToString("dd/MM/yyyy"):null)" class="form-control input-sm bk-date" />
+                                                                </div>
+                                                            </div>
+                                                            <div >
+                                                                <label class="remove-bank" style="color:red;width:155px;cursor:pointer;" data-id='@i'> X</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+
+                                        </div>
+                                        <span style="padding-left:9%;color:darkblue;cursor:pointer;" class="add-new-bankDetail">+ Add Bank...</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <div style="width:100%;text-align:center;padding: 25px 0 5px;">
                                 <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="submit" style="align-content:center">@(Model.Id > 0 ? "Update" : "Add")</button>
-                                <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
+                                <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" onclick="window.location = '/client';" type="button" style="margin-left:10px;">Cancel</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="modal animated fade" id="modalConsultant" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-small">
+                <div class="modal-content">
+                    <div class="modal-header" style="margin-bottom:35px;">
+                        <h3>Commodity</h3>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+
+                    </div>
+                    <div class="modal-footer">
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <div style="display:none;">
+        <div id="Particulars">
+            @foreach (var item in Model.Particulars)
+            {
+                <option value="@item.Id">@item.ParticularFF</option>
+            }
+        </div>
+
+        <div id="Companies">
+            @foreach (var item in Model.Companies)
+            {
+                <option value="@item.Id">@item.CompanyName</option>
+            }
+        </div>
+    </div>
+
+
 
     @section Scripts{
         <script>
             $(".chosen").chosen();
-              $("#liUser").addClass("active");
-        $("#User").addClass("active");
-        $("#liHome").removeClass("active");
+            $("#liUser").addClass("active");
+            $("#User").addClass("active");
+            $("#liHome").removeClass("active");
+
+            $(".date, .bk-date").datepicker({
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true,
+                format: "dd/mm/yyyy"
+            });
+
             @if (ViewBag.ErrorMsg != null)
-{
+            {
                 @:Notification('', 'Please fill up all required details or use different username', 'danger');
             }
+            window.Counter = @(Model.Services !=null ? Model.Services.Count() : 0);
+            window.AdditionCounter = @(Model.AdditionlPlaces !=null ? Model.AdditionlPlaces.Count() : 0);
+            window.BankCounter = @(Model.BankDetails !=null ? Model.BankDetails.Count() : 0);
+
+            $(".add-new-service").on("click", function () {
+
+                $(".services").append('<div class="form-group" id="service' + window.Counter + '">' +
+                    '<div class="row"> <div class="col-lg-1 col-md-offset-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm">Particular</label></div>' +
+                    '<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"><div class="nk-int-st">' +
+                    '<select id="particularId' + window.Counter + '" name="particularId' + window.Counter + '">' +
+                     ''+$("#Particulars").html()+''+
+                     '</select></div></div><div class="col-lg-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm">Company<span style="color:red;vertical-align:text-bottom;"></span></label></div>' +
+                    '<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"><div class="nk-int-st">' +
+                    '<select id="companyId' + window.Counter + '" name="companyId' + window.Counter + '">' +
+                    ''+$("#Companies").html()+''+
+                      '</select></div></div><div class="col-lg-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm">Rate<span style="color:red;vertical-align:text-bottom;"></span></label></div>'+
+                      '<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"><div class="nk-int-st">'+
+                      '<input type="text" id="txtRate'+window.Counter+'" name="txtRate'+window.Counter+'" class="form-control input-sm" placeholder="Enter Rate" />'+
+                      '</div></div><div class="col-lg-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm remove" style="color:red" data-id="'+window.Counter+'"> X </label></div></div></div>');
+                window.Counter++;
+            });
+
+            $(".add-new-additionalPlace").on("click", function () {
+
+                $(".additionalPlace").append('<div class="form-group" id="additionalPlace' + window.AdditionCounter + '">' +
+                    '<div class="row"> <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm">Name</label></div>' +
+                    '<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"><div class="nk-int-st">' +
+                    '<input type="text" id="txtAName' + window.AdditionCounter + '" name="txtAName' + window.AdditionCounter + '" value="" class="form-control input-sm" placeholder="Enter name" />'+
+                    '</div></div>' +
+                    '<div class="col-lg-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm">Address<span style="color:red;vertical-align:text-bottom;"></span></label>'+
+                    '</div> <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"> <div class="nk-int-st">' +
+                    '<input type="text" id="txtAAddress' + window.AdditionCounter + '" name="txtAAddress' + window.AdditionCounter + '" value="" class="form-control input-sm" placeholder="Enter address" />'+
+                    '</div></div>' +
+                    '<div class="col-lg-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm">Open<span style="color:red;vertical-align:text-bottom;"></span></label>' +
+                    '</div> <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"> <div class="nk-int-st">' +
+                    '<input type="text" id="txtAOpen' + window.AdditionCounter + '" name="txtAOpen' + window.AdditionCounter + '" value="" class="form-control input-sm bk-date" placeholder="Enter open date" />'+
+                    '</div></div>' +
+                    '<div class="col-lg-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm">Close<span style="color:red;vertical-align:text-bottom;"></span></label>' +
+                    '</div> <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"> <div class="nk-int-st">' +
+                    '<input type="text" style="width:112px;display:inline-block;" id="txtAClose' + window.AdditionCounter + '" name="txtAClose' + window.AdditionCounter + '" value="" class="form-control input-sm bk-date" placeholder="Enter close date" />'+
+                    '<label class="remove-additional" style="color:red;padding-left:20px;cursor:pointer;" data-id="' + window.AdditionCounter + '"> X</label></div></div>' +
+                    '<div></div>'+
+                    '</div > ');
+                window.AdditionCounter++;
+
+                $(".bk-date").datepicker({
+                    todayBtn: "linked",
+                    keyboardNavigation: false,
+                    forceParse: false,
+                    calendarWeeks: true,
+                    autoclose: true,
+                    format: "dd/mm/yyyy"
+                });
+            });
+
+            $(".add-new-bankDetail").on("click", function () {
+
+                $(".bankDetail").append('<div class="form-group" id="bankDetail' + window.BankCounter + '">' +
+                    '<div class="row"> <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm">Name</label></div>' +
+                    '<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"><div class="nk-int-st">' +
+                    '<input type="text" id="txtBName' + window.BankCounter + '" name="txtBName' + window.BankCounter + '" value="" class="form-control input-sm" placeholder="Enter name" />'+
+                    '</div></div>' +
+                    '<div class="col-lg-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm">Address<span style="color:red;vertical-align:text-bottom;"></span></label>'+
+                    '</div> <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"> <div class="nk-int-st">' +
+                    '<input type="text" id="txtBAddress' + window.BankCounter + '" name="txtBAddress' + window.BankCounter + '" value="" class="form-control input-sm" placeholder="Enter address" />'+
+                    '</div></div>' +
+                    '<div class="col-lg-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm">A/C No<span style="color:red;vertical-align:text-bottom;"></span></label>'+
+                    '</div> <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"> <div class="nk-int-st">' +
+                    '<input type="text" id="txtBAccountNo' + window.BankCounter + '" name="txtBAccountNo' + window.BankCounter + '" value="" class="form-control input-sm" placeholder="Enter account no" />'+
+                    '</div></div>' +
+                    '<div class="col-lg-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm">Open<span style="color:red;vertical-align:text-bottom;"></span></label>' +
+                    '</div> <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"> <div class="nk-int-st">' +
+                    '<input type="text" id="txtBOpen' + window.BankCounter + '" name="txtBOpen' + window.BankCounter + '" value="" class="form-control input-sm bk-date" placeholder="Enter open date" />'+
+                    '</div></div>' +
+                    '<div class="col-lg-1 col-md-1 col-sm-1 col-xs-12"><label class="hrzn-fm">Close<span style="color:red;vertical-align:text-bottom;"></span></label>' +
+                    '</div> <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"> <div class="nk-int-st">' +
+                    '<input type="text" style="width:155px;" id="txtBClose' + window.BankCounter + '" name="txtBClose' + window.BankCounter + '" value="" class="form-control input-sm bk-date" placeholder="Enter close date" />'+
+                    '</div></div>' +
+                    '<div><label class="remove-bank" style="color:red;cursor:pointer;" data-id="' + window.BankCounter + '"> X</label></div>'+
+                    '</div > ');
+                window.BankCounter++;
+                $(".bk-date").datepicker({
+                    todayBtn: "linked",
+                    keyboardNavigation: false,
+                    forceParse: false,
+                    calendarWeeks: true,
+                    autoclose: true,
+                    format: "dd/mm/yyyy"
+                });
+            });
+
+            $("body").on("click", ".remove", function () {
+                $("#service" + $(this).attr("data-id")).fadeOut(400);
+                $("#service" + $(this).attr("data-id")).remove();
+            });
+
+            $("body").on("click", ".remove-bank", function () {
+                $("#bankDetail" + $(this).attr("data-id")).fadeOut(400);
+                $("#bankDetail" + $(this).attr("data-id")).remove();
+            });
+
+            $("body").on("click", ".remove-additional", function () {
+                $("#additionalPlace" + $(this).attr("data-id")).fadeOut(400);
+                $("#additionalPlace" + $(this).attr("data-id")).remove();
+            });
+
+            $("#SelectComodity").on("click", function ()
+            {
+                $("#loading").show();
+            $.ajax({
+                url: '@Url.Action("SelectCommodities","Master")',
+                type: 'GET',
+                dataType: 'Html',
+                success: function (response) {
+                    $('#modalConsultant .modal-body').html(response);
+                    $('#modalConsultant').modal('show');
+                    $("#loading").hide();
+                },
+                failure: function () {
+                    $("#loading").hide();
+                    Notification('', 'Something went wrong, Please try again', 'danger');
+                },
+            });
+            });
         </script>
     }
 }

@@ -2,160 +2,211 @@
 @model Arity.Data.Dto.ReceiptDto
 <style>
     .chosen-container {
-        width:100% !important;
-        }
+        width: 100% !important;
+    }
+
     .search-field input {
-        width:100% !important;
+        width: 100% !important;
     }
 </style>
-    <form>
-        @Html.HiddenFor(_ => _.ReceiptId)
-        @Html.HiddenFor(_ => _.CreatedDate)
-        @Html.HiddenFor(_ => _.CreatedBy)
+<form>
+    @Html.HiddenFor(_ => _.ReceiptId)
+    @Html.HiddenFor(_ => _.CreatedDate)
+    @Html.HiddenFor(_ => _.CreatedBy)
 
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Company<span style="color:red;vertical-align:text-bottom;">*</span></label>
-                    </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(Model.ReceiptId>0?"onlyviewmode":"")">
-                        <div class="nk-int-st">
-                            @Html.DropDownListFor(_ => _.CompanyId, ViewBag.company as SelectList, "-- Select Company--", new { @class = "form-control input-sm ", @required = "required" })
-                        </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Company<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(Model.ReceiptId>0?"onlyviewmode":"")">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.CompanyId, ViewBag.company as SelectList, "-- Select Company--", new { @class = "form-control input-sm ", @required = "required" })
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Client<span style="color:red;vertical-align:text-bottom;">*</span></label>
-                    </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12  @(Model.ReceiptId>0?"onlyviewmode":"")">
-                        <div class="nk-int-st">
-                            @Html.DropDownListFor(_ => _.ClientId, ViewBag.client as SelectList, "-- Select Client--", new { @class = "form-control input-sm", @required = "required" })
-                        </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Client<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12  @(Model.ReceiptId>0?"onlyviewmode":"")">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.ClientId, ViewBag.client as SelectList, "-- Select Client--", new { @class = "form-control input-sm", @required = "required" })
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Invoice<span style="color:red;vertical-align:text-bottom;">*</span></label>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Invoice<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="nk-int-st chosen-select-act fm-cmp-mg">
+                        @Html.DropDownListFor(_ => _.InvoiceIds, ViewBag.Invoice as MultiSelectList, new { @class = "form-control chosen", @required = "required", multiple = "multiple" })
                     </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
-                        <div class="nk-int-st chosen-select-act fm-cmp-mg">
-                            @Html.DropDownListFor(_ => _.InvoiceIds, ViewBag.Invoice as MultiSelectList, new { @class = "form-control chosen", @required = "required", multiple = "multiple" })
-                        </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" style="line-height:36px;">
+                    <div class="nk-int-st chosen-select-act fm-cmp-mg">
+                        @Html.CheckBox("IsWithoutInvoice") <span> Without Invoice?</span>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Discount<span style="color:red;vertical-align:text-bottom;">*</span></label>
-                    </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 ">
-                        <div class="nk-int-st">
-                            @Html.TextBoxFor(_ => _.Discount, new { @class = "form-control input-sm", placeholder = "Enter discount amount", @required = "required", @type = "number", onkeyup = "finalAmount()" })
-                        </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Discount<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 ">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Discount, new { @class = "form-control input-sm", placeholder = "Enter discount amount", @required = "required", @type = "number", onkeyup = "finalAmount()" })
                     </div>
                 </div>
             </div>
         </div>
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Total Amount<span style="color:red;vertical-align:text-bottom;">*</span></label>
-                    </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
-                        <div class="nk-int-st">
-                            @Html.TextBoxFor(_ => _.TotalAmount, new { @class = "form-control input-sm", placeholder = "Total amount", @required = "required", @type = "number", disabled = "disabled" })
-                        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Total Amount<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.TotalAmount, new { @class = "form-control input-sm", placeholder = "Total amount", @required = "required", @type = "number", disabled = "disabled" })
                     </div>
                 </div>
             </div>
         </div>
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Bank Name</label>
-                    </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
-                        <div class="nk-int-st">
-                            @Html.TextBoxFor(_ => _.BankName, new { @class = "form-control input-sm", placeholder = "Enter bank name" })
-                        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Bank Name</label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.BankName, new { @class = "form-control input-sm", placeholder = "Enter bank name" })
                     </div>
                 </div>
             </div>
         </div>
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Cheque Number</label>
-                    </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
-                        <div class="nk-int-st">
-                            @Html.TextBoxFor(_ => _.ChequeNumber, new { @class = "form-control input-sm", placeholder = "Enter cheque number" })
-                        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Cheque Number</label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.ChequeNumber, new { @class = "form-control input-sm", placeholder = "Enter cheque number" })
                     </div>
                 </div>
             </div>
         </div>
-        <div class="form-example-int form-horizental">
-            <div class="form-group ">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Receipt Date<span style="color:red;vertical-align:text-bottom;">*</span></label>
-                    </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 nk-datapk-ctm form-elet-mg filter-date">
-                        <div class="nk-int-st date">
-                            @Html.TextBox("RecieptDate",Model.RecieptDate.ToString("dd/MM/yyyy"), new { @class = "form-control input-sm", placeholder = "Select receipt date" })
-                        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group ">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Receipt Date<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 nk-datapk-ctm form-elet-mg filter-date">
+                    <div class="nk-int-st date">
+                        @Html.TextBox("RecieptDate", Model.RecieptDate.ToString("dd/MM/yyyy"), new { @class = "form-control input-sm bk-date", placeholder = "Select receipt date" })
                     </div>
                 </div>
             </div>
         </div>
-        <div class="form-example-int form-horizental">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <label class="hrzn-fm">Status</label>
-                    </div>
-                    <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
-                        <div class="nk-int-st">
-                            @Html.CheckBoxFor(_ => _.Status)
-                        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Status</label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.CheckBoxFor(_ => _.Status)
                     </div>
                 </div>
             </div>
         </div>
-        <div style="width:100%;text-align:center;padding: 25px 0 5px;">
-            <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.ReceiptId > 0 ? "Update" : "Add")</button>
-            <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group ">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Remarks<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 nk-datapk-ctm form-elet-mg filter-date">
+                    <div class="nk-int-st date">
+                        @Html.TextAreaFor(_ => _.Remarks, new { @cols = 2, @class = "form-control input-sm", placeholder = "Enter remarks" })
+                    </div>
+                </div>
+            </div>
         </div>
-    </form>
-
+    </div>
+    <div style="width:100%;text-align:center;padding: 25px 0 5px;">
+        <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.ReceiptId > 0 ? "Update" : "Add")</button>
+        <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
+    </div>
+</form>
+@if (Model != null && Model.InvoiceIds != null && Model.InvoiceIds.Count > 0)
+{
+    <script>
+        var vals = [];
+        @foreach (var item in Model.InvoiceIds)
+        {
+            @:vals.push(@item);
+        }
+        $("#InvoiceIds").val(vals).trigger("chosen:updated");
+    </script>
+}
+else if (Model != null && Model.ReceiptId > 0 && Model.InvoiceIds != null)
+{
+    <script> $("#IsWithoutInvoice").prop("checked",true); $("#TotalAmount").removeAttr("disabled");</script>
+}
 <script>
     var actualTotal;
         $("#InvoiceIds").chosen();
-        $("#RecieptDate").datepicker();
+            $('.bk-date').datepicker({
+                    todayBtn: "linked",
+                    keyboardNavigation: false,
+                    forceParse: false,
+                    calendarWeeks: true,
+                    autoclose: true,
+                    format: "dd/mm/yyyy"
+                });
+
+    $("#IsWithoutInvoice").change(function(){
+        if ($(this).is(":checked")) {
+            $("#TotalAmount").removeAttr("disabled");
+        }
+        else {
+            $("#TotalAmount").attr("disabled","disabled");
+        }
+
+    });
 
     $("#btnAdd").click(function () {
         var isValid = true;
-        if ($("#InvoiceIds").val() == null || $("#InvoiceIds").val() == "") {
+        if (!$("#IsWithoutInvoice").is(":checked") && ($("#InvoiceIds").val() == null || $("#InvoiceIds").val() == "")) {
             Notification('', 'Please select invoice', 'danger');
             isValid = false;
         }
@@ -185,7 +236,8 @@
                 "CompanyId": $("#CompanyId").val(),
                 "ClientId": $("#ClientId").val(),
                 "RecieptDate": $("#RecieptDate").val(),
-                "CreatedBy": $("#CreatedBy").val()
+                "CreatedBy": $("#CreatedBy").val(),
+                "Remarks": $("#Remarks").val()
             }
         });
 

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Arity.Data;
 using Arity.Data.Dto;
@@ -13,9 +11,9 @@ namespace Arity.Service
     public class ParticularServices : IParticularServices
     {
         private readonly RMNEntities _dbContext;
-        public ParticularServices()
+        public ParticularServices(RMNEntities rmnEntities)
         {
-            _dbContext = new RMNEntities();
+            _dbContext = rmnEntities;
         }
 
         public void AddParticular(ParticularDto particular)

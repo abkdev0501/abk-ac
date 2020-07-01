@@ -21,5 +21,6 @@ namespace Arity.Data.Entity
         public bool? IsChargeble { get; set; }
         public DateTime? CompletedOn { get; set; }
         public int AddedBy { get; set; }
+        public decimal? ChargeAmount { get; set; }
     } 
 }

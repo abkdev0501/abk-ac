@@ -19,6 +19,9 @@ namespace Arity.Data.Entity
         public System.DateTime UpdatedDate { get; set; }
         public DateTime RecieptDate { get; set; }
         public int CreatedBy { get; set; }
-
+        public string Remarks { get; set; }
+        public int? AddedBy { get; set; }
+        public long? companyId { get; set; }
+        public long? clientId { get; set; }
     }
 }

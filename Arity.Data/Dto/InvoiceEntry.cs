@@ -23,5 +23,10 @@ namespace Arity.Data.Dto
         public int CreatedBy { get; set; }
         public DateTime InvoiceDate{ get; set; }
         public bool IsExclude { get; set; }
+        public string CompanyName { get; set; }
+        public string CreatedByString { get; set; }
+        public string GroupName { get; set; }
+        public int AddedBy { get; set; }
+        public string Remarks { get; set; }
     }
 }

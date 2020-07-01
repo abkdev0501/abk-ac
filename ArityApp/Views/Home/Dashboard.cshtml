@@ -1,8 +1,7 @@
-﻿@{
+﻿@using Arity.Data.Helpers;
+@{
     ViewBag.Title = "Dashboard";
 }
-
-
 
 <div class="notika-status-area" style="margin-top:30px;">
     <div class="container">
@@ -13,7 +12,7 @@
 <div class="realtime-statistic-area">
     <div class="container">
         <div class="row">
-            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="add-todo-list notika-shadow mg-t-30">
                     <div class="realtime-ctn">
                         <div class="realtime-title">
@@ -22,61 +21,65 @@
                     </div>
                     <div class="card-box">
                         <div class="todoapp">
-                            <div class="notika-todo-scrollbar">
-                                <ul class="list-group no-margn todo-list" >
-                                    <li class="list-group-item" id="notification-list">
-                                    </li>
+                            <div class="notika-todo-scrollbar ">
+                                <ul class="list-group no-margn todo-list" id="notifications">
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
-                <div class="add-todo-list notika-shadow mg-t-30">
-                    <div class="realtime-ctn">
-                        <div class="realtime-title">
-                            <h2>Tasks</h2>
-                        </div>
-                    </div>
-                    <div class="card-box">
-                        <div class="todoapp">
-                            <div class="notika-todo-scrollbar">
-                                <ul class="list-group no-margn todo-list">
-                                    <li class="list-group-item" id="task-list">
-                                    </li>
-                                </ul>
+            @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+            {
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="add-todo-list notika-shadow mg-t-30">
+                        <div class="realtime-ctn">
+                            <div class="realtime-title">
+                                <h2>Tasks</h2>
                             </div>
+                        </div>
+                        <div class="card-box">
+                            <div class="todoapp">
+                                <div class="notika-todo-scrollbar">
+                                    <ul class="list-group no-margn todo-list">
+                                        <li class="list-group-item" id="task-list">
+                                        </li>
+                                    </ul>
+                                </div>
 
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
-                <div class="add-todo-list notika-shadow mg-t-30">
-                    <div class="realtime-ctn">
-                        <div class="realtime-title">
-                            <h2>Documents</h2>
-                        </div>
-                    </div>
-                    <div class="card-box">
-                        <div class="todoapp">
-                            <div class="notika-todo-scrollbar">
-                                <ul class="list-group no-margn todo-list" id="documentList">
-                                </ul>
                             </div>
-
                         </div>
                     </div>
                 </div>
+            }
+            @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
+            {
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="add-todo-list notika-shadow mg-t-30">
+                        <div class="realtime-ctn">
+                            <div class="realtime-title">
+                                <h2>News</h2>
+                            </div>
+                        </div>
+                        <div class="card-box">
+                            <div class="todoapp">
+                                <div class="tickerv-wrap"  style="max-height:445px;">
+                                    <ul class="list-group no-margn todo-list" id="alertList">
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
             </div>
-        </div>
     </div>
 </div>
 @section Scripts{
     <script>
     $("#task-list").html('<li class="list-group-item"><div class="checkbox checkbox-primary"><label for="9">Loading...</label></div></li>')
-    $("#notification-list").html('<li class="list-group-item"><div class="checkbox checkbox-primary"><label for="9">Loading...</label></div></li>')
+    $("#notifications").html('<li class="list-group-item"><div class="checkbox checkbox-primary"><label for="9">Loading...</label></div></li>')
     $.ajax({
                 url: '@Url.Action("GetAllTask", "Home")',
                 dataType: "json",
@@ -107,8 +110,10 @@
                                     '</div')
                     });
                     if (response.length <= 0) {
-                    $("#task-list").append('<span style="display:block;text-align:center;">Task not found</span>');
-                }
+                            $("#task-list").append('<span style="display:block;text-align:center;">Task not found</span>');
+                    }
+
+                       
                 },
                 error: function (error) {
                 }
@@ -119,12 +124,13 @@
                 dataType: "json",
                 type: "GET",
                 cache: false,
+                data: {type:1},
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
-                    $("#notification-list").html('');
+                    $("#notifications").html('');
                     $(response).each(function (i, data) {
-                        $("#notification-list").append(
-                            '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="border-bottom:1px solid #eee;">' +
+                        $("#notifications").append(
+                            '<li class="list-group-item"><div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="border-bottom:1px solid #eee;">' +
                             '<div class="breadcomb-list" style="padding:0px !important; background: #fff; margin-top: 10px !important;margin-bottom:5px;">' +
                             '<div class="row">' +
                             '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">' +
@@ -137,62 +143,70 @@
                             '</div>' +
                             '</div>' +
                             '</div>' +
-                            '</div>');
+                            '</div></li>');
                     });
                     if (response.length <= 0) {
-                    $("#notification-list").append('<span style="display:block;text-align:center;">No new notification for you</span>');
-                }
+                        $("#notifications").append('<li class="list-group-item"><span style="display:block;text-align:center;">No new notification for you</span></li>');
+                    }
+                    
                 },
                 error: function (error) {
                 }
     });
 
-    $.ajax({
-        url: '@Url.Action("GetDocumentList", "Home")',
-        dataType: "json",
-        type: "GET",
-        cache: false,
-        contentType: 'application/json; charset=utf-8',
-        success: function (response) {
-                $("#documentList").html('');
-            $(response).each(function (i, data) {
-                    //$("#documentList").append('<li class="list-group-item"><div class="checkbox checkbox-primary"><label for="document">'+data.Name+'</label></div></li>')
-                $("#documentList").append('<li class="list-group-item">'+
-                                '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">'+
-                                    '<div class="breadcomb-list" style="padding:0px !important; background: #fff; margin-top: 10px !important;">'+
-                                        '<div class="row">'+
-                                            '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">'+
-                                                '<div class="breadcomb-wp">'+
-                                                    '<div class="breadcomb-ctn" style="margin-left:0px !important">'+
-                                                        '<p style="font-size: 16px;font-weight: 600;">' + data.Name +
-                                                        '<span style="color: #6e5e5e;font-size: 12px;font-weight: 400;margin-left:10px;">'
-                                                        + data.DocumentTypeName + '</span></p>' +
-                                                        '<span class="bread-ntd"  style="margin-top: 11px !important;color: #261d1d7a;">Created By:  '+
-                                                        '<span class="bread-ntd" style="margin-left: 5px;color: #6e5e5e;">' + data.ClientName +'</span></span>' +
-                                                    '</div>'+
-                                                '</div>'+
-                                            '</div>'+
-                                            '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">'+
-                                                '<div class="breadcomb-report">'+
-                                                    '<button data-toggle="tooltip" id="btnDownloadDocument" onClick="downloadDocument('+data.DocumentId+')" data-placement="left" title="" class="btn waves-effect" data-original-title="Download Report"><i class="notika-icon notika-down-arrow"></i></button>'+
-                                                '</div>'+
-                                            '</div>'+
-                                        '</div>'+
-                                    '</div>'+
-                                '</div>'+
-                                '</li>')
-            });
-            if (response.length <= 0) {
-                $("#documentList").append('<span style="display:block;text-align:center;">No documents yet</span>');
-            }
+     $.ajax({
+                url: '@Url.Action("GetAllNotification", "Home")',
+                dataType: "json",
+                type: "GET",
+                cache: false,
+                data: {type:3},
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    $("#alertList").html('');
+                    $(response).each(function (i, data) {
+                        $("#alertList").append(
+                            '<li class="list-group-item ' + (response.length == (i+1) ? "last-item":"")+ '"><div class="" style="border-bottom:1px solid #eee;">' +
+                            '<div class="breadcomb-list" style="padding:0px !important; background: #fff; margin-top: 10px !important;margin-bottom:5px;">' +
+                            '<div class="row">' +
+                            '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">' +
+                            '<div class="breadcomb-wp">' +
+                            '<div class="breadcomb-ctn" style="margin-left:0px !important">' +
+                            '<p style="font-size: 15px;">' + data.Message +
+                            '<span style="color: #6e5e5e;font-size: 12px;font-weight: 400;margin-left:10px;"></span></p>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div></li>');
+                    });
+                    if (response.length <= 0) {
+                    $("#alertList").append('<span style="display:block;text-align:center;">No new news</span>');
+                    }
+                    //$("#alertList").liScroll();
+                    $('.tickerv-wrap').easyTicker({
+                        direction: 'up',
+                        easing: 'swing',
+                        speed: 'slow',
+                        interval: 3000,
+                        height: 'auto',
+                        visible: 0,
+                        mousePause: true,
+                        callbacks: {
+                            before: function(ul, li){
+                console.log(this, ul, li);
+                $(li).css('color', 'red');
             },
-            error: function (error) {
+            after: function(ul, li){
+                console.log(this, ul, li);
             }
-    });
+                        }
+                    }).data('easyTicker');
 
-    function downloadDocument(docID) {
-        window.open("@Url.Action("DownloadDocument", "Home")?documentID="+docID);
-    }
+                },
+                error: function (error) {
+                }
+    });
 
     function GetFormttedStaus(StatusName) {
         if(StatusName ==="Assigned")
@@ -210,5 +224,40 @@
                     else
                         return '<span class="btn-success" style="padding:3px;">'+StatusName+'</span>';
     }
+
+        jQuery.fn.liScroll = function(settings) {
+	settings = jQuery.extend({
+		travelocity: 0.03
+		}, settings);		
+		return this.each(function(){
+				var $strip = jQuery(this);
+				$strip.addClass("newsticker")
+				var stripHeight = 1;
+				$strip.find("li").each(function(i){
+					stripHeight += $(this).children().outerHeight() + $(this).outerHeight(); // thanks to Michael Haszprunar and Fabien Volpi
+                });
+				var $mask = $strip.wrap("<div class='mask'></div>");
+				var $tickercontainer = $strip.parent().wrap("<div class='tickercontainer'></div>");								
+				var containerHeight = $strip.parent().parent().height();	//a.k.a. 'mask' width 	
+				$strip.height(stripHeight);			
+				var totalTravel = stripHeight;
+				var defTiming = totalTravel/settings.travelocity;	// thanks to Scott Waye		
+				function scrollnews(spazio, tempo){
+				$strip.animate({top: '-='+ spazio}, tempo, "linear", function(){$strip.css("top", containerHeight); scrollnews(totalTravel, defTiming);});
+				}
+				scrollnews(totalTravel, defTiming);				
+				$strip.hover(function(){
+				  jQuery(this).stop();
+				},
+				function(){
+				  var offset = jQuery(this).offset();
+				  var residualSpace = offset.top + stripHeight;
+				  var residualTime = residualSpace/settings.travelocity;
+				  scrollnews(residualSpace, residualTime);
+				});			
+		});	
+};
+
+
     </script>
 }

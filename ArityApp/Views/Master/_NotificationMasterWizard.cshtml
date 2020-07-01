@@ -10,7 +10,7 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
                     <div class="nk-int-st">
-                        @Html.TextAreaFor(_ => _.Message, new {@rows="4", @class = "form-control input-sm", placeholder = "Enter Message", @required = "required" })
+                        @Html.EditorFor(_ => _.Message, new { htmlAttributes = new { @class = "form-control input-sm summernote", placeholder = "Enter Message", @required = "required" } })
                     </div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
                     <div class="nk-int-st">
-                        @Html.TextBox("OnBroadcastDateTime",Model.OnBroadcastDateTime.ToString("dd/MM/yyyy"), new { @class = "form-control input-sm data-time", placeholder = "Enter description" })
+                        @Html.TextBox("OnBroadcastDateTime", Model.OnBroadcastDateTime.ToString("dd/MM/yyyy"), new { @class = "form-control input-sm data-time", placeholder = "Enter description" })
                     </div>
                 </div>
             </div>
@@ -97,13 +97,16 @@
 </form>
 
 <script>
+    $(document).ready(function() {
+    $(".summernote").summernote();
     $(".chosen").chosen();
      $('.data-time').datepicker({
         todayBtn: "linked",
         keyboardNavigation: false,
         forceParse: false,
         calendarWeeks: true,
-        autoclose: true
+         autoclose: true,
+        format:'dd/mm/yyyy'
     });
     $('#btnGroup').on('click', function () {
         var isValid = true;
@@ -162,6 +165,7 @@
                 }
             });
         }
-    })
+    });
+  });
 </script>
 

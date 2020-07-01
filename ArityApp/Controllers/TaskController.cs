@@ -14,8 +14,16 @@ namespace ArityApp.Controllers
     [Authorize]
     public class TaskController : Controller
     {
-        ITaskService _taskService;
-        IAccountService _accountService;
+        private readonly ITaskService _taskService;
+        private readonly IAccountService _accountService;
+
+        public TaskController(ITaskService taskService,
+           IAccountService accountService )
+        {
+            _taskService = taskService;
+            _accountService = accountService;
+        }
+
         public ActionResult Index()
         {
             ViewBag.FromDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year - 1, DateTime.Now.Month, 01));
@@ -27,14 +35,16 @@ namespace ArityApp.Controllers
         /// Load list of task by from and to date of user and all
         /// </summary>
         /// <returns></returns>
-        public async Task<JsonResult> LoadTask(DateTime from, DateTime to)
+        public async Task<JsonResult> LoadTask(string from, string to)
         {
             try
             {
-                _taskService = new TaskService();
-                to = to + new TimeSpan(23, 59, 59);
-                from = from + new TimeSpan(00, 00, 1);
-                var invoiceList = await _taskService.GetAll(from, to);
+                DateTime fromDate = Convert.ToDateTime(from);
+                DateTime toDate = Convert.ToDateTime(to);
+
+                toDate = toDate + new TimeSpan(23, 59, 59);
+                fromDate = fromDate + new TimeSpan(00, 00, 1);
+                var invoiceList = await _taskService.GetAll(fromDate, toDate);
                 return Json(new { data = invoiceList }, JsonRequestBehavior.AllowGet);
             }
             catch
@@ -47,8 +57,6 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _taskService = new TaskService();
-                _accountService = new AccountService();
                 var users = await _accountService.GetAllUsers();
                 var task = await _taskService.GetTask(id);
                 if (task == null)
@@ -72,9 +80,8 @@ namespace ArityApp.Controllers
                }), "Id", "Name", task.Priorities);
                 return PartialView("_TaskWizard", task);
             }
-            catch (Exception ex)
+            catch 
             {
-                var inn = ex.InnerException;
                 throw;
             }
         }
@@ -84,11 +91,10 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _taskService = new TaskService();
                 await _taskService.AddUpdateTask(task);
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch 
             {
                 return Json(false, JsonRequestBehavior.AllowGet);
             }
@@ -99,11 +105,10 @@ namespace ArityApp.Controllers
         {
             try
             {
-                _taskService = new TaskService();
                 await _taskService.DeleteTask(taskId);
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }

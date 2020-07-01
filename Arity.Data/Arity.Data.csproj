@@ -55,14 +55,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArityDBContext.cs" />
+    <Compile Include="Dto\BankDetail.cs" />
     <Compile Include="Dto\ClientParticularMappingDto.cs" />
+    <Compile Include="Dto\CommodityDTO.cs" />
     <Compile Include="Dto\CompanyClientList.cs" />
     <Compile Include="Dto\CompanyDto.cs" />
+    <Compile Include="Dto\ConsultontDTO.cs" />
+    <Compile Include="Dto\GodownDetail.cs" />
     <Compile Include="Dto\GroupMasterDTO.cs" />
     <Compile Include="Dto\InvoiceEntry.cs" />
     <Compile Include="Dto\InvoiceParticularDto.cs" />
     <Compile Include="Dto\ParticularDto.cs" />
     <Compile Include="Dto\ReceiptDto.cs" />
+    <Compile Include="Dto\ServiceTypes.cs" />
     <Compile Include="Dto\TaskDTO.cs" />
     <Compile Include="Dto\TrackingInformation.cs" />
     <Compile Include="Dto\DocumentMasterDto.cs" />
@@ -70,6 +75,7 @@
     <Compile Include="Dto\NotificationDTO.cs" />
     <Compile Include="Dto\UsersDto.cs" />
     <Compile Include="Entity\Client_Particular_Mapping.cs" />
+    <Compile Include="Entity\CommodityMaster.cs" />
     <Compile Include="Entity\Company_Client_Mapping.cs" />
     <Compile Include="Entity\Company_master.cs" />
     <Compile Include="Entity\Consultants.cs" />

@@ -1,0 +1,96 @@
+﻿@model Arity.Data.Dto.UsersDto
+
+<form>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <label class="hrzn-fm">Name :<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="nk-int-st">
+                        @Model.FullName
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <label class="hrzn-fm">Email :<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="nk-int-st">
+                        @Model.Email
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <label class="hrzn-fm">Address :</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="nk-int-st">
+                        @Model.Address
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <label class="hrzn-fm">City :</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="nk-int-st">
+                        @Model.City @(!string.IsNullOrEmpty(Model.Pincode) ? ", " + Model.Pincode :"")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <label class="hrzn-fm">PhoneNumber :</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="nk-int-st">
+                        @Model.PhoneNumber
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <label class="hrzn-fm">Commodity :</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="nk-int-st">
+                        @Model.CommodityName
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+</form>
+
+

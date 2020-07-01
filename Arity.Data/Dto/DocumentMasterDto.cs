@@ -25,7 +25,9 @@ namespace Arity.Data.Dto
         public string ClientName { get; set; }
         public string FileName { get; set; }
         public string ALreadyUploadedFile { get; set; }
-
-      }
+        public string CreatedByString { get; set; }
+        public int AddedBy { get; set; }
+        public string UserName { get; set; }
+    }
 }
  
