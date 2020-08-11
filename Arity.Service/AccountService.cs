@@ -116,11 +116,11 @@ namespace Arity.Service
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<List<UsersDto>> GetAllUsers(DateTime fromDate, DateTime toDate)
+        public async Task<List<UsersDto>> GetAllUsersList()
         {
             return (from user in _dbContext.Users
                     join type in _dbContext.UserTypes on user.UserTypeId equals type.Id
-                    where user.CreatedDate >= fromDate && user.CreatedDate <= toDate && user.UserTypeId != (int)Arity.Service.Core.UserType.User
+                    where user.UserTypeId != (int)Core.UserType.User
                     select new UsersDto
                     {
                         Id = user.Id,

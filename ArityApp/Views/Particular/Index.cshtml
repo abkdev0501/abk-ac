@@ -50,7 +50,7 @@
                     </div>
                     <div class="date-filter">
 
-                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
+                        @*<div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
                             <label>From</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
@@ -66,7 +66,7 @@
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
                             <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnFilterGrid">Search</button>
-                        </div>
+                        </div>*@
 
                     </div>
                     <div class="table-responsive">
@@ -120,8 +120,6 @@
                     type: "GET",
                     dataType: "json",
                     data: {
-                        from: ""+$("#FromDate").val()+"",
-                        to: ""+$("#ToDate").val()+""
                     },
                     beforeSend: function (xhrObj) {
                         $("#loading").show();
@@ -140,14 +138,15 @@
             "language": {
                 "emptyTable": "No particular found"
             },
-            dom: 'Bfrtip',
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        title: 'Excel',
-                        text:'Export to excel'
-                    }
-                ],
+           "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    title: 'Excel',
+                    text: 'Export to excel'
+                }
+            ],
            "columns": [
                 { "data": "ParticularSF" },
                 { "data": "ParticularFF" },

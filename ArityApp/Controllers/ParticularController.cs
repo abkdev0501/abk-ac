@@ -24,18 +24,12 @@ namespace ArityApp.Controllers
         //Listing page for Particulars 
         public ActionResult Index()
         {
-            ViewBag.FromDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year - 1, DateTime.Now.Month, 01));
-            ViewBag.ToDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month)));
             return View();
         }
 
-        public async Task<JsonResult> LoadParticulars(string from, string to)
+        public async Task<JsonResult> LoadParticulars()
         {
-            var fromDate = Convert.ToDateTime(from);
-            var toDate = Convert.ToDateTime(to);
-            toDate = toDate + new TimeSpan(23, 59, 59);
-            fromDate = fromDate + new TimeSpan(00, 00, 1);
-            var List = await _particularServices.FetchParticular(toDate, fromDate);
+            var List = await _particularServices.FetchParticular();
             return Json(new { data = List }, JsonRequestBehavior.AllowGet);
 
         }

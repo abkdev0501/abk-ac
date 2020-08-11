@@ -9,5 +9,5 @@ namespace Arity.Data.Entity
         [Key]
         public long Id { get; set; }
         public string RoleName { get; set; }
-    }
+    } 
 }

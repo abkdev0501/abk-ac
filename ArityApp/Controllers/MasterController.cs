@@ -1,4 +1,5 @@
 ﻿using Arity.Data.Dto;
+using Arity.Data.Entity;
 using Arity.Data.Helpers;
 using Arity.Service;
 using Arity.Service.Contract;
@@ -117,11 +118,11 @@ namespace ArityApp.Controllers
         {
             try
             {
-                
+
                 var groups = await _masterService.GetAllGroup();
                 return Json(new { data = groups }, JsonRequestBehavior.AllowGet);
             }
-            catch 
+            catch
             {
                 throw;
             }
@@ -133,7 +134,7 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> AddGroup(int id)
         {
-            
+
             var groupMaster = await _masterService.GetGroupById(id);
             if (groupMaster == null)
                 groupMaster = new GroupMasterDTO();
@@ -147,7 +148,7 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> AddGroup(GroupMasterDTO groupMaster)
         {
-            
+
             await _masterService.AddUpdateGroup(groupMaster);
 
             return Json(true, JsonRequestBehavior.AllowGet);
@@ -160,7 +161,7 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> DeleteGroup(int groupId)
         {
-            
+
             await _masterService.DeleteGroup(groupId);
 
             return Json(true, JsonRequestBehavior.AllowGet);
@@ -174,8 +175,6 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public ActionResult ClientMaster()
         {
-            ViewBag.FromDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01));
-            ViewBag.ToDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month)));
             return View();
         }
 
@@ -187,12 +186,7 @@ namespace ArityApp.Controllers
         {
             try
             {
-                
-                DateTime fromDate = Convert.ToDateTime(from);
-                DateTime toDate = Convert.ToDateTime(to);
-                toDate = toDate + new TimeSpan(23, 59, 59);
-                fromDate = fromDate + new TimeSpan(00, 00, 1);
-                var users = await _masterService.GetAllClient(fromDate, toDate);
+                var users = await _masterService.GetAllClient();
                 return Json(new { data = users }, JsonRequestBehavior.AllowGet);
             }
             catch
@@ -207,7 +201,7 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> ManageClient(int? id)
         {
-            
+
             var clientMaster = await _masterService.GetClientById(id ?? 0);
             if (clientMaster == null)
                 clientMaster = new UsersDto();
@@ -228,20 +222,8 @@ namespace ArityApp.Controllers
             ViewBag.Companies = new MultiSelectList(companies, "Id", "CompanyName", clientMaster.CompanyIds);
             ViewBag.Consultant = new SelectList(await _masterService.GetAllConsultant(), "ConsultantId", "Name", clientMaster.ConsultantId);
             ViewBag.Groups = new SelectList(await _masterService.GetAllGroups(), "GroupId", "Name", clientMaster.GroupId);
-            ViewBag.BusinessType = new SelectList(Enum.GetValues(typeof(EnumHelper.BusinessType))
-               .Cast<EnumHelper.BusinessType>()
-               .Select(t => new
-               {
-                   Id = ((int)t),
-                   Name = t.ToString()
-               }), "Id", "Name", clientMaster.BusinessType);
-            ViewBag.BusinessStatus = new SelectList(Enum.GetValues(typeof(EnumHelper.BusinessStatus))
-               .Cast<EnumHelper.BusinessStatus>()
-               .Select(t => new
-               {
-                   Id = t.ToString(),
-                   Name = t.ToString()
-               }), "Id", "Name", clientMaster.BusinessStatus);
+            ViewBag.BusinessType = new SelectList(await _masterService.GetAllBusinessType(), "BusinessTypeId", "Name", clientMaster?.BusinessType);
+            ViewBag.BusinessStatus = new SelectList(await _masterService.GetAllBusinessStatus(), "BusinessStatusId", "Name", clientMaster?.BusinessStatus);
 
             return View(clientMaster);
         }
@@ -350,13 +332,13 @@ namespace ArityApp.Controllers
                     usersDto.BankDetails = bankDetails.Count() > 0 ? bankDetails : null;
                     usersDto.AdditionlPlaces = additionalDetails.Count() > 0 ? additionalDetails : null;
 
-                    
+
                     await _masterService.AddUpdateClient(usersDto);
                     TempData["Success"] = usersDto.Id > 0 ? "Client updated successfully" : "Client added successfully";
                     return RedirectToAction("ClientMaster");
                 }
             }
-            catch 
+            catch
             {
             }
             ViewBag.ErrorMsg = "client not added";
@@ -382,11 +364,11 @@ namespace ArityApp.Controllers
         {
             try
             {
-                
+
                 var notifications = await _masterService.GetAllNotification();
                 return Json(new { data = notifications }, JsonRequestBehavior.AllowGet);
             }
-            catch 
+            catch
             {
                 throw;
             }
@@ -398,7 +380,7 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> AddNotification(int id)
         {
-            
+
             var notificationMaster = await _masterService.GetNotificationById(id);
             if (notificationMaster == null)
                 notificationMaster = new NotificationDTO { OnBroadcastDateTime = DateTime.Now, OffBroadcastDateTime = DateTime.Now };
@@ -415,7 +397,7 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> AddNotification(NotificationDTO notification)
         {
-            
+
             await _masterService.AddUpdateNotification(notification);
 
             return Json(true, JsonRequestBehavior.AllowGet);
@@ -428,7 +410,7 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> DeleteNotification(int notificationId)
         {
-            
+
             await _masterService.DeleteNotification(notificationId);
 
             return Json(true, JsonRequestBehavior.AllowGet);
@@ -451,11 +433,11 @@ namespace ArityApp.Controllers
         {
             try
             {
-                
+
                 var notes = await _masterService.GetAllNotes(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId));
                 return Json(new { data = notes }, JsonRequestBehavior.AllowGet);
             }
-            catch 
+            catch
             {
                 throw;
             }
@@ -478,7 +460,7 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> LoadCommodityMaster()
         {
-            
+
             var commodities = await _masterService.GetAllCommodities();
             return Json(new { data = commodities }, JsonRequestBehavior.AllowGet);
         }
@@ -489,7 +471,7 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> AddCommodityMaster(int id)
         {
-            
+
             var commodity = await _masterService.GetCommodityById(id);
             if (commodity == null)
                 commodity = new Arity.Data.Entity.CommodityMaster() { EFDate = DateTime.Now };
@@ -505,7 +487,7 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> AddCommodityMaster(Arity.Data.Entity.CommodityMaster commodity)
         {
-            
+
             await _masterService.AddUpdateCommodity(commodity);
 
             return Json(true, JsonRequestBehavior.AllowGet);
@@ -528,7 +510,7 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> LoadConsultants()
         {
-            
+
             var consultants = await _masterService.GetAllConsultants();
             return Json(new { data = consultants }, JsonRequestBehavior.AllowGet);
         }
@@ -539,7 +521,7 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> AddConsultant(int id)
         {
-            
+
             var consultant = await _masterService.GetConsultantById(id);
             if (consultant == null)
                 consultant = new ConsultantDTO();
@@ -554,7 +536,7 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> AddConsultant(ConsultantDTO consultant)
         {
-            
+
             await _masterService.AddUpdateConsultant(consultant);
 
             return Json(true, JsonRequestBehavior.AllowGet);
@@ -569,7 +551,7 @@ namespace ArityApp.Controllers
         {
             try
             {
-                
+
                 await _masterService.RemoveConsultant(id);
 
                 return Json(true, JsonRequestBehavior.AllowGet);
@@ -587,10 +569,209 @@ namespace ArityApp.Controllers
         /// <returns></returns>
         public async Task<ActionResult> SelectCommodities()
         {
-            
+
             var commodities = await _masterService.GetAllCommodities();
             ViewBag.Commodities = new SelectList(commodities, "Id", "Name");
             return PartialView("_SelectConsultantwizard", commodities);
+        }
+
+        #endregion
+
+        #region Document Types
+        /// <summary>
+        /// Landing page of Document Types
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult DocumentType()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Get all document type
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> LoadDocumentType()
+        {
+            var documentTypes = await _masterService.GetAllDocumentTypes();
+            return Json(new { data = documentTypes }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Add/Update document type
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> AddDocumentType(int id)
+        {
+            var documentType = await _masterService.GetDocumentTypeById(id);
+            if (documentType == null)
+                documentType = new DocumentTypes();
+
+            return PartialView("_DocumentTypeWizard", documentType);
+        }
+
+        /// <summary>
+        /// Add/Update document type
+        /// </summary>
+        /// <returns></returns>
+        /// 
+        [HttpPost]
+        public async Task<ActionResult> AddDocumentType(DocumentTypes documentType)
+        {
+            await _masterService.AddUpdateDocumentType(documentType);
+            return Json(true, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Delete document type
+        /// </summary>
+        /// <returns></returns>
+        /// 
+        [HttpPost]
+        public async Task<ActionResult> DeleteDocumentType(int documentTypeId)
+        {
+            try
+            {
+                await _masterService.DeleteDocumentType(documentTypeId);
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        #endregion
+
+
+        #region Business Status
+        /// <summary>
+        /// Landing page of Business status
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult BusinessStatus()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Get all business status
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> LoadBusinessStatus()
+        {
+            var businessStatus = await _masterService.GetAllBusinessStatus();
+            return Json(new { data = businessStatus }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Add/Update business status
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> AddBusinessStatus(int id)
+        {
+            var businessStatus = await _masterService.GetBusinessStatusById(id);
+            if (businessStatus == null)
+                businessStatus = new BusinessStatus();
+
+            return PartialView("_BusinessStatusWizard", businessStatus);
+        }
+
+        /// <summary>
+        /// Add/Update business status
+        /// </summary>
+        /// <returns></returns>
+        /// 
+        [HttpPost]
+        public async Task<ActionResult> AddBusinessStatus(BusinessStatus businessStatus)
+        {
+            await _masterService.AddUpdateBusinessStatus(businessStatus);
+            return Json(true, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Delete business status
+        /// </summary>
+        /// <returns></returns>
+        /// 
+        [HttpPost]
+        public async Task<ActionResult> DeleteBusinessStatus(int businessStatusId)
+        {
+            try
+            {
+                await _masterService.DeleteBusinessStatus(businessStatusId);
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        #endregion
+
+        #region Business Type
+        /// <summary>
+        /// Landing page of business type
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult BusinessType()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Get all business type
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> LoadBusinessType()
+        {
+            var businessType = await _masterService.GetAllBusinessType();
+            return Json(new { data = businessType }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Add/Update business type
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> AddBusinessType(int id)
+        {
+            var businessType = await _masterService.GetBusinessTypeById(id);
+            if (businessType == null)
+                businessType = new BusinessTypes();
+
+            return PartialView("_BusinessTypeWizard", businessType);
+        }
+
+        /// <summary>
+        /// Add/Update business type
+        /// </summary>
+        /// <returns></returns>
+        /// 
+        [HttpPost]
+        public async Task<ActionResult> AddBusinessTypes(BusinessTypes businessTypes)
+        {
+            await _masterService.AddUpdateBusinessTypes(businessTypes);
+            return Json(true, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Delete business type
+        /// </summary>
+        /// <returns></returns>
+        /// 
+        [HttpPost]
+        public async Task<ActionResult> DeleteBusinessTypes(int businessTypesId)
+        {
+            try
+            {
+                await _masterService.DeleteBusinessTypes(businessTypesId);
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         #endregion

@@ -118,14 +118,15 @@
             "language": {
                 "emptyTable": "No commodity found"
             },
-            dom: 'Bfrtip',
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        title: 'Excel',
-                        text:'Export to excel'
-                    }
-                ],
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    title: 'Excel',
+                    text: 'Export to excel'
+                }
+            ],
            "columns": [
                 { "data": "Name" },
                 { "data": "HSN" },

@@ -31,6 +31,7 @@
                             <div class="breadcomb-report">
                                 @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                 {
+                                    <button id="btnAddInvoiceImport" onclick="ImportReceipt()" data-toggle="tooltip" data-placement="left" class="btn btn-default notika-btn-default waves-effect"><i class="fa fa-upload"></i> Import</button>
                                     <button id="btnAddInvoiceEntry" onclick="AddUpdatePaymentEntry(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
                                 }
                             </div>
@@ -42,7 +43,9 @@
         </div>
     </div>
 </div>
-<!-- Breadcrumb area End-->
+@if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+{
+    <!-- Breadcrumb area End-->
 <div class="modal animated fade" id="modelPaymentEntry" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-large">
         <div class="modal-content">
@@ -60,6 +63,40 @@
     </div>
 </div>
 
+<div class="modal animated fade" id="modelUploadFile" role="dialog">
+    <div class="modal-dialog modals-default">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Import Receipt </h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-dismissible alert-model" style="display:none;width:100%;">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa notify-icon"></i> <span id="Alertmessage"></span> </h4>
+                </div>
+                <form action="@Url.Action("ImportReceipt", "Home")" class="dropzone dropzone-nk" id="dropzoneJsForm">
+                    <div class="dz-message needsclick">
+                        <i class="fa fa-cloud-upload" style="font-size:35px"></i><br />
+                        <br />
+                        <h4> Drop files here or click to upload.</h4>
+                    </div>
+                </form>
+                <div style="width:60%;margin-left:30%;padding: 25px 0 5px;">
+                    <div class="form-group">
+                        <a href="/Content/SampleTemplate/ImportReceipt_Sample.xlsx" download="ImportReceiptSampleTemplate" id="downloadSample" style="display: inline-block;vertical-align:bottom;margin-left:10px;">Download sample template</a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="width:100%;text-align:center;">
+                    <button class="btn btn-primary" type="submit" id="btnFileUpload"><i class="fa fa-upload"></i> Import</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+}
 <!-- Data Table area Start-->
 <div class="data-table-area">
     <div class="container">
@@ -124,6 +161,7 @@
                                     <th style="width:10%;">Group</th>
                                     <th style="width:10%;">Added by</th>
                                     <th style="width:9%;">Status</th>
+                                    <th style="width:9%;">Remarks</th>
                                     @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                     {
                                         <th style="width:9%;"></th>
@@ -132,6 +170,29 @@
                                 </tr>
                             </thead>
                             <tbody></tbody>
+                            <tfoot>
+                                <tr>
+                                    <th style="width:5%;" no-serach><input type="checkbox" class="chkSelectAll" /></th>
+                                    <th style="width:12%;">Invoice#</th>
+                                    <th style="width:12%;">Receipt#</th>
+                                    <th style="width:12%;">Client</th>
+                                    <th style="width:12%;">Company</th>
+                                    <th style="width:10%;">Discount</th>
+                                    <th style="width:12%;">Total Amount</th>
+                                    <th style="width:10%;">Date</th>
+                                    <th style="width:10%;">Bank Name</th>
+                                    <th style="width:10%;">Cheque#</th>
+                                    <th style="width:10%;">Group</th>
+                                    <th style="width:10%;">Added by</th>
+                                    <th style="width:9%;">Status</th>
+                                    <th style="width:9%;">Remarks</th>
+                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                    {
+                                        <th style="width:9%;" no-serach></th>
+                                        <th style="width:9%;" no-serach></th>
+                                    }
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -145,6 +206,10 @@
     $(document).ready(function () {
         $("#liReceipt").addClass("active");
         $("#liHome").removeClass("active");
+        $('#tblPaymentHistory tfoot th').each( function () {
+            var title = $(this).text();
+            $(this).html('<input type="text" style="display:' + ($(this).attr("no-serach") == undefined ? "inline-block" :"none") + '" placeholder="Search ' + title + '" />');
+        });
         table = $('#tblPaymentHistory').DataTable({
             "ajax": function (data, callback, settings) {
                 $.ajax({
@@ -172,7 +237,8 @@
             "language": {
                 "emptyTable": "No receipts found"
             },
-            dom: 'Bfrtip',
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            dom: 'Blfrtip',
                 buttons: [
                     {
                         extend: 'excelHtml5',
@@ -209,6 +275,7 @@
                             return 'FALSE';
                     }
                 },
+                { "data": "Remarks" },
                 @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                 {
                     @:{
@@ -232,8 +299,80 @@
                     @:}
                     }
             ],
-            "order": [[5, "desc"]]
-       });
+            "order": [[5, "desc"]],
+            initComplete: function () {
+                // Apply the search
+                this.api().columns().every( function () {
+                    var that = this;
+ 
+                    $('input', this.footer()).on('keyup change clear', function () {
+                        if ( that.search() !== this.value ) {
+                            that
+                                .search( this.value )
+                                .draw();
+                        }
+                        });
+                });
+            }
+        });
+
+        Dropzone.options.dropzoneJsForm = {
+            autoProcessQueue: false,
+            acceptedFiles: ".xlsx,.xls",
+            maxFiles: 1,
+            parallelUploads: 1,
+            maxFilesize: 25,
+            addRemoveLinks: true,
+            timeout: 180000,
+            init: function () {
+                var submitButton = document.querySelector("#btnFileUpload");
+                var myDropzone = this; //closure
+                this.on("maxfilesexceeded", function (file) {
+                     Notification('', 'You can only upload single file at a time', 'danger');
+                    this.removeFile(file);
+                });
+                this.on("error", function (file, message, xhr) {
+                    if (message === "You can't upload files of this type.") {
+                        Notification('', 'You can import .xls and .xlsx files only', 'danger');
+                        this.removeFile(file);
+                    }
+                });
+                this.on("sending", function (file, xhr, formData) {
+                    formData.append("TemplateId", $("#TemplateId").val());
+                    $("#loading").show();
+                });
+                this.on("complete", function (file) {
+                    if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
+                        if (file.status == 'error') { }
+                        else if (file.xhr.response != null && file.xhr.response === "error") {
+                            Notification('', 'An error occurred while importing receipts. Please try again', 'danger');
+                            this.removeFile(file);
+                        }
+                        else if (file.xhr.response != null && file.xhr.response === "template_id_null") {
+                            Notification('', 'Please select template", "alert-danger', 'danger');
+                        }
+                        else {
+                            Notification('', 'File imported successfully!', 'success');
+                            this.removeFile(file);
+                             table.ajax.reload();
+                        }
+                        $("#loading").hide();
+                    }
+                });
+                submitButton.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var isValid = true;
+                    if (myDropzone.getUploadingFiles().length === 0 && myDropzone.getQueuedFiles().length === 0) {
+                        isValid = false;
+                         Notification('', 'Please select file', 'danger');
+                    }
+                    if (isValid) {
+                        myDropzone.processQueue();
+                    }
+                });
+            }
+        };
 
          $("#btnFilterGrid").click(function () {
                 table.ajax.reload();
@@ -357,6 +496,9 @@
                 });
 		});
 
+        }
+         function ImportReceipt() {
+             $("#modelUploadFile").modal('toggle');
         }
     </script>
 }

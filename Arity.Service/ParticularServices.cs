@@ -43,10 +43,9 @@ namespace Arity.Service
         /// fetch List of particulars from db 
         /// </summary>
         /// <returns></returns>
-        public async Task<List<ParticularDto>> FetchParticular(DateTime toDate, DateTime fromDate)
+        public async Task<List<ParticularDto>> FetchParticular()
         {
             return (from data in _dbContext.Particulars.ToList()
-                    where data.CreatedDate >= fromDate && data.CreatedDate <= toDate
                     select new ParticularDto()
                     {
                         Id = (int)data.Id,

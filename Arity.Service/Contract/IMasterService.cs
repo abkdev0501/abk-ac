@@ -15,7 +15,6 @@ namespace Arity.Service.Contract
         Task<List<GroupMasterDTO>> GetAllGroup();
         Task<GroupMasterDTO> GetGroupById(int id);
         Task AddUpdateGroup(GroupMasterDTO groupMaster);
-        Task<List<UsersDto>> GetAllClient(DateTime from, DateTime to);
         Task<List<UsersDto>> GetAllClient();
         Task<UsersDto> GetClientById(int id);
         Task<List<Consultants>> GetAllConsultant();
@@ -36,5 +35,17 @@ namespace Arity.Service.Contract
         Task AddUpdateConsultant(ConsultantDTO consultant);
         Task RemoveConsultant(int id);
         Task DeleteCompany(int companyId);
+        Task<List<DocumentTypes>> GetAllDocumentTypes();
+        Task<DocumentTypes> GetDocumentTypeById(int id);
+        Task AddUpdateDocumentType(DocumentTypes documentType);
+        Task DeleteDocumentType(int documentTypeId);
+        Task<List<BusinessStatus>> GetAllBusinessStatus();
+        Task<BusinessStatus> GetBusinessStatusById(int id);
+        Task AddUpdateBusinessStatus(BusinessStatus businessStatus);
+        Task DeleteBusinessStatus(int businessStatusId);
+        Task<List<BusinessTypes>> GetAllBusinessType();
+        Task<BusinessTypes> GetBusinessTypeById(int id);
+        Task AddUpdateBusinessTypes(BusinessTypes businessTypes);
+        Task DeleteBusinessTypes(int businessTypesId);
     }
 }

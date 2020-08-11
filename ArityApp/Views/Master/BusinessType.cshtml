@@ -1,0 +1,215 @@
+﻿@using Arity.Data.Helpers;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Business Type";
+
+}
+
+<div class="breadcomb-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="breadcomb-list">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="breadcomb-wp">
+                                <div class="breadcomb-icon">
+                                    <i class="notika-icon notika-form"></i>
+                                </div>
+                                <div class="breadcomb-ctn">
+                                    <h2>Business Type</h2>
+                                    <p>List of types</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+                            <div class="breadcomb-report">
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                                {
+                                    <button onclick="AddEditBusinessType(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Table area Start-->
+<div class="data-table-area" style="margin-top:25px;height:100%">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="data-table-list">
+                    <div class="basic-tb-hd">
+                        <h2>Business Type List</h2>
+                        <p>Below are List of Business Type.</p>
+                    </div>
+                    <div class="date-filter">
+                    </div>
+                    <div class="table-responsive">
+                        <table id="tblBusinessType" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width:80%;">Name</th>
+                                    <th style="width:14%;">Status</th>
+                                    <th style="width:3%;"></th>
+                                    <th style="width:3%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal animated fade" id="modalBusinessType" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-large">
+            <div class="modal-content">
+                <div class="modal-header" style="margin-bottom:35px;">
+                    <h3>Add/Update Business Type</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+            $("#liMaster").addClass("active");
+            $("#Master").addClass("active");
+            $("#liHome").removeClass("active");
+        table =  $('#tblBusinessType').DataTable({
+            "ajax": function (data, callback, settings) {
+                $.ajax({
+                    url: '@Url.Action("LoadBusinessType","Master")',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                    },
+                    beforeSend: function (xhrObj) {
+                        $("#loading").show();
+                    }
+                    })
+                    .done(function (data, textStatus, jqXHR) {
+                        callback(data);
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        Notification('Error! ', ''+errorThrown+'', 'danger');
+                    })
+                    .always(function (data, textStatus, jqXHR) {
+                        $("#loading").hide();
+                    });
+            },
+            "language": {
+                "emptyTable": "No business type found"
+            },
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    title: 'Excel',
+                    text: 'Export to excel'
+                }
+            ],
+           "columns": [
+                { "data": "Name" },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                        if(data.IsActive)
+                            return '<i class="notika-icon notika-checked" aria-hidden="true"></i>';
+                        else
+                            return '<i class="notika-icon notika-close" aria-hidden="true"></i>';
+                    }
+                },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                            return '<button class="btn waves-effect" onclick="AddEditBusinessType(' + data.BusinessTypeId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                    }
+                },
+                {
+                    "orderable": false,
+                    "data": null,
+                   "render": function (data, type, full) {
+                           return '<div class="dialog-pro dialog">' +
+                               '<button class="btn btn-info" onclick="DeleteBusinessType(' + data.BusinessTypeId + ')" id="sa-warning">' +
+                               '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                               '</button> </div>';
+                    }
+                }
+            ],
+            "order": []
+        });
+
+         $("#btnFilterGrid").click(function () {
+                 table.ajax.reload();
+        });
+    });
+
+      function AddEditBusinessType(Id) {
+          $("#loading").show();
+            $.ajax({
+                url: '@Url.Action("AddBusinessType","Master")',
+                data: { id: Id},
+                type: 'GET',
+                dataType: 'Html',
+                success: function (response) {
+                    $('#modalBusinessType .modal-body').html(response);
+                    $('#modalBusinessType').modal('show');
+                     $("#loading").hide();
+                },
+                failure: function () {
+                     $("#loading").hide();
+                        Notification('', 'Something went wrong, Please try again', 'danger');
+                },
+            });
+        }
+
+        function DeleteBusinessType(id) {
+            swal({
+			title: "Are you sure?",
+			text: "You will not be able to recover this business type",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonText: "Delete",
+            }).then(function () {
+                $("#loading").show();
+                $.ajax({
+                    url: '@Url.Action("DeleteBusinessTypes", "Master")',
+                    type: "POST",
+                    data: { businessTypesId: id },
+                    cache: false,
+                    success: function (response) {
+                        table.ajax.reload();
+                        $("#loading").hide();
+			            swal("Deleted!", "Business type has been deleted.", "success");
+                    },
+                    error: function (error) {
+                        $("#loading").hide();
+                        Notification('', 'Internal error occured, Please try again', 'danger');
+                    }
+                });
+		});
+        }
+    </script>
+}
+
+

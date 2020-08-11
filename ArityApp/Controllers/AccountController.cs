@@ -49,6 +49,7 @@ namespace ArityApp.Controllers
                     FormsAuthentication.SetAuthCookie(validUser.Username, false);
                     SessionHelper.UserId = validUser.Id;
                     SessionHelper.UserTypeId = validUser.UserTypeId;
+                    SessionHelper.UserName = validUser.Username;
 
                     // Logging user details
                     Task.Run(() =>

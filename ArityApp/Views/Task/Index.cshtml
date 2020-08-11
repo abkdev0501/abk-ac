@@ -115,7 +115,8 @@
                                     <th style="width:10%;">Status</th>
                                     <th style="width:10%;">User comment</th>
                                     <th style="width:5%;">Chargeable</th>
-                                    <th style="width:5%;">Created On</th>
+                                    <th style="width:2%;">Priority</th>
+                                    <th style="width:2%;">Created On</th>
                                     <th style="width:5%;">Created By</th>
                                     @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                                     {
@@ -125,6 +126,26 @@
                                 </tr>
                             </thead>
                             <tbody></tbody>
+                            <tfoot>
+                                <tr>
+                                    <th style="width:12%;">Title</th>
+                                    <th style="width:12%;">Assign To</th>
+                                    <th style="width:8%;">client</th>
+                                    <th style="width:8%;">Description</th>
+                                    <th style="width:5%;">DueDate</th>
+                                    <th style="width:10%;">Status</th>
+                                    <th style="width:10%;">User comment</th>
+                                    <th style="width:5%;">Chargeable</th>
+                                    <th style="width:2%;">Priority</th>
+                                    <th style="width:2%;">Created On</th>
+                                    <th style="width:5%;">Created By</th>
+                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                    {
+                                        <th style="width:5%;display:none;"></th>
+                                        <th style="width:5%;display:none;"></th>
+                                    }
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -137,7 +158,11 @@
     <script>
         $(document).ready(function () {
             $("#liHome").removeClass("active");
-        $("#liTask").addClass("active");
+            $("#liTask").addClass("active");
+            $('#tblUsers tfoot th').each( function () {
+                    var title = $(this).text();
+                    $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+            });
        table =  $('#tblUsers').DataTable({
             "ajax": function (data, callback, settings) {
                 $.ajax({
@@ -165,14 +190,15 @@
             "language": {
                 "emptyTable": "No tasks found"
            },
-            dom: 'Bfrtip',
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        title: 'Excel',
-                        text:'Export to excel'
-                    }
-                ],
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    title: 'Excel',
+                    text: 'Export to excel'
+                }
+            ],
            "columns": [
                 { "data": "TaskName" },
                 { "data": "UserName" },
@@ -212,6 +238,7 @@
                         }
                     }
                 },
+                { "data": "PriorityString" },
                 { "data": "CreatedOnString" },
                { "data": "CreatedByString" }
                  @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
@@ -241,12 +268,26 @@
 
                  }
            ],
-            "order": []
+           "order": [],
+            initComplete: function () {
+                // Apply the search
+                this.api().columns().every( function () {
+                    var that = this;
+ 
+                    $('input', this.footer()).on('keyup change clear', function () {
+                        if ( that.search() !== this.value ) {
+                            that
+                                .search( this.value )
+                                .draw();
+                        }
+                        });
+                });
+            }
        });
 
          $("#btnFilterGrid").click(function () {
-    table.ajax.reload();
-});
+            table.ajax.reload();
+        });
        });
 
 
@@ -256,7 +297,8 @@
 
         <script>
         function AddUpdateTask(id) {
-              $("#loading").show();
+            $("#loading").show();
+
             $.ajax({
                 url: '@Url.Action("AddUpdateTask", "Task")',
                 dataType: "html",
@@ -267,6 +309,7 @@
                 success: function (response) {
                     $("#loading").hide();
                     $("#modelTask .modal-body").html(response);
+                    $("body .summernote").summernote();
                     $("#modelTask").modal('toggle');
                 },
                 error: function (error) {

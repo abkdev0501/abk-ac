@@ -45,7 +45,7 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 ">
                     <div class="nk-int-st">
-                        @Html.EnumDropDownListFor(_ => _.DocumentType, "-- Select DocumentType--", new { @class = "form-control", @required = "required" })
+                        @Html.DropDownListFor(_ => _.DocumentType, ViewBag.DocumentType as SelectList, "-- Select DocumentType--", new { @class = "form-control", @required = "required" })
                     </div>
                 </div>
             </div>
@@ -121,4 +121,8 @@
         <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
     </div>
 
+    if (Model != null)
+    {
+        <script>$("#DocumentType").val(@Model.DocumentType).trigger("chosen:updated");</script>
+    }
 }

@@ -30,5 +30,8 @@ namespace Arity.Data
         public virtual DbSet<GroupMaster> GroupMasters { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<CommodityMaster> CommodityMasters { get; set; }
+        public virtual DbSet<DocumentTypes> DocumentTypes { get; set; }
+        public virtual DbSet<BusinessTypes> BusinessTypes { get; set; }
+        public virtual DbSet<BusinessStatus> BusinessStatus { get; set; }
     }
 }

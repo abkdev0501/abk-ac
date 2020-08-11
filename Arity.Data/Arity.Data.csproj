@@ -63,6 +63,7 @@
     <Compile Include="Dto\ConsultontDTO.cs" />
     <Compile Include="Dto\GodownDetail.cs" />
     <Compile Include="Dto\GroupMasterDTO.cs" />
+    <Compile Include="Dto\ImportInvoices.cs" />
     <Compile Include="Dto\InvoiceEntry.cs" />
     <Compile Include="Dto\InvoiceParticularDto.cs" />
     <Compile Include="Dto\ParticularDto.cs" />
@@ -74,12 +75,15 @@
     <Compile Include="Dto\UserDTO.cs" />
     <Compile Include="Dto\NotificationDTO.cs" />
     <Compile Include="Dto\UsersDto.cs" />
+    <Compile Include="Entity\BusinessStatus.cs" />
+    <Compile Include="Entity\BusinessTypes.cs" />
     <Compile Include="Entity\Client_Particular_Mapping.cs" />
     <Compile Include="Entity\CommodityMaster.cs" />
     <Compile Include="Entity\Company_Client_Mapping.cs" />
     <Compile Include="Entity\Company_master.cs" />
     <Compile Include="Entity\Consultants.cs" />
     <Compile Include="Entity\DocumentMaster.cs" />
+    <Compile Include="Entity\DocumentTypes.cs" />
     <Compile Include="Entity\GroupMaster.cs" />
     <Compile Include="Entity\InvoiceDetail.cs" />
     <Compile Include="Entity\InvoiceParticular.cs" />
@@ -105,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Entity\script\RMN.bak" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

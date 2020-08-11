@@ -1,0 +1,215 @@
+﻿@using Arity.Data.Helpers;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Business Status";
+
+}
+
+<div class="breadcomb-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="breadcomb-list">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="breadcomb-wp">
+                                <div class="breadcomb-icon">
+                                    <i class="notika-icon notika-form"></i>
+                                </div>
+                                <div class="breadcomb-ctn">
+                                    <h2>Business Status</h2>
+                                    <p>List of status</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+                            <div class="breadcomb-report">
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                                {
+                                    <button onclick="AddEditBusinessStatus(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Table area Start-->
+<div class="data-table-area" style="margin-top:25px;height:100%">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="data-table-list">
+                    <div class="basic-tb-hd">
+                        <h2>Business Status List</h2>
+                        <p>Below are List of Business Status.</p>
+                    </div>
+                    <div class="date-filter">
+                    </div>
+                    <div class="table-responsive">
+                        <table id="tblBusinessStatus" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width:80%;">Name</th>
+                                    <th style="width:14%;">Status</th>
+                                    <th style="width:3%;"></th>
+                                    <th style="width:3%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal animated fade" id="modalBusinessStatus" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-large">
+            <div class="modal-content">
+                <div class="modal-header" style="margin-bottom:35px;">
+                    <h3>Add/Update Business Status</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+            $("#liMaster").addClass("active");
+            $("#Master").addClass("active");
+            $("#liHome").removeClass("active");
+        table =  $('#tblBusinessStatus').DataTable({
+            "ajax": function (data, callback, settings) {
+                $.ajax({
+                    url: '@Url.Action("LoadBusinessStatus","Master")',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                    },
+                    beforeSend: function (xhrObj) {
+                        $("#loading").show();
+                    }
+                    })
+                    .done(function (data, textStatus, jqXHR) {
+                        callback(data);
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        Notification('Error! ', ''+errorThrown+'', 'danger');
+                    })
+                    .always(function (data, textStatus, jqXHR) {
+                        $("#loading").hide();
+                    });
+            },
+            "language": {
+                "emptyTable": "No business status found"
+            },
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    title: 'Excel',
+                    text: 'Export to excel'
+                }
+            ],
+           "columns": [
+                { "data": "Name" },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                        if(data.IsActive)
+                            return '<i class="notika-icon notika-checked" aria-hidden="true"></i>';
+                        else
+                            return '<i class="notika-icon notika-close" aria-hidden="true"></i>';
+                    }
+                },
+                {
+                    "orderable": false,
+                    "data": null,
+                    "render": function (data, type, full) {
+                            return '<button class="btn waves-effect" onclick="AddEditBusinessStatus(' + data.BusinessStatusId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                    }
+                },
+                {
+                    "orderable": false,
+                    "data": null,
+                   "render": function (data, type, full) {
+                           return '<div class="dialog-pro dialog">' +
+                               '<button class="btn btn-info" onclick="DeleteBusinessStatus(' + data.BusinessStatusId + ')" id="sa-warning">' +
+                               '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                               '</button> </div>';
+                    }
+                }
+            ],
+            "order": []
+        });
+
+         $("#btnFilterGrid").click(function () {
+                 table.ajax.reload();
+        });
+    });
+
+      function AddEditBusinessStatus(Id) {
+          $("#loading").show();
+            $.ajax({
+                url: '@Url.Action("AddBusinessStatus","Master")',
+                data: { id: Id},
+                type: 'GET',
+                dataType: 'Html',
+                success: function (response) {
+                    $('#modalBusinessStatus .modal-body').html(response);
+                    $('#modalBusinessStatus').modal('show');
+                     $("#loading").hide();
+                },
+                failure: function () {
+                     $("#loading").hide();
+                        Notification('', 'Something went wrong, Please try again', 'danger');
+                },
+            });
+        }
+
+        function DeleteBusinessStatus(id) {
+            swal({
+			title: "Are you sure?",
+			text: "You will not be able to recover this business status",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonText: "Delete",
+            }).then(function () {
+                $("#loading").show();
+                $.ajax({
+                    url: '@Url.Action("DeleteBusinessStatus", "Master")',
+                    type: "POST",
+                    data: { businessStatusId: id },
+                    cache: false,
+                    success: function (response) {
+                        table.ajax.reload();
+                        $("#loading").hide();
+			            swal("Deleted!", "Business status has been deleted.", "success");
+                    },
+                    error: function (error) {
+                        $("#loading").hide();
+                        Notification('', 'Internal error occured, Please try again', 'danger');
+                    }
+                });
+		});
+        }
+    </script>
+}
+
+

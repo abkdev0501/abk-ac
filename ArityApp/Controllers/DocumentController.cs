@@ -13,10 +13,13 @@ namespace ArityApp.Controllers
     public class DocumentController : Controller
     {
         private readonly IDocumentService _documentService;
+        private readonly IMasterService _masterService;
 
-        public DocumentController(IDocumentService documentService)
+        public DocumentController(IDocumentService documentService,
+            IMasterService masterService)
         {
             _documentService = documentService;
+            _masterService = masterService;
         }
 
         // GET: Document
@@ -35,11 +38,12 @@ namespace ArityApp.Controllers
             var documentDetail = new DocumentMasterDto();
             try
             {
-                ViewBag.Client = new SelectList(await _documentService.GetClient(), "Id", "FullName");
                 if (documentID > 0)
                 {
                     documentDetail = await _documentService.GetDocumentByID(documentID);
                 }
+                ViewBag.Client = new SelectList(await _documentService.GetClient(), "Id", "FullName");
+                ViewBag.DocumentType = new SelectList(await _masterService.GetAllDocumentTypes(), "DocumnetTypeId", "Name", documentDetail?.DocumentType);
             }
             catch
             {

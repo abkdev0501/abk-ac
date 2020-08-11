@@ -35,5 +35,6 @@ namespace Arity.Data.Dto
         public string ClientName { get; set; }
         public string CreatedByString { get; set; }
         public decimal? ChargeAmount { get; set; }
+        public string PriorityString { get; set; }
     }
 }

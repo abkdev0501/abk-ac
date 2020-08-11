@@ -174,11 +174,11 @@ namespace Arity.Service
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        public async Task<List<UsersDto>> GetAllClient(DateTime fromDate, DateTime toDate)
+        public async Task<List<UsersDto>> GetAllClient()
         {
             return (from user in _dbContext.Users
                     join type in _dbContext.UserTypes on user.UserTypeId equals type.Id
-                    where user.CreatedDate >= fromDate && user.CreatedDate <= toDate && user.UserTypeId == (int)Arity.Service.Core.UserType.User
+                    where user.UserTypeId == (int)Core.UserType.User
                     select new UsersDto
                     {
                         Id = user.Id,
@@ -198,40 +198,12 @@ namespace Arity.Service
         }
 
         /// <summary>
-        /// Get all clients
-        /// </summary>
-        /// <returns></returns>
-        public async Task<List<UsersDto>> GetAllClient()
-        {
-            return (from user in _dbContext.Users
-                    join type in _dbContext.UserTypes on user.UserTypeId equals type.Id
-                    where user.UserTypeId == (int)Arity.Service.Core.UserType.User
-                    select new UsersDto
-                    {
-                        Id = user.Id,
-                        Address = user.Address,
-                        City = user.City,
-                        Pincode = user.Pincode,
-                        FullName = user.FullName,
-                        PhoneNumber = user.PhoneNumber,
-                        Username = user.Username,
-                        UserType = type.UserTypeName,
-                        Email = user.Email,
-                        Active = user.Active,
-                        UserTypeId = user.UserTypeId,
-                        CreatedBy = user.CreatedBy
-                    }).ToList();
-        }
-
-        /// <summary>
         /// Get client by Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public async Task<UsersDto> GetClientById(int id)
         {
-            var jc = JsonConvert.DeserializeObject("");
-
             return (from client in _dbContext.Users.ToList()
                     where client.Id == id
                     select new UsersDto
@@ -684,6 +656,170 @@ namespace Arity.Service
             _dbContext.Consultant.Remove(_dbContext.Consultant.FirstOrDefault(_ => _.ConsultantId == id));
             await _dbContext.SaveChangesAsync();
         }
+
+        #region Document type
+        /// <summary>
+        /// Get list of document type
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<DocumentTypes>> GetAllDocumentTypes()
+        {
+            return await _dbContext.DocumentTypes.ToListAsync();
+        }
+
+        /// <summary>
+        /// Get document type by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<DocumentTypes> GetDocumentTypeById(int id)
+        {
+            return await _dbContext.DocumentTypes.FirstOrDefaultAsync(_ => _.DocumnetTypeId == id);
+        }
+
+        /// <summary>
+        /// Add update document type
+        /// </summary>
+        /// <param name="documentType"></param>
+        /// <returns></returns>
+        public async Task AddUpdateDocumentType(DocumentTypes documentType)
+        {
+            if (documentType.DocumnetTypeId > 0)
+            {
+                var existingDocumentType = await _dbContext.DocumentTypes.FirstOrDefaultAsync(_ => _.DocumnetTypeId == documentType.DocumnetTypeId);
+                existingDocumentType.Name = documentType.Name;
+                existingDocumentType.IsActive = documentType.IsActive;
+            }
+            else
+            {
+                var existingDocumentType = await _dbContext.DocumentTypes.FirstOrDefaultAsync(_ => _.Name == documentType.Name);
+                if (existingDocumentType == null)
+                    _dbContext.DocumentTypes.Add(documentType);
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Delete document type by id
+        /// </summary>
+        /// <param name="documentTypeId"></param>
+        /// <returns></returns>
+        public async Task DeleteDocumentType(int documentTypeId)
+        {
+            _dbContext.DocumentTypes.Remove(await _dbContext.DocumentTypes.FirstOrDefaultAsync(_ => _.DocumnetTypeId == documentTypeId));
+            await _dbContext.SaveChangesAsync();
+        }
+        #endregion
+
+        #region Business status
+        /// <summary>
+        /// Get list of business status
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<BusinessStatus>> GetAllBusinessStatus()
+        {
+            return await _dbContext.BusinessStatus.ToListAsync();
+        }
+
+        /// <summary>
+        /// Get business status by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<BusinessStatus> GetBusinessStatusById(int id)
+        {
+            return await _dbContext.BusinessStatus.FirstOrDefaultAsync(_ => _.BusinessStatusId == id);
+        }
+
+        /// <summary>
+        /// Add update business status
+        /// </summary>
+        /// <param name="documentType"></param>
+        /// <returns></returns>
+        public async Task AddUpdateBusinessStatus(BusinessStatus businessStatus)
+        {
+            if (businessStatus.BusinessStatusId > 0)
+            {
+                var existingBusinessStatus = await _dbContext.BusinessStatus.FirstOrDefaultAsync(_ => _.BusinessStatusId == businessStatus.BusinessStatusId);
+                existingBusinessStatus.Name = businessStatus.Name;
+                existingBusinessStatus.IsActive = businessStatus.IsActive;
+            }
+            else
+            {
+                var existingBusinessStatus = await _dbContext.BusinessStatus.FirstOrDefaultAsync(_ => _.Name == businessStatus.Name);
+                if (existingBusinessStatus == null)
+                    _dbContext.BusinessStatus.Add(businessStatus);
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Delete business status by id
+        /// </summary>
+        /// <param name="documentTypeId"></param>
+        /// <returns></returns>
+        public async Task DeleteBusinessStatus(int businessStatusId)
+        {
+            _dbContext.BusinessStatus.Remove(await _dbContext.BusinessStatus.FirstOrDefaultAsync(_ => _.BusinessStatusId == businessStatusId));
+            await _dbContext.SaveChangesAsync();
+        }
+        #endregion
+
+        #region Business Types
+        /// <summary>
+        /// Get list of business types
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<BusinessTypes>> GetAllBusinessType()
+        {
+            return await _dbContext.BusinessTypes.ToListAsync();
+        }
+
+        /// <summary>
+        /// Get business types by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<BusinessTypes> GetBusinessTypeById(int id)
+        {
+            return await _dbContext.BusinessTypes.FirstOrDefaultAsync(_ => _.BusinessTypeId == id);
+        }
+
+        /// <summary>
+        /// Add update business types
+        /// </summary>
+        /// <param name="documentType"></param>
+        /// <returns></returns>
+        public async Task AddUpdateBusinessTypes(BusinessTypes businessTypes)
+        {
+            if (businessTypes.BusinessTypeId > 0)
+            {
+                var existingBusinessTypes = await _dbContext.BusinessTypes.FirstOrDefaultAsync(_ => _.BusinessTypeId == businessTypes.BusinessTypeId);
+                existingBusinessTypes.Name = businessTypes.Name;
+                existingBusinessTypes.IsActive = businessTypes.IsActive;
+            }
+            else
+            {
+                var existingBusinessTypes = await _dbContext.BusinessTypes.FirstOrDefaultAsync(_ => _.Name == businessTypes.Name);
+                if (existingBusinessTypes == null)
+                    _dbContext.BusinessTypes.Add(businessTypes);
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Delete business types by id
+        /// </summary>
+        /// <param name="businessTypesId"></param>
+        /// <returns></returns>
+        public async Task DeleteBusinessTypes(int businessTypesId)
+        {
+            _dbContext.BusinessTypes.Remove(await _dbContext.BusinessTypes.FirstOrDefaultAsync(_ => _.BusinessTypeId == businessTypesId));
+            await _dbContext.SaveChangesAsync();
+        }
+        #endregion
     }
 }
 

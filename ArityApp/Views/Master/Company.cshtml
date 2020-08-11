@@ -64,6 +64,17 @@
                                 </tr>
                             </thead>
                             <tbody></tbody>
+                            <tfoot>
+                                <tr>
+                                    <th style="width:30%;">Name</th>
+                                    <th style="width:30%;">Address</th>
+                                    <th style="width:15%;">Head</th>
+                                    <th style="width:10%;">Prefix</th>
+                                    <th style="width:10%;display:none;">Status</th>
+                                    <th style="width:5%;display:none;"></th>
+                                    <th style="width:5%;display:none;"></th>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -95,6 +106,10 @@
             $("#liMaster").addClass("active");
             $("#Master").addClass("active");
             $("#liHome").removeClass("active");
+            $('#tblCompany tfoot th').each( function () {
+                    var title = $(this).text();
+                    $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+            });
         table =  $('#tblCompany').DataTable({
             "ajax": function (data, callback, settings) {
                 $.ajax({
@@ -120,14 +135,15 @@
             "language": {
                 "emptyTable": "No company found"
             },
-            dom: 'Bfrtip',
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        title: 'Excel',
-                        text:'Export to excel'
-                    }
-                ],
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    title: 'Excel',
+                    text: 'Export to excel'
+                }
+            ],
            "columns": [
                 { "data": "CompanyName" },
                 { "data": "Address" },
@@ -167,7 +183,21 @@
                     }
                 }
             ],
-            "order": [[0, "asc"]]
+            "order": [[0, "asc"]],
+            initComplete: function () {
+                // Apply the search
+                this.api().columns().every( function () {
+                    var that = this;
+ 
+                    $('input', this.footer()).on('keyup change clear', function () {
+                        if ( that.search() !== this.value ) {
+                            that
+                                .search( this.value )
+                                .draw();
+                        }
+                        });
+                });
+            }
         });
 
          $("#btnFilterGrid").click(function () {

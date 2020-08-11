@@ -13,7 +13,7 @@ namespace Arity.Data.Dto
         public int DocumentId { get; set; }
         public string Name { get; set; }
         public int ClientId { get; set; }
-        public DocumentType DocumentType { get; set; }
+        public int DocumentType { get; set; }
         public string DocumentTypeName { get; set; }
         public DocumentStatus Status { get; set; }
         public string StatusName { get; set; }

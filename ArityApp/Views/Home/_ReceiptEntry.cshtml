@@ -22,7 +22,7 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(Model.ReceiptId>0?"onlyviewmode":"")">
                     <div class="nk-int-st">
-                        @Html.DropDownListFor(_ => _.CompanyId, ViewBag.company as SelectList, "-- Select Company--", new { @class = "form-control input-sm ", @required = "required" })
+                        @Html.DropDownListFor(_ => _.CompanyId, ViewBag.company as SelectList, "-- Select Company--", new { @class = "form-control input-sm bk-choosen", @required = "required" })
                     </div>
                 </div>
             </div>
@@ -37,7 +37,7 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12  @(Model.ReceiptId>0?"onlyviewmode":"")">
                     <div class="nk-int-st">
-                        @Html.DropDownListFor(_ => _.ClientId, ViewBag.client as SelectList, "-- Select Client--", new { @class = "form-control input-sm", @required = "required" })
+                        @Html.DropDownListFor(_ => _.ClientId, ViewBag.client as SelectList, "-- Select Client--", new { @class = "form-control input-sm bk-choosen", @required = "required" })
                     </div>
                 </div>
             </div>
@@ -180,19 +180,20 @@
 }
 else if (Model != null && Model.ReceiptId > 0 && Model.InvoiceIds != null)
 {
-    <script> $("#IsWithoutInvoice").prop("checked",true); $("#TotalAmount").removeAttr("disabled");</script>
+    <script>$("#IsWithoutInvoice").prop("checked", true); $("#TotalAmount").removeAttr("disabled");</script>
 }
 <script>
     var actualTotal;
         $("#InvoiceIds").chosen();
-            $('.bk-date').datepicker({
-                    todayBtn: "linked",
-                    keyboardNavigation: false,
-                    forceParse: false,
-                    calendarWeeks: true,
-                    autoclose: true,
-                    format: "dd/mm/yyyy"
-                });
+        $(".bk-choosen").chosen();
+        $('.bk-date').datepicker({
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true,
+                format: "dd/mm/yyyy"
+        });
 
     $("#IsWithoutInvoice").change(function(){
         if ($(this).is(":checked")) {
@@ -283,10 +284,11 @@ else if (Model != null && Model.ReceiptId > 0 && Model.InvoiceIds != null)
             cache: false,
             contentType: 'application/json; charset=utf-8',
             success: function (response) {
-                $("#ClientId").html("<option value>-- Select client --</option>");
+                $("#ClientId").html("<option value>-- Select Client --</option>");
                 $.each(response, function (i, client) {
                     $("#ClientId").append($("<option />").val(client.Id).text(client.FullName));
                 });
+                $(".bk-choosen").trigger("chosen:updated");
             },
             error: function () {
 
@@ -326,7 +328,6 @@ else if (Model != null && Model.ReceiptId > 0 && Model.InvoiceIds != null)
             contentType: 'application/json; charset=utf-8',
             data: {"invoices":$("#InvoiceIds").val()},
             success: function (response) {
-                console.log(response)
                 actualTotal = response
                 finalAmount();
             },
@@ -335,8 +336,7 @@ else if (Model != null && Model.ReceiptId > 0 && Model.InvoiceIds != null)
     });
 
     function finalAmount() {
-        var total = parseFloat(actualTotal) - Number($("#Discount").val())
-        console.log(total);
+        var total = ($("#IsWithoutInvoice").is(":checked") ?parseFloat($("#TotalAmount").val()) :parseFloat(actualTotal)) - Number($("#Discount").val())
         $("#TotalAmount").val(total);
     }
 </script>

@@ -156,7 +156,8 @@ namespace Arity.Service
                             CreatedByString = createdby.FullName,
                             Year = _dbContext.InvoiceParticulars.Where(_ => _.InvoiceId == invoice.Id)?.FirstOrDefault()?.year ?? string.Empty,
                             GroupName = (user.GroupId ?? 0) > 0 ? _dbContext.GroupMasters.FirstOrDefault(_ => _.GroupId == user.GroupId).Name : string.Empty,
-                            AddedBy = Convert.ToInt32(createdby.UserTypeId)
+                            AddedBy = Convert.ToInt32(createdby.UserTypeId),
+                            Remarks = invoice.Remarks
                         }).ToList();
             else if (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.MasterAdmin)
 
@@ -180,7 +181,8 @@ namespace Arity.Service
                             CreatedByString = createdby.FullName,
                             Year = _dbContext.InvoiceParticulars.Where(_ => _.InvoiceId == invoice.Id)?.FirstOrDefault()?.year ?? string.Empty,
                             GroupName = (user.GroupId ?? 0) > 0 ? _dbContext.GroupMasters.FirstOrDefault(_ => _.GroupId == user.GroupId).Name : string.Empty,
-                            AddedBy = Convert.ToInt32(createdby.UserTypeId)
+                            AddedBy = Convert.ToInt32(createdby.UserTypeId),
+                            Remarks = invoice.Remarks
                         }).ToList();
 
             else
@@ -205,7 +207,8 @@ namespace Arity.Service
                             CreatedByString = createdby.FullName,
                             Year = _dbContext.InvoiceParticulars.Where(_ => _.InvoiceId == invoice.Id)?.FirstOrDefault()?.year ?? string.Empty,
                             GroupName = (user.GroupId ?? 0) > 0 ? _dbContext.GroupMasters.FirstOrDefault(_ => _.GroupId == user.GroupId).Name : string.Empty,
-                            AddedBy = Convert.ToInt32(createdby.UserTypeId)
+                            AddedBy = Convert.ToInt32(createdby.UserTypeId),
+                            Remarks = invoice.Remarks
                         }).ToList();
         }
 
@@ -268,7 +271,9 @@ namespace Arity.Service
                           select new InvoiceEntry()
                           {
                               InvoiceId = invoice.Id,
-                              InvoiceNumber = invoice.Invoice_Number
+                              InvoiceNumber = invoice.Invoice_Number,
+                              CompanyId = invoice.CompanyId,
+                              ClientId = invoice.ClientId
                           }).ToListAsync();
         }
 
@@ -322,19 +327,61 @@ namespace Arity.Service
 
 
         #region Private Method
+        /// <summary>
+        /// Generate generic invoice number based on invoice date
+        /// It will adjust invoice number in between dates and current year
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="invoiceDate"></param>
+        /// <returns></returns>
         private string GenerateInvoiceNumber(int companyId, DateTime invoiceDate)
         {
-
+            string genericNumber = "";
+            int invoiceNum = 0;
             var yearStartAt = Convert.ToDateTime(ConfigurationManager.AppSettings["YearStart"].Replace("XXXX", (invoiceDate.Month >= 4 ? invoiceDate.Year : (invoiceDate.Year - 1)).ToString()));
             var yearEndedAt = Convert.ToDateTime(ConfigurationManager.AppSettings["YearEnd"].Replace("XXXX", (invoiceDate.Month > 3 ? (invoiceDate.Year + 1) : invoiceDate.Year).ToString()));
 
-            var genericNumber = (from invoice in _dbContext.InvoiceDetails
+            var invoices = (from invoice in _dbContext.InvoiceDetails
+                            join particular in _dbContext.InvoiceParticulars on invoice.Id equals particular.InvoiceId
+                            where invoice.CompanyId == companyId
+                            && invoice.InvoiceDate >= yearStartAt
+                            && invoice.InvoiceDate <= yearEndedAt
+                            && invoice.InvoiceDate >= invoiceDate
+                            select invoice)
+                            .OrderBy(_ => _.InvoiceDate)
+                            .ToList();
+
+            if (invoices != null && (invoices?.Any() ?? false))
+            {
+                var sameDateInvoice = invoices.Where(_ => _.InvoiceDate == invoiceDate).ToList();
+                if (sameDateInvoice != null && sameDateInvoice.Any())
+                {
+                    genericNumber = sameDateInvoice.OrderByDescending(_ => _.Id).Select(_ => _.Invoice_Number).FirstOrDefault();
+                    genericNumber = (Convert.ToInt32(genericNumber) + 1).ToString();
+                }
+                else
+                    genericNumber = invoices.OrderBy(_ => _.InvoiceDate).Select(_ => _.Invoice_Number).FirstOrDefault();
+                genericNumber = (Convert.ToInt32(genericNumber) - 1).ToString();
+                invoiceNum = Convert.ToInt32(genericNumber) + 1;
+                invoices.Where(_ => _.InvoiceDate > invoiceDate).ToList().ForEach(_ =>
+                  {
+                      invoiceNum++;
+                      _.Invoice_Number = invoiceNum.ToString();
+                  });
+            }
+            else
+            {
+                genericNumber = (from invoice in _dbContext.InvoiceDetails
                                  join particular in _dbContext.InvoiceParticulars on invoice.Id equals particular.InvoiceId
-                                 where invoice.CompanyId == companyId && invoice.InvoiceDate >= yearStartAt && invoice.InvoiceDate <= yearEndedAt
+                                 where invoice.CompanyId == companyId
+                                 && invoice.InvoiceDate >= yearStartAt
+                                 && invoice.InvoiceDate <= yearEndedAt
                                  select invoice)
-                                 .OrderByDescending(_ => _.Id)
+                                 .OrderByDescending(_ => _.InvoiceDate)
                                  .Select(_ => _.Invoice_Number)
                                  .FirstOrDefault();
+            }
+
             if (!string.IsNullOrEmpty(genericNumber))
             {
                 genericNumber = (Convert.ToInt32(genericNumber) + 1).ToString();
@@ -457,6 +504,16 @@ namespace Arity.Service
             {
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Get company id by client
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <returns></returns>
+        public async Task<int> GetCompanyByClientId(int clientId)
+        {
+            return await _dbContext.Company_Client_Mapping.Where(_ => _.UserId == clientId).Select(_ => (_.CompanyId ?? 0)).FirstAsync();
         }
 
         #endregion

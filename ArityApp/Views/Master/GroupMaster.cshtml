@@ -24,7 +24,7 @@
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
                             <div class="breadcomb-report">
-                                @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
                                 {
                                     <button onclick="AddEditGroup(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
                                 }
@@ -118,14 +118,15 @@
             "language": {
                 "emptyTable": "No group found"
             },
-            dom: 'Bfrtip',
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        title: 'Excel',
-                        text:'Export to excel'
-                    }
-                ],
+           "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    title: 'Excel',
+                    text: 'Export to excel'
+                }
+            ],
            "columns": [
                 { "data": "Name" },
                 { "data": "Description" },
@@ -134,24 +135,37 @@
                     "orderable": false,
                     "data": null,
                     "render": function (data, type, full) {
-                            return '<button class="btn waves-effect" onclick="AddEditGroup(' + data.GroupId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                         @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                         {
+                                @: return '<button class="btn waves-effect" onclick="AddEditGroup(' + data.GroupId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+                             }
+                         else
+                         {
+                             @: return '';
+                         }
                     }
                },
                {
                     "orderable": false,
                     "data": null,
                    "render": function (data, type, full) {
-
-                       if (!data.IsAsociatedWithClient) {
-                           return '<div class="dialog-pro dialog">' +
-                               '<button class="btn btn-info" onclick="DeleteGroup(' + data.GroupId + ')" id="sa-warning">' +
-                               '<i class="fa fa-trash" aria-hidden="true"></i>' +
-                               '</button> </div>';
-                       }
-                       else {
-                           return '';
-                       }
-                    }
+                        @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                        {
+                            @:if (!data.IsAsociatedWithClient) {
+                            @:    return '<div class="dialog-pro dialog">' +
+                            @:        '<button class="btn btn-info" onclick="DeleteGroup(' + data.GroupId + ')" id="sa-warning">' +
+                            @:        '<i class="fa fa-trash" aria-hidden="true"></i>' +
+                            @:        '</button> </div>';
+                            @:}
+                            @:else {
+                            @:    return '';
+                            @:}
+                        }
+                        else
+                        {
+                            @: return '';
+                        }
+                   }
                 }
             ],
             "order": [[0, "asc"]]

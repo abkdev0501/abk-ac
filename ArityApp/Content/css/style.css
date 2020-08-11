@@ -3142,7 +3142,7 @@ hr {
 }
 
 .table.table-bordered > tbody > tr > td, .table.table-bordered > tbody > tr > th, .table.table-bordered > tfoot > tr > td, .table.table-bordered > tfoot > tr > th, .table.table-bordered > thead > tr > td, .table.table-bordered > thead > tr > th {
-    border: 1px solid #F5F5F5;
+    border: 1px solid #000;
     font-size: 14px;
     color: #333;
     padding: 15px;
@@ -3159,12 +3159,23 @@ hr {
     padding: 15px;
 }
 
-.table.table-hover > tbody > tr > td, .table.table-hover > tbody > tr > th, .table.table-hover > tfoot > tr > td, .table.table-hover > tfoot > tr > th, .table.table-hover > thead > tr > td, .table.table-hover > thead > tr > th {
-    border-top: 1px solid #F5F5F5;
-    font-size: 14px;
-    color: #333;
-    padding: 15px 15px;
-}
+    .table.table-striped > tfoot > tr > th > input {
+        color: #000 !important;
+        font-weight: 500;
+        border: 1px solid #00c292;
+        padding:3px;
+        width:100%;
+    }
+        .table.table-striped > tfoot > tr > th > input:focus {
+            border: 0px solid #00c292;
+        }
+
+        .table.table-hover > tbody > tr > td, .table.table-hover > tbody > tr > th, .table.table-hover > tfoot > tr > td, .table.table-hover > tfoot > tr > th, .table.table-hover > thead > tr > td, .table.table-hover > thead > tr > th {
+            border-top: 1px solid #F5F5F5;
+            font-size: 14px;
+            color: #333;
+            padding: 15px 15px;
+        }
 
 .table.table-condensed > tbody > tr > td, .table.table-condensed > tbody > tr > th, .table.table-condensed > tfoot > tr > td, .table.table-condensed > tfoot > tr > th, .table.table-condensed > thead > tr > td, .table.table-condensed > thead > tr > th {
     border-top: 1px solid #F5F5F5;
@@ -3272,6 +3283,10 @@ hr {
     }
 
         .dataTables_filter input:focus, .dataTables_filter select:focus, .dataTables_length input:focus, .dataTables_length select:focus, .dataTables_length option:focus {
+            border: 1px solid #00c292;
+        }
+
+        .dataTables_filter input {
             border: 1px solid #00c292;
         }
 

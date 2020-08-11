@@ -77,7 +77,7 @@
     <script src="/Content/js/vendor/modernizr-2.8.3.min.js"></script>
     <link href="/Content/css/dialog/sweetalert2.min.css" rel="stylesheet" />
     <link href="/Content/css/dialog/dialog.css" rel="stylesheet" />
-
+    <link href="/Content/css/dropzone.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet" />
     <style>
         .no-rights {
@@ -103,6 +103,9 @@
                 </div>
 
                 <ul class="nav navbar-nav notika-top-nav">
+                    <li>
+                        <a href="#" class="nav-link" style="font-size:14px;">Welcome @SessionHelper.UserName</a>
+                    </li>
                     <li class="nav-item">
                         <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle" id="btnProfile"><span><i class="notika-icon notika-support"></i></span></a>
                     </li>
@@ -137,39 +140,44 @@
 
                                 @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin || Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
                                 {
+                                    if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                                    {
+                                        <li>
+                                            <a data-toggle="collapse" data-target="#demolibra" href="#">Masters</a>
+                                            <ul id="demolibra" class="collapse dropdown-header-top">
+                                                <li>
+                                                    <a href="\particular">Particulars</a>
+                                                </li>
+                                                <li>
+                                                    <a href="\company">Companies</a>
+                                                </li>
+                                                <li>
+                                                    <a href="\group">Groups</a>
+                                                </li>
+
+                                                <li>
+                                                    <a href="\commodity">Commodity</a>
+                                                </li>
+                                                <li>
+                                                    <a href="\consultant">Consultant</a>
+                                                </li>
+                                                <li>
+                                                    <a href="\documenttype">Document Type</a>
+                                                </li>
+                                                <li>
+                                                    <a href="\businessstatus">Business Status</a>
+                                                </li>
+                                                <li>
+                                                    <a href="\businesstype">Business Type</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <a href="/user">Users</a>
+                                        </li>
+                                    }
                                     <li>
-                                        <a data-toggle="collapse" data-target="#demolibra" href="#">Masters</a>
-                                        <ul id="demolibra" class="collapse dropdown-header-top">
-                                            <li>
-                                                <a href="\particular">Particulars</a>
-                                            </li>
-                                            <li>
-                                                <a href="\company">Companies</a>
-                                            </li>
-                                            <li>
-                                                <a href="\group">Groups</a>
-                                            </li>
-                                            <li>
-                                                <a href="\notification">Notifications</a>
-                                            </li>
-                                            <li>
-                                                <a href="\commodity">Commodity</a>
-                                            </li>
-                                            <li>
-                                                <a href="\consultant">Consultant</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a data-toggle="collapse" data-target="#demo" href="#">Users</a>
-                                        <ul id="demo" class="collapse dropdown-header-top">
-                                            <li>
-                                                <a href="/user">Users</a>
-                                            </li>
-                                            <li>
-                                                <a href="/client">Client</a>
-                                            </li>
-                                        </ul>
+                                        <a href="/client">Client</a>
                                     </li>
                                 }
                                 <li>
@@ -178,6 +186,12 @@
                                 <li>
                                     <a href="/Document/Index">Document</a>
                                 </li>
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin || Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                                {
+                                    <li>
+                                        <a href="\notification">Notes</a>
+                                    </li>
+                                }
                                 @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
                                 {
                                     <li>
@@ -209,11 +223,17 @@
                         </li>
                         @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin || Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
                         {
-                            <li id="liMaster">
-                                <a data-toggle="tab" href="#Master"><i class="notika-icon notika-app"></i> Masters</a>
-                            </li>
-                            <li id="liUser">
-                                <a data-toggle="tab" href="#User"><i class="notika-icon notika-support"></i> Users</a>
+                            if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                            {
+                                <li id="liMaster">
+                                    <a data-toggle="tab" href="#Master"><i class="notika-icon notika-app"></i> Masters</a>
+                                </li>
+                                <li id="liUser">
+                                    <a href="/user"><i class="notika-icon notika-support"></i> Users</a>
+                                </li>
+                            }
+                            <li id="liClient">
+                                <a href="/client"><i class="notika-icon notika-support"></i> Client</a>
                             </li>
                         }
                         <li id="liTask">
@@ -222,6 +242,12 @@
                         <li id="liDoc">
                             <a href="/Document/Index"><i class="notika-icon notika-windows"></i>Document</a>
                         </li>
+                        @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin || Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                        {
+                            <li id="liNotes">
+                                <a href="/notification"><i class="notika-icon notika-form"></i>Notes</a>
+                            </li>
+                        }
                         @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
                         {
                             <li id="liNotes">
@@ -244,23 +270,19 @@
                                         <a href="\group">Groups</a>
                                     </li>
                                     <li>
-                                        <a href="\notification">Notifications</a>
-                                    </li>
-                                    <li>
                                         <a href="\commodity">Commodity</a>
                                     </li>
                                     <li>
                                         <a href="\consultant">Consultant</a>
                                     </li>
-                                </ul>
-                            </div>
-                            <div id="User" class="tab-pane notika-tab-menu-bg animated flipInX">
-                                <ul class="notika-main-menu-dropdown">
                                     <li>
-                                        <a href="/user">Users</a>
+                                        <a href="\documenttype">Document Type</a>
                                     </li>
                                     <li>
-                                        <a href="/client">Client</a>
+                                        <a href="\businessstatus">Business Status</a>
+                                    </li>
+                                    <li>
+                                        <a href="\businesstype">Business Type</a>
                                     </li>
                                 </ul>
                             </div>
@@ -390,7 +412,7 @@
     <script src="/Content/js/dialog/dialog-active.js"></script>
     <script src="/Content/js/dialog/sweetalert2.min.js"></script>
     <script src="/Scripts/jquery.easy-ticker.js"></script>
-
+    <script src="/Content/js/dropzone/dropzone.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
     @RenderSection("scripts", required: false)
     <script>

@@ -47,7 +47,7 @@ namespace ArityApp.Controllers
                 var invoiceList = await _taskService.GetAll(fromDate, toDate);
                 return Json(new { data = invoiceList }, JsonRequestBehavior.AllowGet);
             }
-            catch
+            catch(Exception ex)
             {
                 return Json(new { data = new List<Tasks>() }, JsonRequestBehavior.AllowGet);
             }

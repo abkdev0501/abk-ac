@@ -59,13 +59,13 @@ namespace ArityApp
               url: "company",
               defaults: new { controller = "Master", action = "Company", id = UrlParameter.Optional }
           );
-            
+
             routes.MapRoute(
               name: "commodity",
               url: "commodity",
               defaults: new { controller = "Master", action = "CommodityMaster", id = UrlParameter.Optional }
-          ); 
-            
+          );
+
             routes.MapRoute(
               name: "consultant",
               url: "consultant",
@@ -77,7 +77,7 @@ namespace ArityApp
               url: "group",
               defaults: new { controller = "Master", action = "GroupMaster", id = UrlParameter.Optional }
           );
-           
+
             routes.MapRoute(
               name: "client",
               url: "client",
@@ -89,16 +89,34 @@ namespace ArityApp
              url: "login",
              defaults: new { controller = "Account", action = "Login", id = UrlParameter.Optional }
          );
-            
+
             routes.MapRoute(
              name: "notification",
              url: "notification",
              defaults: new { controller = "Master", action = "NotificationMaster", id = UrlParameter.Optional }
-         ); 
+         );
             routes.MapRoute(
              name: "notes",
              url: "notes",
              defaults: new { controller = "Master", action = "NotesMaster", id = UrlParameter.Optional }
+         );
+
+            routes.MapRoute(
+             name: "documenttype",
+             url: "documenttype",
+             defaults: new { controller = "Master", action = "DocumentType", id = UrlParameter.Optional }
+         );
+
+            routes.MapRoute(
+             name: "businessstatus",
+             url: "businessstatus",
+             defaults: new { controller = "Master", action = "BusinessStatus", id = UrlParameter.Optional }
+         );
+
+            routes.MapRoute(
+             name: "businesstype",
+             url: "businesstype",
+             defaults: new { controller = "Master", action = "BusinesStype", id = UrlParameter.Optional }
          );
 
             routes.MapRoute(

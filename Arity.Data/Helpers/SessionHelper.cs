@@ -32,6 +32,18 @@ namespace Arity.Data.Helpers
                 SessionVariables.Set("UserTypeId", value);
             }
         }
+        
+        public static string UserName
+        {
+            get
+            {
+                return SessionVariables.Get<string>("UserName");
+            }
+            set
+            {
+                SessionVariables.Set("UserName", value);
+            }
+        }
 
         private static class SessionVariables
         {

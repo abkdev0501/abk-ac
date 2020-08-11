@@ -30,5 +30,6 @@ namespace Arity.Service.Contract
         Task<bool> DeleteInvoiceById(int invoiceId);
 
         Task<List<CompanyClientList>> GetAllCompanyWithClients();
+        Task<int> GetCompanyByClientId(int clientId);
     }
 }

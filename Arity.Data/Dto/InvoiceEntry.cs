@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Arity.Data.Dto
 {
     public class InvoiceEntry
     {
+        public InvoiceEntry()
+        {
+            ImportInvoices = new List<ImportInvoices>();
+        }
         public long InvoiceId { get; set; }
         public long InvoiceParticularId { get; set; }
         public long ClientId { get; set; }
@@ -28,5 +33,8 @@ namespace Arity.Data.Dto
         public string GroupName { get; set; }
         public int AddedBy { get; set; }
         public string Remarks { get; set; }
+        public int Row { get; set; }
+        public List<ImportInvoices> ImportInvoices { get; set; }
+        public decimal Discount { get; set; }
     }
 }

@@ -51,7 +51,7 @@
 
                     <div class="date-filter">
 
-                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
+                        @*<div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
                             <label>From</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
@@ -67,7 +67,7 @@
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
                             <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnFilterGrid">Search</button>
-                        </div>
+                        </div>*@
 
                     </div>
                     <div class="table-responsive">
@@ -100,8 +100,7 @@
     <script src="https://cdn.datatables.net/buttons/1.0.3/js/dataTables.buttons.min.js"></script>
     <script>
     $(document).ready(function () {
-        $("#liUser").addClass("active");
-        $("#User").addClass("active");
+        $("#liClient").addClass("active");
         $("#liHome").removeClass("active");
         @if (TempData["Success"] != null)
         {
@@ -113,10 +112,6 @@
                     url: '@Url.Action("LoadClient","Master")',
                     type: "GET",
                     dataType: "json",
-                    data: {
-                        from: "" + $("#FromDate").val() + "",
-                        to: "" + $("#ToDate").val() + ""
-                    },
                     beforeSend: function (xhrObj) {
                         $("#loading").show();
                     }
@@ -134,7 +129,8 @@
             "language": {
                 "emptyTable": "No clients found"
             },
-            dom: 'Bfrtip',
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            dom: 'Blfrtip',
             buttons: [
                 {
                     extend: 'excelHtml5',

@@ -13,7 +13,7 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(Model.CompanyId > 0?"no-rights":"")">
                     <div class="nk-int-st">
-                        @Html.DropDownListFor(_ => _.CompanyId, ViewBag.company as SelectList, "-- Select Company--", new { @class = "form-control input-sm", @required = "required" })
+                        @Html.DropDownListFor(_ => _.CompanyId, ViewBag.company as SelectList, "-- Select Company--", new { @class = "form-control input-sm bk-choosen", @required = "required" })
                     </div>
                 </div>
             </div>
@@ -28,7 +28,7 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(Model.CompanyId > 0?"no-rights":"")">
                     <div class="nk-int-st">
-                        @Html.DropDownListFor(_ => _.ClientId, ViewBag.Client as SelectList, "-- Select Client--", new { @class = "form-control input-sm", @required = "required" })
+                        @Html.DropDownListFor(_ => _.ClientId, ViewBag.Client as SelectList, "-- Select Client--", new { @class = "form-control input-sm bk-choosen", @required = "required" })
                     </div>
                 </div>
             </div>
@@ -42,7 +42,7 @@
                 </div>
                 <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 cls-particular @(Model.ParticularId > 0?"no-rights":"")">
                     <div class="nk-int-st">
-                        @Html.DropDownListFor(_ => _.ParticularId, ViewBag.Particular as SelectList, "-- Select Particular--", new { @class = "form-control input-sm", @required = "required" })
+                        @Html.DropDownListFor(_ => _.ParticularId, ViewBag.Particular as SelectList, "-- Select Particular--", new { @class = "form-control input-sm bk-choosen", @required = "required" })
                     </div>
                 </div>
             </div>
@@ -119,7 +119,8 @@
                     calendarWeeks: true,
                     autoclose: true,
                     format: "dd/mm/yyyy"
-                });
+     });
+    $(".bk-choosen").chosen();
     $("#btnAdd").click(function () {
         var isValid = true;
         if ($("#CompanyId").val() == null || $("#CompanyId").val() == "") {
@@ -229,6 +230,7 @@
                 $.each(response, function (i, client) {
                     $("#ClientId").append($("<option />").val(client.Id).text(client.FullName));
                 });
+                $(".bk-choosen").trigger("chosen:updated");
             },
             error: function () {
 

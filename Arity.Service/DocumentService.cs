@@ -31,6 +31,7 @@ namespace Arity.Service
         /// <returns></returns>
         public async Task<List<DocumentMasterDto>> FetchDocuments(DateTime toDate, DateTime fromDate)
         {
+            var documentTypes = await _dbContext.DocumentTypes.ToListAsync();
             if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
             {
                 return (from data in _dbContext.DocumentMasters.ToList()
@@ -42,7 +43,7 @@ namespace Arity.Service
                             DocumentId = data.DocumentId,
                             Name = data.Name,
                             ClientId = data.ClientId,
-                            DocumentTypeName = Enum.GetName(typeof(DocumentType), data.DocumentType),
+                            DocumentTypeName = documentTypes.FirstOrDefault(_ => _.DocumnetTypeId == data.DocumentType)?.Name ?? string.Empty,
                             IsActive = data.IsActive,
                             CreatedBy = data.CreatedBy,
                             CreatedOn = data.CreatedOn,
@@ -50,7 +51,8 @@ namespace Arity.Service
                             AddedBy = Convert.ToInt32(createdBy.UserTypeId),
                             StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
                             ClientName = user.FullName,
-                            UserName = user.Username
+                            UserName = user.Username,
+                            FileName = data.FileName
                         }).ToList();
             }
             else
@@ -63,7 +65,7 @@ namespace Arity.Service
                             DocumentId = data.DocumentId,
                             Name = data.Name,
                             ClientId = data.ClientId,
-                            DocumentTypeName = Enum.GetName(typeof(DocumentType), data.DocumentType),
+                            DocumentTypeName = documentTypes.FirstOrDefault(_ => _.DocumnetTypeId == data.DocumentType)?.Name ?? string.Empty,
                             IsActive = data.IsActive,
                             CreatedBy = data.CreatedBy,
                             CreatedOn = data.CreatedOn,
@@ -71,7 +73,8 @@ namespace Arity.Service
                             AddedBy = Convert.ToInt32(createdBy.UserTypeId),
                             StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
                             ClientName = user.FullName,
-                            UserName = user.Username
+                            UserName = user.Username,
+                            FileName = data.FileName
                         }).ToList();
         }
 
@@ -87,20 +90,24 @@ namespace Arity.Service
 
         public async Task<DocumentMasterDto> GetDocumentByID(int documentID)
         {
-            return (from documentMaster
-                    in _dbContext.DocumentMasters.Where(_ => _.DocumentId == documentID)
-                    select new DocumentMasterDto()
-                    {
-                        DocumentId = documentMaster.DocumentId,
-                        Name = documentMaster.Name,
-                        ClientId = documentMaster.ClientId,
-                        DocumentType = (DocumentType)documentMaster.DocumentType,
-                        CreatedBy = documentMaster.CreatedBy,
-                        CreatedOn = documentMaster.CreatedOn,
-                        Status = (DocumentStatus)documentMaster.Status,
-                        IsActive = documentMaster.IsActive,
-                        FileName = documentMaster.FileName
-                    }).FirstOrDefault();
+            var document = await _dbContext.DocumentMasters.Where(_ => _.DocumentId == documentID).Select(_ =>
+                     new DocumentMasterDto()
+                     {
+                         DocumentId = _.DocumentId,
+                         Name = _.Name,
+                         ClientId = _.ClientId,
+                         CreatedBy = _.CreatedBy,
+                         CreatedOn = _.CreatedOn,
+                         Status = (DocumentStatus)_.Status,
+                         IsActive = _.IsActive,
+                         FileName = _.FileName,
+                         DocumentType = _.DocumentType
+                     }).FirstOrDefaultAsync();
+
+            if (document != null)
+                document.DocumentType = _dbContext.DocumentTypes.FirstOrDefault(x => x.DocumnetTypeId == document.DocumentType)?.DocumnetTypeId ?? 0;
+
+            return document;
         }
 
         public async Task<int> SaveDocument(DocumentMasterDto document)
@@ -134,10 +141,10 @@ namespace Arity.Service
                         documentMaster.FileName = document.FileName;
                     documentMaster.IsActive = document.IsActive;
                 }
-               await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
 
             }
-            catch 
+            catch
             {
             }
             return documentMaster.DocumentId;

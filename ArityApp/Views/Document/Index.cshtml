@@ -85,6 +85,7 @@
                                         <th style="width:10%;"></th>
                                     }
                                     <th style="width:10%;"></th>
+                                    <th style="width:10%;"></th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -163,6 +164,15 @@
                 "language": {
                     "emptyTable": "No document found"
                 },
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                dom: 'Blfrtip',
+                 buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        title: 'Excel',
+                        text:'Export to excel'
+                    }
+                ],
                 "columns": [
                     //{ "data": "DocumentId" },
                     { "data": "Name" },
@@ -195,7 +205,7 @@
                     @:{
                     @:"orderable": false,
                     @:"data": null,
-                    @:"render": function (data, type, full) { console.log(data.AddedBy);
+                    @:"render": function (data, type, full) { 
                     @:    if (data.AddedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) ) { return '<div class="dialog-pro dialog">' +
                     @:                    '<button class="btn btn-info" onclick="DeleteDocument(' + data.DocumentId + ')" id="sa-warning">'+
                     @:                    '<i class="fa fa-trash" aria-hidden="true"></i>' +
@@ -208,13 +218,20 @@
                  {
                     "orderable": false,
                     "data": null,
-                    "render": function (data, type, full) { console.log(data.AddedBy);
+                    "render": function (data, type, full) { 
                         if (data.AddedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.User )) { return '' +
                                         '<button class="btn btn-info" onclick="DownloadDocument(' + data.DocumentId + ')" id="sa-warning">'+
                                         '<i class="notika-icon notika-down-arrow" aria-hidden="true"></i>' +
                                         '</button>'; }
                         else { return ''; }
                           }
+                    },
+                    {
+                        "orderable": false,
+                        "data": null,
+                        "render": function (data, type, full) {
+                            return "<a href='/ViewerJS/#../Content/Documents/"+ data.DocumentId+"_"+data.FileName+"' target='_blank'>View</a>"
+                        }
                     }
                 ],
                 "order": []

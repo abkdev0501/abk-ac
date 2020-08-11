@@ -12,6 +12,9 @@ using Arity.Data.Helpers;
 using Arity.Data.Entity;
 using System.Text;
 using System.Drawing;
+using System.Web;
+using ExcelDataReader;
+using System.Data;
 
 namespace ArityApp.Controllers
 {
@@ -278,6 +281,213 @@ namespace ArityApp.Controllers
             }
         }
 
+        /// <summary>
+        /// Import invoice in bulk
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> ImportInvoice()
+        {
+            try
+            {
+                List<InvoiceEntry> invoices = new List<InvoiceEntry>();
+                List<InvoiceEntry> erroredInvoices = new List<InvoiceEntry>();
+                List<ImportInvoices> invoiceParticulars = new List<ImportInvoices>();
+                List<ImportInvoices> erroredParticulars = new List<ImportInvoices>();
+                StringBuilder errors = new StringBuilder();
+                HttpPostedFileBase importedFile = Request.Files[0];
+                var allowedExtension = new string[] { ".xls", ".xlsx" };
+                var extension = Path.GetExtension(importedFile.FileName);
+                if (importedFile != null && importedFile.ContentType.Length > 0 && allowedExtension.Contains(extension)) /// Check if files fallin under selected extention or not
+                {
+                    var companies = await _masterService.GetAllCompany();
+                    var clients = await _masterService.GetAllClient();
+                    var particulars = await _invoiceService.GetParticular();
+
+                    using (Stream inputStream = importedFile.InputStream)
+                    {
+                        //convert uploaded file data into bite 
+                        MemoryStream memoryStream = inputStream as MemoryStream;
+                        if (memoryStream == null)
+                        {
+                            memoryStream = new MemoryStream();
+                            inputStream.CopyTo(memoryStream);
+                        }
+
+                        #region Fetch each sheets of uploaded file
+                        IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(inputStream);
+                        DataSet result = excelReader.AsDataSet();
+                        for (int i = 4; i < result.Tables[0].Rows.Count; i++)
+                        {
+                            try
+                            {
+                                if (!string.IsNullOrEmpty(result.Tables[0].Rows[i].ItemArray[0].ToString()))
+                                {
+                                    invoices.Add(new InvoiceEntry
+                                    {
+                                        Row = i + 1,
+                                        CompanyName = result.Tables[0].Rows[i].ItemArray[4].ToString(),
+                                        FullName = result.Tables[0].Rows[i].ItemArray[1].ToString(),
+                                        CompanyId = companies.FirstOrDefault(_ => _.CompanyName.ToLower() == result.Tables[0].Rows[i].ItemArray[4].ToString().Replace("Receipt", "").Trim().ToLower())?.Id ?? 0,
+                                        ClientId = clients.FirstOrDefault(_ => _.FullName.ToLower() == result.Tables[0].Rows[i].ItemArray[1].ToString().Trim().ToLower())?.Id ?? 0,
+                                        InvoiceDate = Convert.ToDateTime(result.Tables[0].Rows[i].ItemArray[0]),
+                                        Remarks = result.Tables[0].Rows[i].ItemArray[5] != null
+                                                                        ? "Tally Invoice# " + result.Tables[0].Rows[i].ItemArray[5].ToString()
+                                                                        : string.Empty
+                                    });
+                                }
+                                else
+                                {
+                                    var particularName = result.Tables[0].Rows[i].ItemArray[1].ToString().Contains("Fees For")
+                                                            ? result.Tables[0].Rows[i].ItemArray[1].ToString().Replace("Fees For F.Y.", "#").Split('#')[0].ToString().Trim()
+                                                            : result.Tables[0].Rows[i].ItemArray[1].ToString().Replace("Fees F.Y.", "#").Split('#')[0].ToString().Trim();
+                                    var particularYear = FormateYear(result.Tables[0].Rows[i].ItemArray[1].ToString());
+
+                                    invoices.LastOrDefault().ImportInvoices.Add(new ImportInvoices
+                                    {
+                                        ParticularId = particulars.FirstOrDefault(_ => _.ParticularFF.ToLower() == particularName.ToLower())?.Id ?? 0,
+                                        Amount = invoices.LastOrDefault().CompanyName.Contains("Receipt")
+                                                                         ? Convert.ToDecimal(result.Tables[0].Rows[i].ItemArray[6])
+                                                                         : Convert.ToDecimal(result.Tables[0].Rows[i].ItemArray[7]),
+                                        Year = particularYear,
+                                        ParticularName = particularName,
+                                        Row = i + 1
+                                    });
+                                }
+                            }
+                            catch
+                            {
+                            }
+
+                        }
+
+                        // Add errors list if company, client, particulars not found for any invoice
+                        // Remove those invoices and particulars from list
+                        foreach (var invoice in invoices)
+                        {
+                            if (invoice.ClientId == 0 || invoice.CompanyId == 0)
+                                errors.Append(string.Format("<br />Row# {0}, Errors : {1}", invoice.Row, (
+                                                                                                    invoice.ClientId == 0
+                                                                                                            ? "Client " + invoice.FullName + " is missing"
+                                                                                                            : "") + " " + (invoice.CompanyId == 0
+                                                                                                                                    ? "Company " + invoice.CompanyName + " is missing"
+                                                                                                                                    : "")));
+                            foreach (var particular in invoice.ImportInvoices)
+                            {
+                                if (particular.ParticularId == 0 && !invoice.CompanyName.Contains("Receipt"))
+                                {
+                                    errors.Append(string.Format("<br />Row# {0}, Errors : {1}", particular.Row, "Particular " + particular.ParticularName + " is missing"));
+                                    erroredParticulars.Add(particular);
+                                }
+                            }
+                            invoice.ImportInvoices.RemoveAll(_ => erroredParticulars.Any(x => x.Row == _.Row));
+
+                            if (invoice.ClientId == 0 || invoice.CompanyId == 0)
+                                erroredInvoices.Add(invoice);
+                        };
+
+                        invoices.RemoveAll(_ => erroredInvoices.Any(x => x.Row == _.Row));
+
+                        // Import invoices and receipt if there are no any errors in uploaded sheet
+                        if (!string.IsNullOrEmpty(errors.ToString()))
+                        {
+                            // Importing all receipt informations
+                            foreach (var reciept in invoices.Where(_ => _.CompanyName.Contains("Receipt")))
+                            {
+
+                                try
+                                {
+                                    await _paymentService.AddUpdateReceiptEntry(new ReceiptDto
+                                    {
+                                        CompanyId = reciept.CompanyId,
+                                        ClientId = reciept.ClientId,
+                                        Discount = reciept.ImportInvoices?.FirstOrDefault(_ => _.ParticularName == "Discount")?.Amount ?? 0,
+                                        TotalAmount = reciept.ImportInvoices?.FirstOrDefault(_ => _.ParticularName != "Discount")?.Amount ?? 0,
+                                        RecieptDate = reciept.InvoiceDate,
+                                        BankName = reciept.ImportInvoices?.FirstOrDefault(_ => _.ParticularName != "Discount")?.ParticularName ?? string.Empty,
+                                        Status = true,
+                                        Remarks = reciept.Remarks.Replace("Invoice", "Receipt"),
+                                    });
+                                }
+                                catch
+                                {
+                                }
+                            }
+
+                            // Importing all invoices information
+                            foreach (var invoice in invoices.Where(_ => !_.CompanyName.Contains("Receipt")))
+                            {
+                                try
+                                {
+                                    if (invoice.ImportInvoices?.Count > 0)
+                                    {
+                                        invoice.ParticularId = invoice.ImportInvoices.FirstOrDefault().ParticularId;
+                                        invoice.Amount = invoice.ImportInvoices.FirstOrDefault().Amount;
+                                        invoice.Year = invoice.ImportInvoices.FirstOrDefault().Year;
+                                        var addedInvoiceId = await _invoiceService.AddUpdateInvoiceEntry(Convert.ToInt32(SessionHelper.UserId), invoice);
+                                        if (addedInvoiceId > 0)
+                                            for (int i = 1; i < invoice.ImportInvoices.Count; i++)
+                                            {
+                                                invoice.ParticularId = invoice.ImportInvoices[i].ParticularId;
+                                                invoice.Amount = invoice.ImportInvoices[i].Amount;
+                                                invoice.Year = invoice.ImportInvoices[i].Year;
+                                                invoice.InvoiceId = addedInvoiceId;
+                                                await _invoiceService.AddUpdateInvoiceEntry(Convert.ToInt32(SessionHelper.UserId), invoice);
+                                            }
+                                    }
+                                }
+                                catch
+                                {
+                                }
+                            }
+                        }
+                        #endregion
+                    }
+
+                    return Content("success$" + errors.ToString());
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            return Content("error");
+        }
+
+        /// <summary>
+        /// Get formated year by string i.e. 18/19, 19/20 etc..
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        private string FormateYear(string year)
+        {
+            try
+            {
+                var particularYear = "";
+                year = year.Contains("Fees For")
+                                            ? (year.Replace("Fees For F.Y.", "#").Split('#').Length > 1
+                                                    ? year.Replace("Fees For F.Y.", "#").Split('#')[1].ToString().Trim()
+                                                    : "")
+                                            : (year.Replace("Fees F.Y.", "#").Split('#').Length > 1
+                                                    ? year.Replace("Fees F.Y.", "#").Split('#')[1].ToString().Trim()
+                                                    : "");
+                var splitYear = year.Split('/');
+                if (splitYear.Length > 1)
+                {
+                    particularYear = (splitYear[0].Length > 3
+                                            ? splitYear[0].Substring(2, 2)
+                                            : splitYear[0])
+                                            + "/" + (splitYear[1].Length > 3
+                                                             ? splitYear[1].Substring(2, 2)
+                                                             : splitYear[1]);
+                }
+                return particularYear;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
         #endregion
 
         #region Payment
@@ -340,6 +550,12 @@ namespace ArityApp.Controllers
             }
         }
 
+        /// <summary>
+        /// Get invoice by client and company
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="clientId"></param>
+        /// <returns></returns>
         public async Task<JsonResult> GetInvoiceByClientAndCompany(int companyId, int clientId)
         {
             try
@@ -352,6 +568,11 @@ namespace ArityApp.Controllers
             }
         }
 
+        /// <summary>
+        /// Get total amount for all invoices
+        /// </summary>
+        /// <param name="invoices"></param>
+        /// <returns></returns>
         public async Task<JsonResult> GetTotalOfInvoice(List<long> invoices)
         {
             try
@@ -402,23 +623,84 @@ namespace ArityApp.Controllers
         }
 
         /// <summary>
-        /// Render ViewToString
+        /// Import receipt in bulk
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="viewPath"></param>
-        ///<param name="model"></param>
         /// <returns></returns>
-        public static String RenderViewToString(ControllerContext context, String viewPath, object model = null)
+        public async Task<ActionResult> ImportReceipt()
         {
-            context.Controller.ViewData.Model = model;
-            using (var sw = new StringWriter())
+            try
             {
-                var viewResult = ViewEngines.Engines.FindView(context, viewPath, null);
-                var viewContext = new ViewContext(context, viewResult.View, context.Controller.ViewData, context.Controller.TempData, sw);
-                viewResult.View.Render(viewContext, sw);
-                viewResult.ViewEngine.ReleaseView(context, viewResult.View);
-                return sw.GetStringBuilder().ToString();
+                List<ReceiptDto> receipts = new List<ReceiptDto>();
+                HttpPostedFileBase importedFile = Request.Files[0];
+                var allowedExtension = new string[] { ".xlx", ".xlsx" };
+                var extension = Path.GetExtension(importedFile.FileName);
+                if (importedFile != null && importedFile.ContentType.Length > 0 && allowedExtension.Contains(extension)) /// Check if files fallin under selected extention or not
+                {
+                    var companies = await _masterService.GetAllCompany();
+                    var clients = await _masterService.GetAllClient();
+                    var allInvoices = await _invoiceService.GetAllInvoice();
+
+                    using (Stream inputStream = importedFile.InputStream)
+                    {
+                        //convert uploaded file data into bite 
+                        MemoryStream memoryStream = inputStream as MemoryStream;
+                        if (memoryStream == null)
+                        {
+                            memoryStream = new MemoryStream();
+                            inputStream.CopyTo(memoryStream);
+                        }
+
+                        #region Fetch each sheets of uploaded file
+                        ExcelPackage excelPackage = new ExcelPackage(inputStream);
+                        bool isValidaSheet = true;
+                        foreach (ExcelWorksheet worksheet in excelPackage.Workbook.Worksheets)
+                        {
+                            if (isValidaSheet)
+                            {
+                                var sheetDatas = worksheet.Cells.ToList();
+                                for (int i = 2; i <= (sheetDatas.Count() / 7); i++)
+                                {
+                                    int companyId = companies.FirstOrDefault(_ => _.CompanyName == worksheet.Cells[i, 1].Value.ToString())?.Id ?? 0;
+                                    long clientId = clients.FirstOrDefault(_ => _.Username == worksheet.Cells[i, 2].Value.ToString())?.Id ?? 0;
+                                    List<long> invoiceIds = new List<long>();
+                                    if (worksheet.Cells[i, 3].Value != null)
+                                    {
+                                        var invoiceNumbers = worksheet.Cells[i, 3].Value.ToString().Split(',').ToArray();
+                                        invoiceIds = allInvoices.Where(_ => invoiceNumbers.Contains(_.InvoiceNumber) && _.CompanyId == companyId && _.ClientId == clientId).Select(_ => _.InvoiceId).ToList();
+                                    }
+
+                                    receipts.Add(new ReceiptDto
+                                    {
+                                        CompanyId = companyId,
+                                        ClientId = clientId,
+                                        InvoiceIds = invoiceIds,
+                                        Discount = Convert.ToDecimal(worksheet.Cells[i, 4].Value.ToString()),
+                                        TotalAmount = worksheet.Cells[i, 5].Value != null ? Convert.ToDecimal(worksheet.Cells[i, 5].Value.ToString()) : 0,
+                                        RecieptDate = Convert.ToDateTime(worksheet.Cells[i, 6].Value.ToString()),
+                                        BankName = worksheet.Cells[i, 7].Value != null ? worksheet.Cells[i, 7].Value.ToString() : string.Empty,
+                                        ChequeNumber = worksheet.Cells[i, 8].Value != null ? worksheet.Cells[i, 8].Value.ToString() : string.Empty,
+                                        Status = worksheet.Cells[i, 9].Value != null ? Convert.ToBoolean(Convert.ToInt32(worksheet.Cells[i, 9].Value.ToString())) : false,
+                                        Remarks = worksheet.Cells[i, 10].Value != null ? worksheet.Cells[i, 10].Value.ToString() : string.Empty,
+                                    });
+                                }
+                                isValidaSheet = false;
+                            }
+                        }
+
+                        foreach (var receipt in receipts)
+                        {
+                            await _paymentService.AddUpdateReceiptEntry(receipt);
+                        };
+                        #endregion
+                    }
+
+                    return Content("success");
+                }
             }
+            catch (Exception ex)
+            {
+            }
+            return Content("error");
         }
         #endregion
 
@@ -971,21 +1253,14 @@ namespace ArityApp.Controllers
         #region User
         public async Task<ActionResult> Users()
         {
-
-            ViewBag.FromDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01));
-            ViewBag.ToDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month)));
             return View();
         }
 
-        public async Task<JsonResult> LoadUsers(string from, string to)
+        public async Task<JsonResult> LoadUsers()
         {
             try
             {
-                DateTime fromDate = Convert.ToDateTime(from);
-                DateTime toDate = Convert.ToDateTime(to);
-                toDate = toDate + new TimeSpan(23, 59, 59);
-                fromDate = fromDate + new TimeSpan(00, 00, 1);
-                var users = await _accountService.GetAllUsers(fromDate, toDate);
+                var users = await _accountService.GetAllUsersList();
                 return Json(new { data = users }, JsonRequestBehavior.AllowGet);
             }
             catch

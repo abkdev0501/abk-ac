@@ -52,7 +52,7 @@ namespace Arity.Service
                 {
                     RecieptNo = GenerateNextRecieptNumber(Convert.ToInt32(receiptEntry.CompanyId), receiptEntry.RecieptDate, receiptEntry.InvoiceIds),
                     Status = receiptEntry.Status,
-                    TotalAmount = receiptEntry.InvoiceIds?.Count() == 0 ? receiptEntry.TotalAmount : await _invoiceService.GetInvoiceAmountTotal(receiptEntry.InvoiceIds),
+                    TotalAmount = (receiptEntry.InvoiceIds == null || receiptEntry.InvoiceIds?.Count() == 0) ? receiptEntry.TotalAmount : await _invoiceService.GetInvoiceAmountTotal(receiptEntry.InvoiceIds),
                     UpdatedDate = DateTime.Now,
                     CreatedDate = DateTime.Now,
                     Discount = receiptEntry.Discount,
@@ -70,7 +70,7 @@ namespace Arity.Service
                 ReceiptId = receiptDetail.Id;
             }
 
-            if (receiptEntry.InvoiceIds.Any())
+            if (receiptEntry.InvoiceIds != null && receiptEntry.InvoiceIds.Any())
             {
                 foreach (var invoiceId in receiptEntry.InvoiceIds)
                 {
@@ -125,7 +125,8 @@ namespace Arity.Service
                                     GroupName = receipt.clientId.HasValue ? groups.FirstOrDefault(_ => _.GroupId == clients.FirstOrDefault(x => x.Id == receipt.clientId)?.GroupId)?.Name ?? string.Empty : groups.FirstOrDefault(g => g.GroupId == clients.FirstOrDefault(x => x.Id == _dbContext.InvoiceDetails.Where(i =>
                                                                 _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id))
                                                                 .Select(i => i.ClientId)?.FirstOrDefault())?.GroupId)?.Name ?? string.Empty,
-                                    AddedBy = clients.FirstOrDefault(_ => _.Id == receipt.AddedBy)?.FullName ?? string.Empty
+                                    AddedBy = clients.FirstOrDefault(_ => _.Id == receipt.AddedBy)?.FullName ?? string.Empty,
+                                    Remarks = receipt.Remarks
                                 }).ToList();
 
                 var clientIds = (from rec in _dbContext.InvoiceReciepts.ToList()
@@ -168,7 +169,8 @@ namespace Arity.Service
                             GroupName = receipt.clientId.HasValue ? groups.FirstOrDefault(_ => _.GroupId == clients.FirstOrDefault(x => x.Id == receipt.clientId)?.GroupId)?.Name ?? string.Empty : groups.FirstOrDefault(g => g.GroupId == clients.FirstOrDefault(x => x.Id == _dbContext.InvoiceDetails.Where(i =>
                                                         _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id))
                                                         .Select(i => i.ClientId)?.FirstOrDefault())?.GroupId)?.Name ?? string.Empty,
-                            AddedBy = clients.FirstOrDefault(_ => _.Id == receipt.AddedBy)?.FullName ?? string.Empty
+                            AddedBy = clients.FirstOrDefault(_ => _.Id == receipt.AddedBy)?.FullName ?? string.Empty,
+                            Remarks = receipt.Remarks
                         }).ToList();
 
             else
@@ -199,7 +201,8 @@ namespace Arity.Service
                             GroupName = receipt.clientId.HasValue ? groups.FirstOrDefault(_ => _.GroupId == clients.FirstOrDefault(x => x.Id == receipt.clientId)?.GroupId)?.Name ?? string.Empty : groups.FirstOrDefault(g => g.GroupId == clients.FirstOrDefault(x => x.Id == _dbContext.InvoiceDetails.Where(i =>
                                                         _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id))
                                                         .Select(i => i.ClientId)?.FirstOrDefault())?.GroupId)?.Name ?? string.Empty,
-                            AddedBy = clients.FirstOrDefault(_ => _.Id == receipt.AddedBy)?.FullName ?? string.Empty
+                            AddedBy = clients.FirstOrDefault(_ => _.Id == receipt.AddedBy)?.FullName ?? string.Empty,
+                            Remarks = receipt.Remarks
                         }).ToList();
         }
 
@@ -236,43 +239,88 @@ namespace Arity.Service
                                                CompanyId = i.CompanyId,
                                                FullName = _dbContext.Users.FirstOrDefault(_ => _.Id == i.ClientId).FullName
                                            }).ToList(),
-                               ClientName = receipt.clientId.HasValue? _dbContext.Users.FirstOrDefault(_ => _.Id == receipt.clientId.Value).FullName:string.Empty
+                               ClientName = receipt.clientId.HasValue ? _dbContext.Users.FirstOrDefault(_ => _.Id == receipt.clientId.Value).FullName : string.Empty
                            }).FirstOrDefault();
             if (reciept != null)
             {
-                long invoiceId = reciept.Invoices.FirstOrDefault()?.InvoiceId??0;
-                reciept.Year = _dbContext.InvoiceParticulars.FirstOrDefault(pm => invoiceId == pm.InvoiceId)?.year??string.Empty;
+                long invoiceId = reciept.Invoices.FirstOrDefault()?.InvoiceId ?? 0;
+                reciept.Year = _dbContext.InvoiceParticulars.FirstOrDefault(pm => invoiceId == pm.InvoiceId)?.year ?? string.Empty;
             }
             return reciept;
         }
 
+        /// <summary>
+        /// Generate generic receipt number based on receipt date
+        /// It will adjust receipt number in between dates and current year
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="recieptDate"></param>
+        /// <param name="invoiceIds"></param>
+        /// <returns></returns>
         private string GenerateNextRecieptNumber(int companyId, DateTime recieptDate, List<long> invoiceIds)
         {
+            string genericNumber = "";
+            int recieptNum = 0;
             var yearStartAt = Convert.ToDateTime(ConfigurationManager.AppSettings["YearStart"].Replace("XXXX", (recieptDate.Month >= 4 ? recieptDate.Year : (recieptDate.Year - 1)).ToString()));
             var yearEndedAt = Convert.ToDateTime(ConfigurationManager.AppSettings["YearEnd"].Replace("XXXX", (recieptDate.Month > 3 ? (recieptDate.Year + 1) : recieptDate.Year).ToString()));
             var reciepts = new List<InvoiceReciept>();
 
-            var invoiceIdslst = _dbContext.InvoiceDetails.Where(_ => _.CompanyId == companyId).ToList();
+            //var invoiceIdslst = new List<InvoiceDetail>();
 
-            if (invoiceIds?.Count() == 0)
-                reciepts = _dbContext.RecieptDetails.Where(_ => _.companyId == companyId).ToList().Select(_ => new InvoiceReciept
-                {
-                    RecieptId = _.Id
-                }).ToList();
-            else
-                reciepts = (from invoiceRec in _dbContext.InvoiceReciepts.ToList()
-                            join ids in invoiceIdslst on invoiceRec.InvoiceId equals ids.Id
-                            select invoiceRec)
-                                     .Distinct()
-                                     .ToList();
+            //invoiceIdslst = _dbContext.InvoiceDetails.Where(_ => _.CompanyId == companyId).ToList();
 
-            var genericNumber = (from reciept in _dbContext.RecieptDetails.ToList()
-                                 join ids in reciepts on reciept.Id equals ids.RecieptId
-                                 where reciept.RecieptDate >= yearStartAt && reciept.RecieptDate <= yearEndedAt
-                                 select reciept.RecieptNo)
-                                 .OrderByDescending(_ => _)
+            //if (invoiceIds?.Count() == 0)
+            reciepts = _dbContext.RecieptDetails.Where(_ => _.companyId == companyId).ToList().Select(_ => new InvoiceReciept
+            {
+                RecieptId = _.Id
+            }).ToList();
+            //else
+            //    reciepts = (from invoiceRec in _dbContext.InvoiceReciepts.ToList()
+            //                join ids in invoiceIdslst on invoiceRec.InvoiceId equals ids.Id
+            //                select invoiceRec)
+            //                         .Distinct()
+            //                         .ToList();
+
+            var allReceipt = (from reciept in _dbContext.RecieptDetails.ToList()
+                              join ids in reciepts on reciept.Id equals ids.RecieptId
+                              where reciept.RecieptDate >= yearStartAt
+                              && reciept.RecieptDate <= yearEndedAt
+                              && reciept.RecieptDate >= recieptDate
+                              select reciept)
+                                 .OrderBy(_ => _.RecieptDate)
                                  .Distinct()
+                                 .ToList();
+            if (allReceipt != null && (allReceipt?.Any() ?? false))
+            {
+                var sameDateReceipt = allReceipt.Where(_ => _.RecieptDate == recieptDate).ToList();
+                if (sameDateReceipt != null && sameDateReceipt.Any())
+                {
+                    genericNumber = sameDateReceipt.OrderByDescending(_ => _.Id).Select(_ => _.RecieptNo).FirstOrDefault();
+                    genericNumber = (Convert.ToInt32(genericNumber) + 1).ToString();
+                }
+                else
+                    genericNumber = allReceipt.OrderBy(_ => _.RecieptDate).Select(_ => _.RecieptNo).FirstOrDefault();
+                genericNumber = (Convert.ToInt32(genericNumber) - 1).ToString();
+                recieptNum = Convert.ToInt32(genericNumber) + 1;
+                allReceipt.Where(_ => _.RecieptDate > recieptDate).ToList().ForEach(_ =>
+                {
+                    recieptNum++;
+                    _.RecieptNo = recieptNum.ToString();
+                });
+            }
+            else
+            {
+                genericNumber = (from reciept in _dbContext.RecieptDetails.ToList()
+                                 join ids in reciepts on reciept.Id equals ids.RecieptId
+                                 where reciept.RecieptDate >= yearStartAt
+                                 && reciept.RecieptDate <= yearEndedAt
+                                 select reciept)
+                                 .OrderByDescending(_ => _.RecieptDate)
+                                 .Distinct()
+                                 .Select(_ => _.RecieptNo)
                                  .FirstOrDefault();
+            }
+
             if (!string.IsNullOrEmpty(genericNumber))
             {
                 genericNumber = (Convert.ToInt32(genericNumber) + 1).ToString();

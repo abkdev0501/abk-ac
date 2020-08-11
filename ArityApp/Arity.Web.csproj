@@ -73,6 +73,12 @@
     <Reference Include="EPPlus, Version=4.5.3.2, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
       <HintPath>..\packages\EPPlus.4.5.3.2\lib\net40\EPPlus.dll</HintPath>
     </Reference>
+    <Reference Include="ExcelDataReader, Version=3.6.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.3.6.0\lib\net45\ExcelDataReader.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelDataReader.DataSet, Version=3.6.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.DataSet.3.6.0\lib\net35\ExcelDataReader.DataSet.dll</HintPath>
+    </Reference>
     <Reference Include="itext.barcodes, Version=7.1.10.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
       <HintPath>..\packages\itext7.7.1.10\lib\net40\itext.barcodes.dll</HintPath>
     </Reference>
@@ -118,6 +124,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
     <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.FileSystem.Primitives.4.0.1\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
     </Reference>
@@ -390,6 +397,8 @@
     <Content Include="Content\fonts\notika-icon.eot" />
     <Content Include="Content\fonts\notika-icon.ttf" />
     <Content Include="Content\fonts\notika-icon.woff" />
+    <Content Include="Content\SampleTemplate\ImportInvoice_Sample.xlsx" />
+    <Content Include="Content\SampleTemplate\ImportReceipt_Sample.xlsx" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
@@ -403,6 +412,26 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="ViewerJS\compatibility.js" />
+    <Content Include="ViewerJS\example.local.css" />
+    <Content Include="ViewerJS\images\kogmbh.png" />
+    <Content Include="ViewerJS\images\nlnet.png" />
+    <Content Include="ViewerJS\images\texture.png" />
+    <Content Include="ViewerJS\images\toolbarButton-download.png" />
+    <Content Include="ViewerJS\images\toolbarButton-fullscreen.png" />
+    <Content Include="ViewerJS\images\toolbarButton-menuArrows.png" />
+    <Content Include="ViewerJS\images\toolbarButton-pageDown.png" />
+    <Content Include="ViewerJS\images\toolbarButton-pageUp.png" />
+    <Content Include="ViewerJS\images\toolbarButton-presentation.png" />
+    <Content Include="ViewerJS\images\toolbarButton-zoomIn.png" />
+    <Content Include="ViewerJS\images\toolbarButton-zoomOut.png" />
+    <Content Include="ViewerJS\index.html" />
+    <Content Include="ViewerJS\pdf.js" />
+    <Content Include="ViewerJS\pdf.worker.js" />
+    <Content Include="ViewerJS\pdfjsversion.js" />
+    <Content Include="ViewerJS\text_layer_builder.js" />
+    <Content Include="ViewerJS\ui_utils.js" />
+    <Content Include="ViewerJS\webodf.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -450,6 +479,12 @@
     <Content Include="Views\Master\_ConsultantWizard.cshtml" />
     <Content Include="Views\Master\_SelectConsultantwizard.cshtml" />
     <Content Include="Views\Shared\_UserProfile.cshtml" />
+    <Content Include="Views\Master\DocumentType.cshtml" />
+    <Content Include="Views\Master\_DocumentTypeWizard.cshtml" />
+    <Content Include="Views\Master\BusinessStatus.cshtml" />
+    <Content Include="Views\Master\_BusinessStatusWizard.cshtml" />
+    <Content Include="Views\Master\BusinessType.cshtml" />
+    <Content Include="Views\Master\_BusinessTypeWizard.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

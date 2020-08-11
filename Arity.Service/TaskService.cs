@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,7 +30,6 @@ namespace Arity.Service
             {
                 return (from task in _dbContext.Tasks.ToList()
                         join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
-                        join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
                         join assignedTo in _dbContext.Users.ToList() on task.ClientId ?? 0 equals assignedTo.Id
                         where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate && assignedTo.Id == SessionHelper.UserId
                         select new TaskDTO
@@ -42,10 +42,11 @@ namespace Arity.Service
                             TaskName = task.Name,
                             DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("dd/MM/yyyy") : "",
                             CreatedBy = userTask.CreatedBy,
-                            CreatedByString = users.FirstOrDefault(_ => _.Id == userTask.AddedBy).FullName,
+                            CreatedByString = users.FirstOrDefault(_ => _.Id == userTask.AddedBy)?.FullName ?? string.Empty,
                             CreatedOnString = userTask.CreatedOn.ToString("dd/MM/yyyy"),
-                            UserName = user.FullName,
+                            UserName = users.FirstOrDefault(_ => _.Id == userTask.UserId)?.FullName ?? string.Empty,
                             StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
+                            PriorityString = Enum.GetName(typeof(EnumHelper.TaskPrioritis), task.Priorities),
                             StatusId = userTask.Status,
                             ClientName = assignedTo.FullName,
                             IsChargeble = task.IsChargeble ?? false,
@@ -57,8 +58,6 @@ namespace Arity.Service
 
                 return (from task in _dbContext.Tasks.ToList()
                         join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
-                        join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
-                        join assignedTo in _dbContext.Users.ToList() on task.ClientId ?? 0 equals assignedTo.Id
                         where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate
                         select new TaskDTO
                         {
@@ -70,12 +69,13 @@ namespace Arity.Service
                             TaskName = task.Name,
                             DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("dd/MM/yyyy") : "",
                             CreatedBy = userTask.CreatedBy,
-                            CreatedByString = users.FirstOrDefault(_ => _.Id == userTask.AddedBy).FullName,
+                            CreatedByString = users.FirstOrDefault(_ => _.Id == userTask.AddedBy)?.FullName??string.Empty,
                             CreatedOnString = userTask.CreatedOn.ToString("dd/MM/yyyy"),
-                            UserName = user.FullName,
+                            UserName = users.FirstOrDefault(_ => _.Id == userTask.UserId)?.FullName ?? string.Empty,
                             StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
+                            PriorityString = Enum.GetName(typeof(EnumHelper.TaskPrioritis), task.Priorities),
                             StatusId = userTask.Status,
-                            ClientName = assignedTo.FullName,
+                            ClientName = users.FirstOrDefault(_ => _.Id == (task.ClientId ?? 0))?.FullName ?? string.Empty,
                             IsChargeble = task.IsChargeble ?? false,
                             ChargeAmount = task.ChargeAmount
                         }).OrderBy(_ => _.StatusId).ToList();
@@ -136,7 +136,7 @@ namespace Arity.Service
                 existingUserTask.ModifiedOn = DateTime.Now;
                 existingUserTask.DueDate = task.DueDate;
 
-                if (task.IsChargeble && existingUserTask.Status != task.StatusId && task.StatusId == 1)
+                if (task.IsChargeble && existingUserTask.Active != task.Active && task.Active)
                     await CreateInvoice(task);
 
                 await _dbContext.SaveChangesAsync();
@@ -175,14 +175,39 @@ namespace Arity.Service
                 });
                 await _dbContext.SaveChangesAsync();
 
-                if (task.IsChargeble && task.StatusId == 1)
+                if (task.IsChargeble && task.Active)
                     await CreateInvoice(task);
             }
         }
 
+        /// <summary>
+        /// Create invoice based on task completion
+        /// </summary>
+        /// <param name="task"></param>
+        /// <returns></returns>
         private async Task CreateInvoice(TaskDTO task)
         {
-            //await _invoiceService.AddUpdateInvoiceEntry(task.com)
+            try
+            {
+                var yearStartAt = Convert.ToDateTime(ConfigurationManager.AppSettings["YearStart"].Replace("XXXX", ((task.CompletedOn ?? DateTime.Now).Month >= 4 ? (task.CompletedOn ?? DateTime.Now).Year : ((task.CompletedOn ?? DateTime.Now).Year - 1)).ToString()));
+                var yearEndedAt = Convert.ToDateTime(ConfigurationManager.AppSettings["YearEnd"].Replace("XXXX", ((task.CompletedOn ?? DateTime.Now).Month > 3 ? ((task.CompletedOn ?? DateTime.Now).Year + 1) : (task.CompletedOn ?? DateTime.Now).Year).ToString()));
+
+                var companyId = await _invoiceService.GetCompanyByClientId(task.ClientId ?? 0);
+
+                await _invoiceService.AddUpdateInvoiceEntry(companyId, new InvoiceEntry
+                {
+                    ClientId = Convert.ToInt64(task.ClientId ?? 0),
+                    Amount = task.ChargeAmount ?? 0,
+                    Remarks = task.Remarks,
+                    CompanyId = companyId,
+                    InvoiceDate = task.CompletedOn ?? DateTime.Now,
+                    Year = yearStartAt.Year.ToString().Substring(2, 2) + "/" + yearEndedAt.Year.ToString().Substring(2, 2),
+                    ParticularId = 1
+                });
+            }
+            catch
+            {
+            }
         }
 
         public async Task<List<TaskDTO>> GetAll(int userId, int typeId)
@@ -192,7 +217,9 @@ namespace Arity.Service
                         join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
                         join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
                         join client in _dbContext.Users.ToList() on (task.ClientId ?? 0) equals client.Id
-                        where task.ClientId == userId && task.Active == true
+                        where task.ClientId == userId
+                        && task.Status != (int)EnumHelper.TaskStatus.OnHold
+                        && task.Status != (int)EnumHelper.TaskStatus.Cancel
                         select new TaskDTO
                         {
                             TaskId = task.Id,
@@ -216,7 +243,10 @@ namespace Arity.Service
                         join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
                         join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
                         join client in _dbContext.Users.ToList() on (task.ClientId ?? 0) equals client.Id
-                        where userTask.UserId == userId && task.Active == true && userTask.CreatedOn >= Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01))
+                        where userTask.UserId == userId
+                        && task.Status != (int)EnumHelper.TaskStatus.Complete
+                        && task.Status != (int)EnumHelper.TaskStatus.Cancel
+                        && task.Status != (int)EnumHelper.TaskStatus.OnHold
                         select new TaskDTO
                         {
                             TaskId = task.Id,
