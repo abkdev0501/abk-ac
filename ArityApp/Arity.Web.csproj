@@ -399,6 +399,7 @@
     <Content Include="Content\fonts\notika-icon.woff" />
     <Content Include="Content\SampleTemplate\ImportInvoice_Sample.xlsx" />
     <Content Include="Content\SampleTemplate\ImportReceipt_Sample.xlsx" />
+    <Content Include="Content\SampleTemplate\DEMO LED BHAVESH.xls" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
