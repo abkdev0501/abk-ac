@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -150,6 +151,7 @@ namespace Arity.Service
                             InvoiceId = invoice.Id,
                             Address = user.Address + ", " + user.City,
                             City = user.City,
+                            Username = user.Username,
                             FullName = user.FullName,
                             CreatedBy = invoice.CreatedBy,
                             CompanyName = company.CompanyName,
@@ -175,6 +177,7 @@ namespace Arity.Service
                             InvoiceId = invoice.Id,
                             Address = user.Address + ", " + user.City,
                             City = user.City,
+                            Username = user.Username,
                             FullName = user.FullName,
                             CreatedBy = invoice.CreatedBy,
                             CompanyName = company.CompanyName,
@@ -201,6 +204,7 @@ namespace Arity.Service
                             InvoiceId = invoice.Id,
                             Address = user.Address + ", " + user.City,
                             City = user.City,
+                            Username = user.Username,
                             FullName = user.FullName,
                             CreatedBy = invoice.CreatedBy,
                             CompanyName = company.CompanyName,
@@ -516,6 +520,14 @@ namespace Arity.Service
             return await _dbContext.Company_Client_Mapping.Where(_ => _.UserId == clientId).Select(_ => (_.CompanyId ?? 0)).FirstAsync();
         }
 
+        public async Task<List<LedgerReportDto>> GetLedgerReportData(int client, string fromDate, string toDate)
+        {
+            return _dbContext.Database.SqlQuery<LedgerReportDto>("exec LedgerReportDetails @UserId,@FromDate,@ToDate ",
+                new SqlParameter("UserId", client),
+                new SqlParameter("FromDate", Convert.ToDateTime(fromDate)),
+                new SqlParameter("ToDate", Convert.ToDateTime(toDate))).OrderBy(_ => _.Date).ToList<LedgerReportDto>();
+
+        }
         #endregion
     }
 }

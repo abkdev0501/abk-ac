@@ -44,7 +44,7 @@ namespace ArityApp.Controllers
 
                 toDate = toDate + new TimeSpan(23, 59, 59);
                 fromDate = fromDate + new TimeSpan(00, 00, 1);
-                var invoiceList = await _taskService.GetAll(fromDate, toDate);
+                var invoiceList = await _taskService.GetAll();
                 return Json(new { data = invoiceList }, JsonRequestBehavior.AllowGet);
             }
             catch(Exception ex)

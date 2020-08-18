@@ -23,7 +23,7 @@ namespace Arity.Service
             _invoiceService = invoiceService;
         }
 
-        public async Task<List<TaskDTO>> GetAll(DateTime fromDate, DateTime toDate)
+        public async Task<List<TaskDTO>> GetAll()
         {
             var users = _dbContext.Users.ToList();
             if (SessionHelper.UserTypeId == (int)Core.UserType.User)
@@ -31,7 +31,8 @@ namespace Arity.Service
                 return (from task in _dbContext.Tasks.ToList()
                         join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
                         join assignedTo in _dbContext.Users.ToList() on task.ClientId ?? 0 equals assignedTo.Id
-                        where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate && assignedTo.Id == SessionHelper.UserId
+                        //where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate && assignedTo.Id == SessionHelper.UserId
+                        where assignedTo.Id == SessionHelper.UserId
                         select new TaskDTO
                         {
                             TaskId = task.Id,
@@ -58,7 +59,7 @@ namespace Arity.Service
 
                 return (from task in _dbContext.Tasks.ToList()
                         join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
-                        where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate
+                        //where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate
                         select new TaskDTO
                         {
                             TaskId = task.Id,

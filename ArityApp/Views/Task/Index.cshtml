@@ -82,7 +82,8 @@
                         }
                     </div>
 
-                    <div class="date-filter">
+                    @*Date picker*@
+                    @*<div class="date-filter">
 
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
                             <label>From</label>
@@ -102,7 +103,8 @@
                             <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnFilterGrid">Search</button>
                         </div>
 
-                    </div>
+                    </div>*@
+
                     <div class="table-responsive">
                         <table id="tblUsers" class="table table-striped" style="width:100%;">
                             <thead>
@@ -170,8 +172,8 @@
                     type: "GET",
                     dataType: "json",
                     data: {
-                        from: ""+$("#FromDate").val()+"",
-                        to: ""+$("#ToDate").val()+""
+                        //from: ""+$("#FromDate").val()+"",
+                        //to: ""+$("#ToDate").val()+""
                     },
                     beforeSend: function (xhrObj) {
                         $("#loading").show();

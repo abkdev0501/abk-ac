@@ -221,7 +221,8 @@
                         <li id="liReceipt">
                             <a href="/receipt"><i class="notika-icon notika-menus"></i> Receipt</a>
                         </li>
-                        @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin || Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                        @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin ||
+                            Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
                         {
                             if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
                             {
@@ -242,10 +243,15 @@
                         <li id="liDoc">
                             <a href="/Document/Index"><i class="notika-icon notika-windows"></i>Document</a>
                         </li>
-                        @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin || Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                        @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin ||
+                            Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
                         {
                             <li id="liNotes">
                                 <a href="/notification"><i class="notika-icon notika-form"></i>Notes</a>
+                            </li>
+
+                            <li>
+                                <a href="/ledgerReport"><i class="notika-icon notika-form"></i>Reports</a>
                             </li>
                         }
                         @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
@@ -256,7 +262,8 @@
                         }
                     </ul>
                     <div class="tab-content custom-menu-content">
-                        @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin || Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                        @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin ||
+                            Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
                         {
                             <div id="Master" class="tab-pane notika-tab-menu-bg animated flipInX">
                                 <ul class="notika-main-menu-dropdown">
@@ -284,6 +291,7 @@
                                     <li>
                                         <a href="\businesstype">Business Type</a>
                                     </li>
+                                    
                                 </ul>
                             </div>
                         }

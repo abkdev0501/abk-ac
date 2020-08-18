@@ -46,7 +46,9 @@
                         <h2>Document List</h2>
                         <p>Below are List of Document.</p>
                     </div>
-                    <div class="date-filter">
+
+                    @*Datewise filter*@ 
+                    @*<div class="date-filter">
 
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
                             <label>From</label>
@@ -66,7 +68,7 @@
                             <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnFilterGrid">Search</button>
                         </div>
 
-                    </div>
+                    </div>*@
                     <div class="table-responsive">
                         <table id="tblDocument" class="table table-striped">
                             <thead>
@@ -144,8 +146,8 @@
                         type: "GET",
                         dataType: "json",
                         data: {
-                            from: ""+$("#FromDate").val()+"",
-                            to: ""+$("#ToDate").val()+""
+                            //from: ""+$("#FromDate").val()+"",
+                            //to: ""+$("#ToDate").val()+""
                         },
                         beforeSend: function (xhrObj) {
                             $("#loading").show();

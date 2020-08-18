@@ -78,6 +78,57 @@ namespace Arity.Service
                         }).ToList();
         }
 
+        public async Task<List<DocumentMasterDto>> FetchDocuments()
+        {
+            var documentTypes = await _dbContext.DocumentTypes.ToListAsync();
+            if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
+            {
+                return (from data in _dbContext.DocumentMasters.ToList()
+                        join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
+                        join createdBy in _dbContext.Users.ToList() on data.CreatedBy equals createdBy.Id
+                        where  data.ClientId == Convert.ToInt32(SessionHelper.UserId)
+                        select new DocumentMasterDto()
+                        {
+                            DocumentId = data.DocumentId,
+                            Name = data.Name,
+                            ClientId = data.ClientId,
+                            DocumentTypeName = documentTypes.FirstOrDefault(_ => _.DocumnetTypeId == data.DocumentType)?.Name ?? string.Empty,
+                            IsActive = data.IsActive,
+                            CreatedBy = data.CreatedBy,
+                            CreatedOn = data.CreatedOn,
+                            CreatedByString = createdBy.FullName,
+                            AddedBy = Convert.ToInt32(createdBy.UserTypeId),
+                            StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
+                            ClientName = user.FullName,
+                            UserName = user.Username,
+                            FileName = data.FileName
+                        }).ToList();
+            }
+            else
+                return (from data in _dbContext.DocumentMasters.ToList()
+                        join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
+                        join createdBy in _dbContext.Users.ToList() on data.CreatedBy equals createdBy.Id
+                        select new DocumentMasterDto()
+                        {
+                            DocumentId = data.DocumentId,
+                            Name = data.Name,
+                            ClientId = data.ClientId,
+                            DocumentTypeName = documentTypes.FirstOrDefault(_ => _.DocumnetTypeId == data.DocumentType)?.Name ?? string.Empty,
+                            IsActive = data.IsActive,
+                            CreatedBy = data.CreatedBy,
+                            CreatedOn = data.CreatedOn,
+                            CreatedByString = createdBy.FullName,
+                            AddedBy = Convert.ToInt32(createdBy.UserTypeId),
+                            StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
+                            ClientName = user.FullName,
+                            UserName = user.Username,
+                            FileName = data.FileName
+                        }).ToList();
+        }
+
+
+
+
         /// <summary>
         /// Get client list from database
         /// </summary>

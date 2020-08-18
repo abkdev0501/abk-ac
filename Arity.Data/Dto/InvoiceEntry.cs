@@ -19,6 +19,7 @@ namespace Arity.Data.Dto
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
         public string InvoiceNumber { get; set; }
+        public string Username { get; set; }
         public string FullName { get; set; }
         public string Address { get; set; }
         public string City { get; set; }
