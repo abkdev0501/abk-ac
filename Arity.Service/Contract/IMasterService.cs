@@ -17,7 +17,7 @@ namespace Arity.Service.Contract
         Task AddUpdateGroup(GroupMasterDTO groupMaster);
         Task<List<UsersDto>> GetAllClient();
         Task<UsersDto> GetClientById(int id);
-        Task<List<Consultants>> GetAllConsultant();
+        Task<List<UsersDto>> GetAllConsultant();
         Task<List<GroupMasterDTO>> GetAllGroups();
         Task AddUpdateClient(UsersDto usersDto);
         Task<List<NotificationDTO>> GetAllNotification();

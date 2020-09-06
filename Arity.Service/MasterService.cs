@@ -178,7 +178,9 @@ namespace Arity.Service
         {
             return (from user in _dbContext.Users
                     join type in _dbContext.UserTypes on user.UserTypeId equals type.Id
-                    where user.UserTypeId == (int)Core.UserType.User
+                    where SessionHelper.UserTypeId == (int)EnumHelper.UserType.Consultant ?
+                     user.UserTypeId == (int)Core.UserType.User && user.ConsultantId == SessionHelper.UserId
+                    : user.UserTypeId == (int)Core.UserType.User
                     select new UsersDto
                     {
                         Id = user.Id,
@@ -254,9 +256,17 @@ namespace Arity.Service
         /// Get all consultants
         /// </summary>
         /// <returns></returns>
-        public async Task<List<Consultants>> GetAllConsultant()
+        public async Task<List<UsersDto>> GetAllConsultant()
         {
-            return await _dbContext.Consultant.ToListAsync();
+            return await (from cons in _dbContext.Users
+                          where cons.UserTypeId == (int)EnumHelper.UserType.Consultant
+                          select new UsersDto()
+                          {
+                              Id = cons.Id,
+                              Username = cons.Username,
+                              FullName = cons.FullName,
+                              ConsultantId = cons.ConsultantId,
+                          }).ToListAsync();
         }
 
         /// <summary>

@@ -131,6 +131,7 @@
                                 <li>
                                     <a href="/dashboard"> Home</a>
                                 </li>
+                               
                                 <li>
                                     <a href="/invoice">Invoice</a>
                                 </li>
@@ -138,7 +139,9 @@
                                     <a href="/receipt">Receipt</a>
                                 </li>
 
-                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin || Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin ||
+                                    Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
                                 {
                                     if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
                                     {
@@ -215,6 +218,12 @@
                         <li class="active" id="liHome">
                             <a href="/dashboard"><i class="notika-icon notika-house"></i> Home</a>
                         </li>
+                        @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Consultant)
+                        {
+                            <li id="liClient">
+                                <a href="/client"><i class="notika-icon notika-support"></i> Client</a>
+                            </li>
+                        }
                         <li id="liInvoice">
                             <a href="/invoice"><i class="notika-icon notika-bar-chart"></i> Invoice</a>
                         </li>

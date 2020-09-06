@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
@@ -33,6 +34,36 @@ namespace Arity.Service
                         join assignedTo in _dbContext.Users.ToList() on task.ClientId ?? 0 equals assignedTo.Id
                         //where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate && assignedTo.Id == SessionHelper.UserId
                         where assignedTo.Id == SessionHelper.UserId
+                        select new TaskDTO
+                        {
+                            TaskId = task.Id,
+                            TaskUserId = userTask.Id,
+                            UserComment = userTask.Comment,
+                            UserId = userTask.UserId,
+                            Description = task.Description,
+                            TaskName = task.Name,
+                            DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("dd/MM/yyyy") : "",
+                            CreatedBy = userTask.CreatedBy,
+                            CreatedByString = users.FirstOrDefault(_ => _.Id == userTask.AddedBy)?.FullName ?? string.Empty,
+                            CreatedOnString = userTask.CreatedOn.ToString("dd/MM/yyyy"),
+                            UserName = users.FirstOrDefault(_ => _.Id == userTask.UserId)?.FullName ?? string.Empty,
+                            StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
+                            PriorityString = Enum.GetName(typeof(EnumHelper.TaskPrioritis), task.Priorities),
+                            StatusId = userTask.Status,
+                            ClientName = assignedTo.FullName,
+                            IsChargeble = task.IsChargeble ?? false,
+                            ChargeAmount = task.ChargeAmount
+                        }).OrderBy(_ => _.StatusId).ToList();
+            }
+
+            //returns task created by consultant
+            if (SessionHelper.UserTypeId == (int)Core.UserType.Consultant)
+            {
+                return (from task in _dbContext.Tasks.ToList()
+                        join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
+                        join assignedTo in _dbContext.Users.ToList() on task.ClientId ?? 0 equals assignedTo.Id
+                        //where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate && assignedTo.Id == SessionHelper.UserId
+                        where userTask.CreatedBy == SessionHelper.UserId
                         select new TaskDTO
                         {
                             TaskId = task.Id,
