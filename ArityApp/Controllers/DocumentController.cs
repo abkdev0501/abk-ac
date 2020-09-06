@@ -134,14 +134,15 @@ namespace ArityApp.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<JsonResult> LoadDocuments(string from, string to)
+        public async Task<JsonResult> LoadDocuments()
         {
-            DateTime fromDate = Convert.ToDateTime(from);
-            DateTime toDate = Convert.ToDateTime(to);
-            toDate = toDate + new TimeSpan(23, 59, 59);
-            fromDate = fromDate + new TimeSpan(00, 00, 1);
-
-            var List = await _documentService.FetchDocuments(toDate, fromDate);
+            //public async Task<JsonResult> LoadDocuments(string from, string to)
+            //DateTime fromDate = Convert.ToDateTime(from);
+            //DateTime toDate = Convert.ToDateTime(to);
+            //toDate = toDate + new TimeSpan(23, 59, 59);
+            //fromDate = fromDate + new TimeSpan(00, 00, 1);
+            //var List = await _documentService.FetchDocuments(toDate, fromDate);
+            var List = await _documentService.FetchDocuments();
             return Json(new { data = List }, JsonRequestBehavior.AllowGet);
         }
     }

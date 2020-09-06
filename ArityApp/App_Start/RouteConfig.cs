@@ -120,6 +120,12 @@ namespace ArityApp
          );
 
             routes.MapRoute(
+             name: "ledgerReport",
+             url: "ledgerReport",
+             defaults: new { controller = "Master", action = "LedgerReport", id = UrlParameter.Optional }
+         );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Landing", action = "Index", id = UrlParameter.Optional }

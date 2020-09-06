@@ -488,6 +488,7 @@
     <Content Include="Views\Master\_BusinessStatusWizard.cshtml" />
     <Content Include="Views\Master\BusinessType.cshtml" />
     <Content Include="Views\Master\_BusinessTypeWizard.cshtml" />
+    <Content Include="Views\Master\LedgerReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

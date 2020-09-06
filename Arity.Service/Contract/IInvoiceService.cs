@@ -28,8 +28,8 @@ namespace Arity.Service.Contract
         Task<CompanyDto> GetCompanyDetailById(int companyId);
         Task<decimal> GetInvoiceAmountTotal(List<long> invoices);
         Task<bool> DeleteInvoiceById(int invoiceId);
-
         Task<List<CompanyClientList>> GetAllCompanyWithClients();
         Task<int> GetCompanyByClientId(int clientId);
+        Task<List<LedgerReportDto>> GetLedgerReportData(int client, string from, string to);
     }
 }

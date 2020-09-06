@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,7 +41,9 @@ namespace Arity.Service
         {
             return await (from cd in _dbContext.Users
                           join m in _dbContext.Company_Client_Mapping on cd.Id equals (m.UserId ?? 0)
-                          where m.CompanyId == id
+                          where SessionHelper.UserTypeId == (int)EnumHelper.UserType.Consultant ? 
+                          m.CompanyId == id && cd.ConsultantId == (int)SessionHelper.UserId :
+                          m.CompanyId == id
                           select cd).ToListAsync();
         }
         public async Task<List<Particular>> GetParticular()
@@ -75,7 +78,7 @@ namespace Arity.Service
                     invoiceDetail.UpdatedDate = DateTime.Now;
                     invoiceDetail.CreatedDate = DateTime.Now;
                     invoiceDetail.InvoiceDate = invoiceEntry.InvoiceDate;
-                    invoiceDetail.CreatedBy = Convert.ToInt32(SessionHelper.UserId);
+                    invoiceDetail.CreatedBy =  Convert.ToInt32(SessionHelper.UserId);
                     invoiceDetail.Remarks = invoiceEntry.Remarks;
                     _dbContext.InvoiceDetails.Add(invoiceDetail);
                     await _dbContext.SaveChangesAsync();
@@ -135,7 +138,7 @@ namespace Arity.Service
 
         public async Task<List<InvoiceEntry>> GetAllInvoice(DateTime fromDate, DateTime toDate)
         {
-            if (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.User)
+            if (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.User )
                 return (from invoice in _dbContext.InvoiceDetails.ToList()
                         join company in _dbContext.Company_master.ToList() on invoice.CompanyId equals company.Id
                         join user in _dbContext.Users.ToList() on invoice.ClientId equals user.Id
@@ -150,6 +153,7 @@ namespace Arity.Service
                             InvoiceId = invoice.Id,
                             Address = user.Address + ", " + user.City,
                             City = user.City,
+                            Username = user.Username,
                             FullName = user.FullName,
                             CreatedBy = invoice.CreatedBy,
                             CompanyName = company.CompanyName,
@@ -159,6 +163,34 @@ namespace Arity.Service
                             AddedBy = Convert.ToInt32(createdby.UserTypeId),
                             Remarks = invoice.Remarks
                         }).ToList();
+
+            else if (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.Consultant)
+                return (from invoice in _dbContext.InvoiceDetails.ToList()
+                        join company in _dbContext.Company_master.ToList() on invoice.CompanyId equals company.Id
+                        join user in _dbContext.Users.ToList() on invoice.ClientId equals user.Id
+                        join createdby in _dbContext.Users.ToList() on invoice.CreatedBy equals createdby.Id
+                        where invoice.CreatedDate >= fromDate && invoice.CreatedDate <= toDate && invoice.CreatedBy == SessionHelper.UserId
+                        select new InvoiceEntry()
+                        {
+                            Amount = _dbContext.InvoiceParticulars.Where(_ => _.InvoiceId == invoice.Id).Sum(_ => (decimal?)_.Amount) ?? 0,
+                            CreatedDateString = invoice.InvoiceDate.ToString("dd/MM/yyyy"),
+                            UpdatedDate = invoice.UpdatedDate,
+                            InvoiceNumber = company.Prefix + "-" + invoice.Invoice_Number,
+                            InvoiceId = invoice.Id,
+                            Address = user.Address + ", " + user.City,
+                            City = user.City,
+                            Username = user.Username,
+                            FullName = user.FullName,
+                            CreatedBy = invoice.CreatedBy,
+                            CompanyName = company.CompanyName,
+                            CreatedByString = createdby.FullName,
+                            Year = _dbContext.InvoiceParticulars.Where(_ => _.InvoiceId == invoice.Id)?.FirstOrDefault()?.year ?? string.Empty,
+                            GroupName = (user.GroupId ?? 0) > 0 ? _dbContext.GroupMasters.FirstOrDefault(_ => _.GroupId == user.GroupId).Name : string.Empty,
+                            AddedBy = Convert.ToInt32(createdby.UserTypeId),
+                            Remarks = invoice.Remarks
+                        }).ToList();
+
+
             else if (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.MasterAdmin)
 
                 return (from invoice in _dbContext.InvoiceDetails.ToList()
@@ -175,6 +207,7 @@ namespace Arity.Service
                             InvoiceId = invoice.Id,
                             Address = user.Address + ", " + user.City,
                             City = user.City,
+                            Username = user.Username,
                             FullName = user.FullName,
                             CreatedBy = invoice.CreatedBy,
                             CompanyName = company.CompanyName,
@@ -201,6 +234,7 @@ namespace Arity.Service
                             InvoiceId = invoice.Id,
                             Address = user.Address + ", " + user.City,
                             City = user.City,
+                            Username = user.Username,
                             FullName = user.FullName,
                             CreatedBy = invoice.CreatedBy,
                             CompanyName = company.CompanyName,
@@ -516,6 +550,14 @@ namespace Arity.Service
             return await _dbContext.Company_Client_Mapping.Where(_ => _.UserId == clientId).Select(_ => (_.CompanyId ?? 0)).FirstAsync();
         }
 
+        public async Task<List<LedgerReportDto>> GetLedgerReportData(int client, string fromDate, string toDate)
+        {
+            return _dbContext.Database.SqlQuery<LedgerReportDto>("exec LedgerReportDetails @UserId,@FromDate,@ToDate ",
+                new SqlParameter("UserId", client),
+                new SqlParameter("FromDate", Convert.ToDateTime(fromDate)),
+                new SqlParameter("ToDate", Convert.ToDateTime(toDate))).OrderBy(_ => _.Date).ToList<LedgerReportDto>();
+
+        }
         #endregion
     }
 }

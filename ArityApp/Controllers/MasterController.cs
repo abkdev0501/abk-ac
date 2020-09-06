@@ -3,8 +3,11 @@ using Arity.Data.Entity;
 using Arity.Data.Helpers;
 using Arity.Service;
 using Arity.Service.Contract;
+using OfficeOpenXml;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -16,12 +19,15 @@ namespace ArityApp.Controllers
     {
         private readonly IMasterService _masterService;
         private readonly IInvoiceService _invoiceService;
+        private readonly IDocumentService _documentService;
 
         public MasterController(IMasterService masterService,
-            IInvoiceService invoiceService)
+            IInvoiceService invoiceService,
+            IDocumentService documentService)
         {
             _masterService = masterService;
             _invoiceService = invoiceService;
+            _documentService = documentService;
         }
 
         #region Company
@@ -220,7 +226,7 @@ namespace ArityApp.Controllers
             }).ToList();
 
             ViewBag.Companies = new MultiSelectList(companies, "Id", "CompanyName", clientMaster.CompanyIds);
-            ViewBag.Consultant = new SelectList(await _masterService.GetAllConsultant(), "ConsultantId", "Name", clientMaster.ConsultantId);
+            ViewBag.Consultant = new SelectList(await _masterService.GetAllConsultant(), "Id", "FullName", clientMaster.ConsultantId);
             ViewBag.Groups = new SelectList(await _masterService.GetAllGroups(), "GroupId", "Name", clientMaster.GroupId);
             ViewBag.BusinessType = new SelectList(await _masterService.GetAllBusinessType(), "BusinessTypeId", "Name", clientMaster?.BusinessType);
             ViewBag.BusinessStatus = new SelectList(await _masterService.GetAllBusinessStatus(), "BusinessStatusId", "Name", clientMaster?.BusinessStatus);
@@ -774,6 +780,171 @@ namespace ArityApp.Controllers
             }
         }
 
+        #endregion
+
+        #region ledger Report
+
+        /// <summary>
+        /// Ledger report landing page 
+        /// </summary>
+        /// <returns></returns>
+         [HttpGet]
+        public async Task<ActionResult> LedgerReport()
+        {
+            try
+            {
+                ViewBag.FromDate = Convert.ToDateTime(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 01));
+                ViewBag.ToDate = Convert.ToDateTime(
+                                new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month)));
+                ViewBag.Clients = new SelectList(await _documentService.GetClient(), "Id", "FullName");
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return View(new LedgerReportDto());
+        }
+
+        /// <summary>
+        /// Export generated ledger report 
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
+            
+        public async Task ExportLedgerReport(int client, string from, string to)
+        {
+            var ledgerData = await _invoiceService.GetLedgerReportData(client, from, to);
+            if (ledgerData.Count() > 0)
+            {
+                ExcelPackage Ep = new ExcelPackage();
+
+                ExcelWorksheet Sheet = Ep.Workbook.Worksheets.Add(ledgerData.FirstOrDefault().ClientName+"_Ledger Report");
+                int currentCell = 1;
+
+                Sheet.Cells[1,1].Style.Font.Bold = true;
+                Sheet.Cells[1,1].Value = "NAME:";
+
+                Sheet.Cells[1, 2].Style.Font.Bold = true;
+                Sheet.Cells[1, 2].Value = ledgerData.FirstOrDefault().ClientName;
+
+                Sheet.Cells[2,1].Style.Font.Bold = true;
+                Sheet.Cells[2,1].Value = "ADDRESS:";
+
+                Sheet.Cells[2,2].Style.Font.Bold = true;
+                Sheet.Cells[2,2].Value = ledgerData.FirstOrDefault().ClientAddress;
+
+                Sheet.Cells[4, 1].Style.Font.Bold = true;
+                Sheet.Cells[4, 1].Value = "Period:";
+
+                Sheet.Cells[4, 4].Style.Font.Bold = true;
+                Sheet.Cells[4, 2].Value = Convert.ToDateTime(from).ToLongDateString() +"  to  " + Convert.ToDateTime(to).ToLongDateString();
+                Sheet.Cells[4, 4].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                Sheet.Cells[7, 1].Style.Font.Bold = true;
+                Sheet.Cells[7, 1].Value = "Date";
+                Sheet.Cells[7, 1].Style.Border.Left.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[7, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[7, 1].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[7, 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                Sheet.Cells[7, 2].Style.Font.Bold = true;
+                Sheet.Cells[7, 2].Value = "Particular";
+                Sheet.Cells[7, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[7, 2].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[7, 2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                Sheet.Cells[7, 3].Style.Font.Bold = true;
+                Sheet.Cells[7, 3].Value = "Invoice No";
+                Sheet.Cells[7, 2].AutoFitColumns();
+                Sheet.Cells[7, 3].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[7, 3].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[7, 3].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                Sheet.Cells[7, 4].Style.Font.Bold = true;
+                Sheet.Cells[7, 4].Value = "Debit";
+                Sheet.Cells[7, 2].AutoFitColumns();
+                Sheet.Cells[7, 4].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[7, 4].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[7, 4].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                Sheet.Cells[7, 5].Style.Font.Bold = true;
+                Sheet.Cells[7, 5].Value = "Credit";
+                Sheet.Cells[7, 2].AutoFitColumns();
+                Sheet.Cells[7, 5].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[7, 5].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[7, 5].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[7, 5].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                int i = 8;
+                foreach(var iteam in ledgerData)
+                {
+                    Sheet.Cells[string.Format("A"+i)].Value = iteam.Date.ToShortDateString();
+
+                    Sheet.Cells[string.Format("B" + i)].Value = iteam.Particular;
+                    Sheet.Cells[string.Format("B" + i)].Style.Font.Bold = true;
+
+                    Sheet.Cells[string.Format("C" + i)].Value = iteam.InvoiceId;
+
+                    Sheet.Cells[string.Format("D" + i)].Style.Font.Bold = true;
+                    Sheet.Cells[string.Format("D" + i)].Value = iteam.Debit.ToString();
+
+                    Sheet.Cells[string.Format("E" + i)].Style.Font.Bold = true;
+                    Sheet.Cells[string.Format("E" + i)].Value = iteam.Credit.ToString();
+
+                    i++;
+                }
+                Sheet.Cells[string.Format("A" + i)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B" + i)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("C" + i)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("D" + i)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("D" + i)].Value = ledgerData.Sum(_ => _.Debit).ToString();
+                Sheet.Cells[string.Format("D" + i)].Style.Font.Bold = true;
+
+                Sheet.Cells[string.Format("E" + i)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("E" + i)].Value =ledgerData.Sum(_ => _.Credit).ToString();
+                Sheet.Cells[string.Format("E" + i)].Style.Font.Bold = true;
+
+                Sheet.Cells[string.Format("B" + (i + 1))].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("B" + (i + 1))].Value = "Closing Balance";
+
+                Sheet.Cells[string.Format("E" + (i + 1))].Style.Font.Bold = true;
+                Sheet.Cells[string.Format("E" + (i + 1))].Value = (ledgerData.Sum(_ => _.Debit)-ledgerData.Sum(_ => _.Credit)).ToString();
+
+                Sheet.Cells[string.Format("A" + (i+1))].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("B" + (i+1))].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("C" + (i+1))].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("D" + (i+1))].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                Sheet.Cells[string.Format("E" + (i+1))].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+
+                Sheet.Cells[string.Format("D" + (i + 2))].Value = ledgerData.Sum(_ => _.Debit).ToString();
+                Sheet.Cells[string.Format("D" + (i + 2))].Style.Font.Bold = true;
+
+                Sheet.Cells[string.Format("E" + (i + 2))].Value = ledgerData.Sum(_ => _.Debit).ToString();
+                Sheet.Cells[string.Format("E" + (i + 2))].Style.Font.Bold = true;
+
+
+
+
+
+
+                Sheet.Column(2).AutoFit();
+                Sheet.Column(4).Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                Sheet.Column(5).Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                Sheet.Cells.AutoFitColumns();
+                using (var memoryStream = new MemoryStream())
+                {
+                    Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    Response.AddHeader("content-disposition", "attachment;  filename=ckdk.xlsx");
+                    Ep.SaveAs(memoryStream);
+                    memoryStream.WriteTo(Response.OutputStream);
+                    Response.Flush();
+                    Response.End();
+
+                }
+            }
+        }
         #endregion
     }
 }

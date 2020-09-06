@@ -4,6 +4,7 @@
     {
         MasterAdmin = 1,
         Admin = 2,
-        User = 3
+        User = 3,
+        Consultant = 4
     }
 }
