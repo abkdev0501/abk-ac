@@ -72,6 +72,98 @@
                         </div>
                     </div>
                 </div>
+                <script>
+                    $(document).ready(function () {
+                        
+                    $.ajax({
+                                url: '@Url.Action("GetAllNotification", "Home")',
+                                dataType: "json",
+                                type: "GET",
+                                cache: false,
+                                data: {type:3},
+                                contentType: 'application/json; charset=utf-8',
+                                success: function (response) {
+                                    $("#alertList").html('');
+                                    $(response).each(function (i, data) {
+                                        $("#alertList").append(
+                                            '<li class="list-group-item ' + (response.length == (i+1) ? "last-item":"")+ '"><div class="" style="border-bottom:1px solid #eee;">' +
+                                            '<div class="breadcomb-list" style="padding:0px !important; background: #fff; margin-top: 10px !important;margin-bottom:5px;">' +
+                                            '<div class="row">' +
+                                            '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">' +
+                                            '<div class="breadcomb-wp">' +
+                                            '<div class="breadcomb-ctn" style="margin-left:0px !important">' +
+                                            '<p style="font-size: 15px;">' + data.Message +
+                                            '<span style="color: #6e5e5e;font-size: 12px;font-weight: 400;margin-left:10px;"></span></p>' +
+                                            '</div>' +
+                                            '</div>' +
+                                            '</div>' +
+                                            '</div>' +
+                                            '</div>' +
+                                            '</div></li>');
+                                    });
+                                    if (response.length <= 0) {
+                                    $("#alertList").append('<span style="display:block;text-align:center;">No new news</span>');
+                                    }
+                                    //$("#alertList").liScroll();
+                                    $('.tickerv-wrap').easyTicker({
+                                        direction: 'up',
+                                        easing: 'swing',
+                                        speed: 'slow',
+                                        interval: 3000,
+                                        height: 'auto',
+                                        visible: 0,
+                                        mousePause: true,
+                                        callbacks: {
+                                            before: function(ul, li){
+                                console.log(this, ul, li);
+                                $(li).css('color', 'red');
+                            },
+                            after: function(ul, li){
+                                console.log(this, ul, li);
+                            }
+                                        }
+                                    }).data('easyTicker');
+
+                                },
+                                error: function (error) {
+                                }
+                    });
+
+                    jQuery.fn.liScroll = function(settings) {
+	                settings = jQuery.extend({
+		                travelocity: 0.03
+		                }, settings);		
+		                return this.each(function(){
+				                var $strip = jQuery(this);
+				                $strip.addClass("newsticker")
+				                var stripHeight = 1;
+				                $strip.find("li").each(function(i){
+					                stripHeight += $(this).children().outerHeight() + $(this).outerHeight(); // thanks to Michael Haszprunar and Fabien Volpi
+                                });
+				                var $mask = $strip.wrap("<div class='mask'></div>");
+				                var $tickercontainer = $strip.parent().wrap("<div class='tickercontainer'></div>");								
+				                var containerHeight = $strip.parent().parent().height();	//a.k.a. 'mask' width 	
+				                $strip.height(stripHeight);			
+				                var totalTravel = stripHeight;
+				                var defTiming = totalTravel/settings.travelocity;	// thanks to Scott Waye		
+				                function scrollnews(spazio, tempo){
+				                $strip.animate({top: '-='+ spazio}, tempo, "linear", function(){$strip.css("top", containerHeight); scrollnews(totalTravel, defTiming);});
+				                }
+				                scrollnews(totalTravel, defTiming);				
+				                $strip.hover(function(){
+				                  jQuery(this).stop();
+				                },
+				                function(){
+				                  var offset = jQuery(this).offset();
+				                  var residualSpace = offset.top + stripHeight;
+				                  var residualTime = residualSpace/settings.travelocity;
+				                  scrollnews(residualSpace, residualTime);
+				                });			
+		                });	
+                };
+
+                    });
+                </script>
             }
             </div>
     </div>
@@ -154,60 +246,6 @@
                 }
     });
 
-     $.ajax({
-                url: '@Url.Action("GetAllNotification", "Home")',
-                dataType: "json",
-                type: "GET",
-                cache: false,
-                data: {type:3},
-                contentType: 'application/json; charset=utf-8',
-                success: function (response) {
-                    $("#alertList").html('');
-                    $(response).each(function (i, data) {
-                        $("#alertList").append(
-                            '<li class="list-group-item ' + (response.length == (i+1) ? "last-item":"")+ '"><div class="" style="border-bottom:1px solid #eee;">' +
-                            '<div class="breadcomb-list" style="padding:0px !important; background: #fff; margin-top: 10px !important;margin-bottom:5px;">' +
-                            '<div class="row">' +
-                            '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">' +
-                            '<div class="breadcomb-wp">' +
-                            '<div class="breadcomb-ctn" style="margin-left:0px !important">' +
-                            '<p style="font-size: 15px;">' + data.Message +
-                            '<span style="color: #6e5e5e;font-size: 12px;font-weight: 400;margin-left:10px;"></span></p>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div></li>');
-                    });
-                    if (response.length <= 0) {
-                    $("#alertList").append('<span style="display:block;text-align:center;">No new news</span>');
-                    }
-                    //$("#alertList").liScroll();
-                    $('.tickerv-wrap').easyTicker({
-                        direction: 'up',
-                        easing: 'swing',
-                        speed: 'slow',
-                        interval: 3000,
-                        height: 'auto',
-                        visible: 0,
-                        mousePause: true,
-                        callbacks: {
-                            before: function(ul, li){
-                console.log(this, ul, li);
-                $(li).css('color', 'red');
-            },
-            after: function(ul, li){
-                console.log(this, ul, li);
-            }
-                        }
-                    }).data('easyTicker');
-
-                },
-                error: function (error) {
-                }
-    });
-
     function GetFormttedStaus(StatusName) {
         if(StatusName ==="Assigned")
                         return '<span class="btn-info" style="padding:3px;">'+StatusName+'</span>';
@@ -224,40 +262,6 @@
                     else
                         return '<span class="btn-success" style="padding:3px;">'+StatusName+'</span>';
     }
-
-        jQuery.fn.liScroll = function(settings) {
-	settings = jQuery.extend({
-		travelocity: 0.03
-		}, settings);		
-		return this.each(function(){
-				var $strip = jQuery(this);
-				$strip.addClass("newsticker")
-				var stripHeight = 1;
-				$strip.find("li").each(function(i){
-					stripHeight += $(this).children().outerHeight() + $(this).outerHeight(); // thanks to Michael Haszprunar and Fabien Volpi
-                });
-				var $mask = $strip.wrap("<div class='mask'></div>");
-				var $tickercontainer = $strip.parent().wrap("<div class='tickercontainer'></div>");								
-				var containerHeight = $strip.parent().parent().height();	//a.k.a. 'mask' width 	
-				$strip.height(stripHeight);			
-				var totalTravel = stripHeight;
-				var defTiming = totalTravel/settings.travelocity;	// thanks to Scott Waye		
-				function scrollnews(spazio, tempo){
-				$strip.animate({top: '-='+ spazio}, tempo, "linear", function(){$strip.css("top", containerHeight); scrollnews(totalTravel, defTiming);});
-				}
-				scrollnews(totalTravel, defTiming);				
-				$strip.hover(function(){
-				  jQuery(this).stop();
-				},
-				function(){
-				  var offset = jQuery(this).offset();
-				  var residualSpace = offset.top + stripHeight;
-				  var residualTime = residualSpace/settings.travelocity;
-				  scrollnews(residualSpace, residualTime);
-				});			
-		});	
-};
-
 
     </script>
 }

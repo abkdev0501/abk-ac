@@ -219,9 +219,11 @@
     <Compile Include="Controllers\MasterController.cs" />
     <Compile Include="Controllers\ParticularController.cs" />
     <Compile Include="Controllers\TaskController.cs" />
+    <Compile Include="Extensions\LinqExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\AuxiliaryModels\DatatableModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -489,7 +491,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

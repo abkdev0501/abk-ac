@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Arity.Data.Helpers;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
@@ -21,9 +22,9 @@ namespace Arity.Data.Dto
         public int UserId { get; set; }
         public DateTime? DueDate { get; set; }
         public string UserName { get; set; }
-        public string CreatedOnString { get; set; }
-        public string StatusString { get; set; }
-        public string DueDateString { get; set; }
+        public string CreatedOnString { get { return CreatedOn != null ? CreatedOn.ToString("dd/MM/yyyy") : ""; } }
+        public string StatusString { get { return StatusId > 0 ? Enum.GetName(typeof(EnumHelper.TaskStatus), StatusId) : string.Empty; } }
+        public string DueDateString { get { return DueDate.HasValue ? DueDate.Value.ToString("dd/MM/yyyy") : ""; } }
         public int? ClientId { get; set; }
         public int? Priorities { get; set; }
         public string Remarks { get; set; }
@@ -35,6 +36,6 @@ namespace Arity.Data.Dto
         public string ClientName { get; set; }
         public string CreatedByString { get; set; }
         public decimal? ChargeAmount { get; set; }
-        public string PriorityString { get; set; }
+        public string PrioritiesString { get { return Priorities != null ? Enum.GetName(typeof(EnumHelper.TaskPrioritis), Priorities) : string.Empty; } }
     }
 }

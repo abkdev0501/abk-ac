@@ -126,7 +126,8 @@ namespace Arity.Service
                                                                 _dbContext.InvoiceReciepts.Where(_ => _.RecieptId == receipt.Id).Select(_ => _.InvoiceId).ToList().Contains(i.Id))
                                                                 .Select(i => i.ClientId)?.FirstOrDefault())?.GroupId)?.Name ?? string.Empty,
                                     AddedBy = clients.FirstOrDefault(_ => _.Id == receipt.AddedBy)?.FullName ?? string.Empty,
-                                    Remarks = receipt.Remarks
+                                    Remarks = receipt.Remarks,
+                                    ClientId = receipt.clientId ?? 0
                                 }).ToList();
 
                 var clientIds = (from rec in _dbContext.InvoiceReciepts.ToList()
@@ -136,10 +137,11 @@ namespace Arity.Service
                                  {
                                      ReceiptId = rec.RecieptId ?? 0
                                  }).Distinct().ToList();
-
-                receipts.RemoveAll(_ => clientIds.Any(c => c.ReceiptId == _.ReceiptId));
-
-                return receipts;
+                var allReceipts = receipts;
+                allReceipts.RemoveAll(_ => clientIds.Any(c => c.ReceiptId == _.ReceiptId) || _.ClientId != SessionHelper.UserId);
+                receipts = clientIds.Any() ? receipts : new List<ReceiptDto>();
+                allReceipts.AddRange(receipts.Where(_ => string.IsNullOrEmpty(_.InvoiceNumbers) && _.ClientId == SessionHelper.UserId).ToList());
+                return allReceipts;
 
             }
             else if (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.MasterAdmin)

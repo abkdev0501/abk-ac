@@ -23,15 +23,19 @@ namespace Arity.Service
             _invoiceService = invoiceService;
         }
 
-        public async Task<List<TaskDTO>> GetAll(DateTime fromDate, DateTime toDate)
+        public async Task<IQueryable<TaskDTO>> GetAll()
         {
-            var users = _dbContext.Users.ToList();
+            //var users = _dbContext.Users.ToList();
             if (SessionHelper.UserTypeId == (int)Core.UserType.User)
             {
-                return (from task in _dbContext.Tasks.ToList()
-                        join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
-                        join assignedTo in _dbContext.Users.ToList() on task.ClientId ?? 0 equals assignedTo.Id
-                        where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate && assignedTo.Id == SessionHelper.UserId
+                return (from task in _dbContext.Tasks.AsQueryable()
+                        join userTask in _dbContext.UserTasks.AsQueryable() on task.Id equals userTask.TaskId
+                        join assignedTo in _dbContext.Users.AsQueryable() on task.ClientId ?? 0 equals assignedTo.Id
+                        join user in _dbContext.Users.AsQueryable() on userTask.AddedBy equals user.Id into users
+                        join userName in _dbContext.Users.AsQueryable() on userTask.UserId equals userName.Id into userN
+                        from addedBy in users.DefaultIfEmpty()
+                        from userByN in userN.DefaultIfEmpty()
+                        where assignedTo.Id == SessionHelper.UserId
                         select new TaskDTO
                         {
                             TaskId = task.Id,
@@ -40,25 +44,28 @@ namespace Arity.Service
                             UserId = userTask.UserId,
                             Description = task.Description,
                             TaskName = task.Name,
-                            DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("dd/MM/yyyy") : "",
+                            DueDate = userTask.DueDate,
                             CreatedBy = userTask.CreatedBy,
-                            CreatedByString = users.FirstOrDefault(_ => _.Id == userTask.AddedBy)?.FullName ?? string.Empty,
-                            CreatedOnString = userTask.CreatedOn.ToString("dd/MM/yyyy"),
-                            UserName = users.FirstOrDefault(_ => _.Id == userTask.UserId)?.FullName ?? string.Empty,
-                            StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
-                            PriorityString = Enum.GetName(typeof(EnumHelper.TaskPrioritis), task.Priorities),
+                            CreatedByString = addedBy != null ? addedBy.FullName : string.Empty,
+                            CreatedOn = userTask.CreatedOn,
+                            UserName = userByN != null ? userByN.FullName : string.Empty,
+                            Priorities = task.Priorities,
                             StatusId = userTask.Status,
                             ClientName = assignedTo.FullName,
                             IsChargeble = task.IsChargeble ?? false,
                             ChargeAmount = task.ChargeAmount
-                        }).OrderBy(_ => _.StatusId).ToList();
+                        }).OrderBy(_ => _.StatusId).AsQueryable();
             }
-            else
+            else if (SessionHelper.UserTypeId == (int)Core.UserType.Admin)
             {
-
-                return (from task in _dbContext.Tasks.ToList()
-                        join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
-                        where userTask.CreatedOn >= fromDate && userTask.CreatedOn <= toDate
+                return (from task in _dbContext.Tasks.AsQueryable()
+                        join userTask in _dbContext.UserTasks.AsQueryable() on task.Id equals userTask.TaskId
+                        join assignedTo in _dbContext.Users.AsQueryable() on task.ClientId ?? 0 equals assignedTo.Id
+                        join user in _dbContext.Users.AsQueryable() on userTask.AddedBy equals user.Id into users
+                        join userName in _dbContext.Users.AsQueryable() on userTask.UserId equals userName.Id into userN
+                        from addedBy in users.DefaultIfEmpty()
+                        from userByN in userN.DefaultIfEmpty()
+                        where assignedTo.Id == SessionHelper.UserId || userTask.UserId == SessionHelper.UserId || userTask.AddedBy ==SessionHelper.UserId
                         select new TaskDTO
                         {
                             TaskId = task.Id,
@@ -67,18 +74,48 @@ namespace Arity.Service
                             UserId = userTask.UserId,
                             Description = task.Description,
                             TaskName = task.Name,
-                            DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("dd/MM/yyyy") : "",
+                            DueDate = userTask.DueDate,
                             CreatedBy = userTask.CreatedBy,
-                            CreatedByString = users.FirstOrDefault(_ => _.Id == userTask.AddedBy)?.FullName??string.Empty,
-                            CreatedOnString = userTask.CreatedOn.ToString("dd/MM/yyyy"),
-                            UserName = users.FirstOrDefault(_ => _.Id == userTask.UserId)?.FullName ?? string.Empty,
-                            StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
-                            PriorityString = Enum.GetName(typeof(EnumHelper.TaskPrioritis), task.Priorities),
+                            CreatedByString = addedBy != null ? addedBy.FullName : string.Empty,
+                            CreatedOn = userTask.CreatedOn,
+                            UserName = userByN != null ? userByN.FullName : string.Empty,
+                            Priorities = task.Priorities,
                             StatusId = userTask.Status,
-                            ClientName = users.FirstOrDefault(_ => _.Id == (task.ClientId ?? 0))?.FullName ?? string.Empty,
+                            ClientName = assignedTo.FullName,
                             IsChargeble = task.IsChargeble ?? false,
                             ChargeAmount = task.ChargeAmount
-                        }).OrderBy(_ => _.StatusId).ToList();
+                        }).OrderBy(_ => _.StatusId).AsQueryable();
+            }
+            else
+            {
+
+                return (from task in _dbContext.Tasks.AsQueryable()
+                        join userTask in _dbContext.UserTasks.AsQueryable() on task.Id equals userTask.TaskId
+                        join user in _dbContext.Users.AsQueryable() on userTask.AddedBy equals user.Id into users
+                        join userName in _dbContext.Users.AsQueryable() on userTask.UserId equals userName.Id into userN
+                        join client in _dbContext.Users.AsQueryable() on (task.ClientId ?? 0) equals client.Id into clientN
+                        from addedBy in users.DefaultIfEmpty()
+                        from userByN in userN.DefaultIfEmpty()
+                        from clientByN in clientN.DefaultIfEmpty()
+                        select new TaskDTO
+                        {
+                            TaskId = task.Id,
+                            TaskUserId = userTask.Id,
+                            UserComment = userTask.Comment,
+                            UserId = userTask.UserId,
+                            Description = task.Description,
+                            TaskName = task.Name,
+                            DueDate = userTask.DueDate,
+                            CreatedBy = userTask.CreatedBy,
+                            CreatedByString = addedBy != null ? addedBy.FullName : string.Empty,
+                            CreatedOn = userTask.CreatedOn,
+                            UserName = userByN != null ? userByN.FullName : string.Empty,
+                            Priorities = task.Priorities,
+                            StatusId = userTask.Status,
+                            ClientName = clientByN != null ? clientByN.FullName : string.Empty,
+                            IsChargeble = task.IsChargeble ?? false,
+                            ChargeAmount = task.ChargeAmount
+                        }).OrderBy(_ => _.StatusId).AsQueryable();
             }
         }
 
@@ -228,13 +265,12 @@ namespace Arity.Service
                             UserId = userTask.UserId,
                             Description = task.Description,
                             TaskName = task.Name,
-                            DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("dd/MM/yyyy") : "",
+                            DueDate = userTask.DueDate,
                             CreatedBy = userTask.CreatedBy,
-                            CreatedOnString = userTask.CreatedOn.ToString("dd/MM/yyyy"),
+                            CreatedOn = userTask.CreatedOn,
                             UserName = user.FullName,
                             ClientName = client.FullName,
                             Remarks = task.Remarks,
-                            StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
                             StatusId = userTask.Status,
                             ChargeAmount = task.ChargeAmount
                         }).OrderBy(_ => _.StatusId).ToList();
@@ -255,13 +291,12 @@ namespace Arity.Service
                             UserId = userTask.UserId,
                             Description = task.Description,
                             TaskName = task.Name,
-                            DueDateString = userTask.DueDate.HasValue ? userTask.DueDate.Value.ToString("dd/MM/yyyy") : "",
+                            DueDate = userTask.DueDate,
                             CreatedBy = userTask.CreatedBy,
-                            CreatedOnString = userTask.CreatedOn.ToString("dd/MM/yyyy"),
+                            CreatedOn = userTask.CreatedOn,
                             UserName = user.FullName,
                             ClientName = client.FullName,
                             Remarks = task.Remarks,
-                            StatusString = Enum.GetName(typeof(EnumHelper.TaskStatus), userTask.Status),
                             StatusId = userTask.Status,
                             ChargeAmount = task.ChargeAmount
                         }).OrderBy(_ => _.StatusId).ToList();
