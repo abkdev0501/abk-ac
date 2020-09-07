@@ -70,8 +70,30 @@
         $(document).ready(function () {
             $("#liMaster").addClass("active");
             $("#liHome").removeClass("active");
-        table =  $('#tblCompany').DataTable({
-            "ajax": function (data, callback, settings) {
+            table = $('#tblCompany').DataTable({
+                autoWidth: true,
+                processing: true,
+                serverSide: true,
+                searching: { regex: true },
+                "ajax": {
+                    "url": "/Master/LoadNotes",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "language": {
+                    "emptyTable": "No notes found"
+                },
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                dom: 'Blfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        title: 'Excel',
+                        text: 'Export to excel'
+                    }
+                ],
+
+            @*"ajax": function (data, callback, settings) {
                 $.ajax({
                     url: '@Url.Action("LoadNotes","Master")',
                     type: "GET",
@@ -103,7 +125,7 @@
                     title: 'Excel',
                     text: 'Export to excel'
                 }
-            ],
+            ],*@
            "columns": [
                 { "data": "Message" },
                 { "data": "CreatedOn" },

@@ -3,6 +3,8 @@ using Arity.Data.Entity;
 using Arity.Data.Helpers;
 using Arity.Service;
 using Arity.Service.Contract;
+using Arity.Web.Extensions;
+using Arity.Web.Models.AuxiliaryModels;
 using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using System;
@@ -431,17 +433,52 @@ namespace ArityApp.Controllers
             return View();
         }
 
+        [HttpPost]
         /// <summary>
         /// Get all notes
         /// </summary>
         /// <returns></returns>
-        public async Task<ActionResult> LoadNotes()
+        
+        public async Task<ActionResult> LoadNotes(DtParameters dtParameters)
         {
             try
             {
+                var searchBy = dtParameters.Search?.Value;
+
+                var orderCriteria = "NotificationId";
+                var orderAscendingDirection = false;
+
+                if (dtParameters.Order != null)
+                {
+                    // in this example we just default sort on the 1st column
+                    orderCriteria = dtParameters.Columns[dtParameters.Order[0].Column].Data;
+                    orderAscendingDirection = dtParameters.Order[0].Dir.ToString().ToLower() == "asc";
+                }
 
                 var notes = await _masterService.GetAllNotes(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId));
-                return Json(new { data = notes }, JsonRequestBehavior.AllowGet);
+
+                var totalResultsCount = notes.Count();
+                if (!string.IsNullOrEmpty(searchBy))
+                {
+                    notes = notes.Where(r => r.Message != null && r.Message.ToUpper().Contains(searchBy.ToUpper()));
+                }
+
+                notes = orderAscendingDirection ? notes.OrderByDynamic(orderCriteria.Replace("String", ""), DtOrderDir.Asc) : notes.OrderByDynamic(orderCriteria.Replace("String", ""), DtOrderDir.Desc);
+
+                // now just get the count of items (without the skip and take) - eg how many could be returned with filtering
+                var filteredResultsCount = notes.Count();
+
+
+                return Json(new
+                {
+                    draw = dtParameters.Draw,
+                    recordsTotal = totalResultsCount,
+                    recordsFiltered = filteredResultsCount,
+                    data = notes
+                        .Skip(dtParameters.Start)
+                        .Take(dtParameters.Length)
+                        .ToList()
+                });
             }
             catch
             {

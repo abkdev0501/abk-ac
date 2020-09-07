@@ -527,9 +527,9 @@ namespace Arity.Service
             }
         }
 
-        public async Task<List<NotificationDTO>> GetAllNotes(int userId, int userType)
+        public async Task<IQueryable<NotificationDTO>> GetAllNotes(int userId, int userType)
         {
-            return (from n in _dbContext.Notifications.ToList()
+            return (from n in _dbContext.Notifications.AsQueryable()
                     where n.Type == (int)EnumHelper.NotificationType.Notes
                     && (n.ClientId == 0 || n.ClientId == userId)
                     select new NotificationDTO
@@ -541,7 +541,7 @@ namespace Arity.Service
                         Message = n.Message,
                         CreatedOn = n.CreatedOn.HasValue ? n.CreatedOn.Value.ToString("dd/MM/yyyy") : String.Empty,
                         CompletedOn = n.CompletedOn.HasValue ? n.CompletedOn.Value.ToString("dd/MM/yyyy") : String.Empty
-                    }).OrderBy(_ => _.ClientId).ToList();
+                    }).OrderBy(_ => _.ClientId).AsQueryable();
         }
 
         public async Task DeleteNotification(int notificationId)

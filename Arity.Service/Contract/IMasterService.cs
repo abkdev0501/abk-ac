@@ -3,6 +3,7 @@ using Arity.Data.Entity;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Arity.Service.Contract
@@ -24,7 +25,7 @@ namespace Arity.Service.Contract
         Task<NotificationDTO> GetNotificationById(int id);
         Task AddUpdateNotification(NotificationDTO notification);
         Task<List<NotificationDTO>> GetAllNotification(int userId, int userType,int type);
-        Task<List<NotificationDTO>> GetAllNotes(int userId, int userType);
+        Task<IQueryable<NotificationDTO>> GetAllNotes(int userId, int userType);
         Task DeleteNotification(int notificationId);
         Task DeleteGroup(int groupId);
         Task<List<CommodityDTO>> GetAllCommodities();
