@@ -1,7 +1,7 @@
-﻿using Arity.Data.Entity;
-using Arity.Data.Helpers;
+﻿using Arity.Data.Helpers;
 using Arity.Service;
 using Arity.Service.Contract;
+using ArityApp.Models;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
@@ -38,7 +38,7 @@ namespace ArityApp.Controllers
         /// <param name="vendorUser"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> Login(User user)
+        public async Task<ActionResult> Login(LoginModel user)
         {
             string path = Server.MapPath("~/Content/Logs/UserLog.txt");
             if (!string.IsNullOrEmpty(user.Password) && !string.IsNullOrEmpty(user.Username))
@@ -46,7 +46,7 @@ namespace ArityApp.Controllers
                 var validUser = await _accountService.Login(user.Username, Functions.Encrypt(user.Password));
                 if (validUser != null)
                 {
-                    FormsAuthentication.SetAuthCookie(validUser.Username, false);
+                    FormsAuthentication.SetAuthCookie(validUser.Username, user.KeepSignedIn);
                     SessionHelper.UserId = validUser.Id;
                     SessionHelper.UserTypeId = validUser.UserTypeId;
                     SessionHelper.UserName = validUser.Username;

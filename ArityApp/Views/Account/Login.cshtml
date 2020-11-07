@@ -1,4 +1,4 @@
-﻿@model Arity.Data.Entity.User
+﻿@model ArityApp.Models.LoginModel
 @{
     Layout = null;
 }
@@ -96,7 +96,8 @@
                         <span style="color:red"> @Html.ValidationMessageFor(_ => _.Password)</span>
                     </div>
                     <div class="fm-checkbox">
-                        <label><input type="checkbox" class="i-checks"> <i></i> Keep me signed in</label>
+                        @Html.CheckBoxFor(_=> _.KeepSignedIn, new { @class = "i-checks", placeholder = "Keep me signed in" })
+                        <label>Keep me signed in</label>
                     </div>
                     <button type="submit" class="btn btn-login btn-success btn-float"><i class="notika-icon notika-right-arrow right-arrow-ant"></i></button>
                 </div>
