@@ -40,35 +40,37 @@ namespace ArityApp.Controllers
         [HttpPost]
         public async Task<ActionResult> Login(LoginModel user)
         {
-            string path = Server.MapPath("~/Content/Logs/UserLog.txt");
-            if (!string.IsNullOrEmpty(user.Password) && !string.IsNullOrEmpty(user.Username))
+            if (ModelState.IsValid)
             {
-                var validUser = await _accountService.Login(user.Username, Functions.Encrypt(user.Password));
-                if (validUser != null)
+                string path = Server.MapPath("~/Content/Logs/UserLog.txt");
+                if (!string.IsNullOrEmpty(user.Password) && !string.IsNullOrEmpty(user.Username))
                 {
-                    FormsAuthentication.SetAuthCookie(validUser.Username, user.KeepSignedIn);
-                    SessionHelper.UserId = validUser.Id;
-                    SessionHelper.UserTypeId = validUser.UserTypeId;
-                    SessionHelper.UserName = validUser.Username;
-
-                    // Logging user details
-                    Task.Run(() =>
+                    var validUser = await _accountService.Login(user.Username, Functions.Encrypt(user.Password));
+                    if (validUser != null)
                     {
-                        _loggerService.LogAsync(JsonConvert.SerializeObject(new UserDTO
-                        {
-                            UserId = Convert.ToInt32(validUser.Id),
-                            FullName = validUser.FullName,
-                            UserType = Enum.GetName(typeof(EnumHelper.UserType), Convert.ToInt32(validUser.UserTypeId)),
-                            LoginAt = DateTime.Now,
-                            IpAddress = Request.UserHostAddress
-                        }), path);
-                    });
+                        FormsAuthentication.SetAuthCookie(validUser.Username, user.KeepSignedIn);
+                        SessionHelper.UserId = validUser.Id;
+                        SessionHelper.UserTypeId = validUser.UserTypeId;
+                        SessionHelper.UserName = validUser.Username;
 
-                    return RedirectToAction("Dashboard", "Home");
+                        // Logging user details
+                        Task.Run(() =>
+                        {
+                            _loggerService.LogAsync(JsonConvert.SerializeObject(new UserDTO
+                            {
+                                UserId = Convert.ToInt32(validUser.Id),
+                                FullName = validUser.FullName,
+                                UserType = Enum.GetName(typeof(EnumHelper.UserType), Convert.ToInt32(validUser.UserTypeId)),
+                                LoginAt = DateTime.Now,
+                                IpAddress = Request.UserHostAddress
+                            }), path);
+                        });
+
+                        return RedirectToAction("Dashboard", "Home");
+                    }
+                    ViewBag.Message = "Invalid Credential";
                 }
-                ViewBag.Message = "Invalid Credential";
             }
-            ViewBag.Message = "Please enter username & password";
             return View(user);
         }
 

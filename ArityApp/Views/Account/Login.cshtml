@@ -70,7 +70,6 @@
     {
         <div class="login-content">
             <!--Error message-->
-
             <!-- Login -->
             <div class="nk-block toggled" id="l-login">
 
@@ -86,17 +85,17 @@
                         <div class="nk-int-st">
                             @Html.TextBoxFor(_ => _.Username, new { @class = "form-control", placeholder = "Username" })
                         </div>
-                        <span style="color:red"> @Html.ValidationMessageFor(_ => _.Username)</span>
+                        @Html.ValidationMessageFor(_ => _.Username, "", new { @class = "text-danger" })
                     </div>
                     <div class="input-group mg-t-15">
                         <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-edit"></i></span>
                         <div class="nk-int-st">
                             @Html.PasswordFor(_ => _.Password, new { @class = "form-control", placeholder = "Password" })
                         </div>
-                        <span style="color:red"> @Html.ValidationMessageFor(_ => _.Password)</span>
+                        @Html.ValidationMessageFor(_ => _.Password, "", new { @class = "text-danger" })
                     </div>
                     <div class="fm-checkbox">
-                        @Html.CheckBoxFor(_=> _.KeepSignedIn, new { @class = "i-checks", placeholder = "Keep me signed in" })
+                        @Html.CheckBoxFor(_ => _.KeepSignedIn, new { @class = "i-checks", placeholder = "Keep me signed in" })
                         <label>Keep me signed in</label>
                     </div>
                     <button type="submit" class="btn btn-login btn-success btn-float"><i class="notika-icon notika-right-arrow right-arrow-ant"></i></button>
@@ -135,6 +134,8 @@
     <!-- jquery
         ============================================ -->
     <script src="~/Content/js/vendor/jquery-1.12.4.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
     <!-- bootstrap JS
         ============================================ -->
     <script src="~/Content/js/bootstrap.min.js"></script>
