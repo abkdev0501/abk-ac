@@ -4,17 +4,7 @@
     {
         <script>location.href = "/account/login";</script>
     }
-
-    if (SessionHelper.IsKeepMeSignedIn)
-    {
-        <script>
-            var pingCall = function () {
-                  $.ajax({url: '@Url.Action("Ping", "Account")', type: "GET", cache: false });
-            };
-            var interval = 1000 * 60;
-            setInterval(pingCall, interval);
-        </script>
-    }
+   
 }
 <!doctype html>
 <html class="no-js" lang="">
@@ -502,6 +492,17 @@
             return re.test(String(email).toLowerCase());
         }
     </script>
+
+    @if (SessionHelper.IsKeepMeSignedIn)
+    {
+    <script>
+            var pingCall = function () {
+                  $.ajax({url: '@Url.Action("Ping", "Account")', type: "GET", cache: false });
+            };
+            var interval = 1000 * 60;
+            setInterval(pingCall, interval);
+    </script>
+    }
 </body>
 </html>
 
