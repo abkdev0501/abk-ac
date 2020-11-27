@@ -5,6 +5,7 @@ using ArityApp.Models;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -52,7 +53,8 @@ namespace ArityApp.Controllers
                         SessionHelper.UserId = validUser.Id;
                         SessionHelper.UserTypeId = validUser.UserTypeId;
                         SessionHelper.UserName = validUser.Username;
-
+                        SessionHelper.IsKeepMeSignedIn = user.KeepSignedIn;
+                   
                         // Logging user details
                         Task.Run(() =>
                         {
@@ -97,6 +99,15 @@ namespace ArityApp.Controllers
                 details.Password = string.Empty;
 
             return PartialView("_UserProfile", details);
+        }
+
+        /// <summary>
+        /// Add ping route to refresh session
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        public void Ping()
+        {
         }
     }
 }

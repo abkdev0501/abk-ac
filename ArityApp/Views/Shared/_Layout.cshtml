@@ -4,6 +4,17 @@
     {
         <script>location.href = "/account/login";</script>
     }
+
+    if (SessionHelper.IsKeepMeSignedIn)
+    {
+        <script>
+            var pingCall = function () {
+                  $.ajax({url: '@Url.Action("Ping", "Account")', type: "GET", cache: false });
+            };
+            var interval = 1000 * 60;
+            setInterval(pingCall, interval);
+        </script>
+    }
 }
 <!doctype html>
 <html class="no-js" lang="">
@@ -131,7 +142,7 @@
                                 <li>
                                     <a href="/dashboard"> Home</a>
                                 </li>
-                               
+
                                 <li>
                                     <a href="/invoice">Invoice</a>
                                 </li>
@@ -269,9 +280,6 @@
                                 <a href="/notes"><i class="notika-icon notika-form"></i>Notes</a>
                             </li>
                         }
-                        <li id="liFilter">
-                             <a href="/filter"><i class="notika-icon notika-form"></i>Filter</a>
-                        </li>
                     </ul>
                     <div class="tab-content custom-menu-content">
                         @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin ||
@@ -303,7 +311,7 @@
                                     <li>
                                         <a href="\businesstype">Business Type</a>
                                     </li>
-                                    
+
                                 </ul>
                             </div>
                         }

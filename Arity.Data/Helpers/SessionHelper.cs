@@ -45,6 +45,18 @@ namespace Arity.Data.Helpers
             }
         }
 
+        public static bool IsKeepMeSignedIn
+        {
+            get
+            {
+                return SessionVariables.Get<bool>("RememberMe");
+            }
+            set
+            {
+                SessionVariables.Set("RememberMe", value);
+            }
+        }
+
         private static class SessionVariables
         {
             public static T Get<T>(string sessionName)
