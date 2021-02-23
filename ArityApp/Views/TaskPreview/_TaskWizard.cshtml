@@ -1,0 +1,291 @@
+﻿@model Arity.Data.Dto.TaskDTO
+@using Arity.Data.Helpers;
+@{
+
+    bool IsAllowed = (SessionHelper.UserTypeId == (int)Arity.Service.Core.UserType.MasterAdmin) ? false : Model.StatusId > 0 && Model.CreatedBy != SessionHelper.UserTypeId;
+}
+<form>
+    @Html.HiddenFor(_ => _.TaskId)
+    @Html.HiddenFor(_ => _.CreatedOn)
+    @Html.HiddenFor(_ => _.TaskUserId)
+    @Html.HiddenFor(_ => _.CreatedBy)
+    @Html.HiddenFor(_ => _.AddedBy)
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Title<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(IsAllowed?"no-rights":"")">
+                    <div class="nk-int-st">
+                        @Html.EditorFor(_ => _.TaskName, new { htmlAttributes = new { @class = "form-control input-sm summernote", placeholder = "Enter task title", @required = "required" } })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Description</label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12 @(IsAllowed?"no-rights":"")">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Description, new { @class = "form-control input-sm", placeholder = "Enter description" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Client<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 @(IsAllowed?"no-rights":"")">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.ClientId, ViewBag.Clients as SelectList, "-- Select Client--", new { @class = "form-control input-sm choosen-drop", @required = "required" })
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <label class="hrzn-fm">Assign To<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 @(IsAllowed?"no-rights":"")">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.UserId, ViewBag.Users as SelectList, "-- Select User--", new { @class = "form-control input-sm choosen-drop", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Priority<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.Priorities, ViewBag.Prioritis as SelectList, "-- Select priority--", new { @class = "form-control input-sm choosen-drop", @required = "required" })
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <label class="hrzn-fm">Status<span style="color:red;vertical-align:text-bottom;">*</span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.DropDownListFor(_ => _.StatusId, ViewBag.Status as SelectList, "-- Select status--", new { @class = "form-control input-sm choosen-drop", @required = "required" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Due Date<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 nk-datapk-ctm form-elet-mg filter-date @(IsAllowed?"no-rights":"")">
+                    <div class="nk-int-st date">
+                        @Html.TextBox("DueDate", Model.DueDate.HasValue ? Model.DueDate.Value.ToString("dd/MM/yyyy") : DateTime.Now.ToString("dd/MM/yyyy"), new { @class = "form-control input-sm", @readonly = "readonly", placeholder = "Enter due date" })
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                    <label class="hrzn-fm">Complete Date<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 nk-datapk-ctm form-elet-mg filter-date">
+                    <div class="nk-int-st date">
+                        @Html.TextBox("CompletedOn", Model.CompletedOn.HasValue ? Model.CompletedOn.Value.ToString("dd/MM/yyyy") : DateTime.Now.ToString("dd/MM/yyyy"), new { @class = "form-control input-sm", @readonly = "readonly", placeholder = "Enter complete date" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Chargeable</label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.CheckBoxFor(_ => _.IsChargeble)
+                    </div>
+                </div>
+                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                {
+
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                        <label class="hrzn-fm">Status</label>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                        <div class="nk-int-st">
+                            @Html.CheckBoxFor(_ => _.Active)
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    @Html.HiddenFor(_ => _.Active)
+                }
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Charge Amount<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.ChargeAmount, new { @class = "form-control input-sm", placeholder = "Enter charge amount", @type = "number" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">Remarks<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.Remarks, new { @class = "form-control input-sm", placeholder = "Enter remarks" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-example-int form-horizental">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <label class="hrzn-fm">User Comment<span style="color:red;vertical-align:text-bottom;"></span></label>
+                </div>
+                <div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+                    <div class="nk-int-st">
+                        @Html.TextBoxFor(_ => _.UserComment, new { @class = "form-control input-sm", placeholder = "Enter comment" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div style="width:100%;text-align:center;padding: 25px 0 5px;">
+        <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.TaskId > 0 ? "Update" : "Add")</button>
+        <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+
+    $(".choosen-drop").chosen();
+    $('#DueDate, #CompletedOn').datepicker({
+        todayBtn: "linked",
+        keyboardNavigation: false,
+        forceParse: false,
+        calendarWeeks: true,
+        autoclose: true,
+        format:"dd/mm/yyyy"
+    });
+
+    $("#btnAdd").click(function () {
+        var isValid = true;
+        if ($("#TaskName").val() == null || $("#TaskName").val() == "") {
+            Notification('', 'Please enter task name', 'danger');
+            isValid = false;
+        }
+        else if ($("#UserId").val() == null || $("#UserId").val() == "") {
+            Notification('', 'Please assign task to someone', 'danger');
+            isValid = false;
+        }
+        else if ($("#StatusId").val() == null || $("#StatusId").val() == "") {
+            Notification('', 'Please select status', 'danger');
+            isValid = false;
+        }
+        else if ($("#ClientId").val() == null || $("#ClientId").val() == "") {
+            Notification('', 'Please select client', 'danger');
+            isValid = false;
+        }
+        else if ($("#Priorities").val() == null || $("#Priorities").val() == "") {
+            Notification('', 'Please select priority', 'danger');
+            isValid = false;
+        }
+
+        if (isValid) {
+            var data = JSON.stringify({
+            "task": {
+                "TaskName": $("#TaskName").val(),
+                "UserId": $("#UserId").val(),
+                "StatusId": $("#StatusId").val(),
+                "UserComment": $("#UserComment").val(),
+                "DueDate": $("#DueDate").val(),
+                "Description": $("#Description").val(),
+                "TaskId": $("#TaskId").val(),
+                "UserTypeId": $("#UserTypeId").val(),
+                "Email": $("#Email").val(),
+                "Active": $("#Active").is(":checked"),
+                "TaskUserId": $("#TaskUserId").val(),
+                "AddedBy": $("#AddedBy").val(),
+                "Remarks": $("#Remarks").val(),
+                "IsChargeble": $("#IsChargeble").is(":checked"),
+                "CompletedOn": $("#CompletedOn").val(),
+                "Priorities": $("#Priorities").val(),
+                "ClientId": $("#ClientId").val(),
+                "ChargeAmount": $("#ChargeAmount").val()
+            }
+            });
+
+            $.ajax({
+                url: '@Url.Action("AddUpdateTask", "Task")',
+                dataType: "json",
+                type: "POST",
+                data:data,
+                cache: false,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    $("#loading").hide();
+                    if (response) {
+                        if (@Model.TaskId <= 0) {
+                            Notification('', 'Task added successfuly', 'success');
+                        }
+                        else {
+                            Notification('', 'Task updated successfuly', 'success');
+                        }
+                        table.ajax.reload();
+                        $("#modelTask").modal('toggle');
+                    }
+                    else {
+                         Notification('', 'Something went wrong, Please try again', 'danger');
+                    }
+                },
+                error: function (error) {
+                    $("#loading").hide();
+                    Notification('', 'Something went wrong, try again', 'danger');
+                }
+            });
+        }
+    });
+        });
+</script>
+

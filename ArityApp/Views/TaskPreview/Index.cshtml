@@ -1,0 +1,496 @@
+﻿@using Arity.Data.Helpers;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Users";
+}
+<style>
+    tfoot {
+        display: table-header-group;
+    }
+
+    .table.table-striped > tbody > tr > td, .table.table-striped > tbody > tr > th, .table.table-striped > tfoot > tr > td, .table.table-striped > tfoot > tr > th, .table.table-striped > thead > tr > td, .table.table-striped > thead > tr > th {
+        border-top: 0px solid #F5F5F5;
+        font-size: 14px;
+        color: #333;
+        padding: 8px;
+    }
+
+    .daterangepicker > .ranges > .active {
+        color: red !important;
+    }
+
+    .dataTables_filter {
+        display: none;
+    }
+</style>
+
+<div class="breadcomb-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="breadcomb-list">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="breadcomb-wp">
+                                <div class="breadcomb-icon">
+                                    <i class="notika-icon notika-form"></i>
+                                </div>
+                                <div class="breadcomb-ctn">
+                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin)
+                                    {
+                                        <h3>Your Tasks</h3>
+                                        <p>List of your tasks</p>
+                                    }
+                                    else
+                                    {
+                                        <h3>All Tasks</h3>
+                                        <p>List of Task</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+                            <div class="breadcomb-report">
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                {
+                                    <button id="btnAddInvoiceEntry" onclick="AddUpdateTask(0)" data-toggle="tooltip" data-placement="left" class="btn"><i class="fa fa-plus"></i> Add</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb area End-->
+<div class="modal animated fade" id="modelTask" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="false" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-large">
+        <div class="modal-content">
+            <div class="modal-header" style="margin-bottom:35px;">
+                <h3>Add/Update Task</h3>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Table area Start-->
+<div class="data-table-area">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="data-table-list">
+                    <div class="row">
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10"></div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                            <div class="button-icon-btn">
+                                <button id="btn_search" class="btn btn-success success-icon-notika waves-effect"><i class="notika-icon notika-search"></i> Search</button>
+                                <button id="btn_reset" style="margin-left:4px" class="btn btn-success success-icon-notika waves-effect"><i class="notika-icon notika-refresh"></i> Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="tblUsers" class="table table-striped" style="width:100%; padding:8px">
+                            <thead>
+                                <tr>
+                                    <th style="width:12%;">Title</th>
+                                    <th style="width:10%;">Assign To</th>
+                                    <th style="width:8%;">client</th>
+                                    <th style="width:8%;">Description</th>
+                                    <th style="width:5%;">DueDate</th>
+                                    <th style="width:10%;">Status</th>
+                                    <th style="width:10%;">User comment</th>
+                                    <th style="width:5%;">Chargeable</th>
+                                    <th style="width:2%;">Priority</th>
+                                    <th style="width:2%;">Created On</th>
+                                    <th style="width:7%;">Created By</th>
+                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                    {
+                                        <th style="width:5%;"></th>
+                                        <th style="width:5%;"></th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th style="width:12%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_0" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:10%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_1" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:8%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_2" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:8%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_3" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:5%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_4" class="form-control" type="text" name="datefilter" value="" />
+                                        </div>
+                                    </th>
+                                    <th style="width:5%;">
+                                        <div class="nk-int-st">
+                                            <select id="col_5" class="selectpicker" multiple data-selected-text-format="count">
+                                                <option value="1">InProgress</option>
+                                                <option value="2">Assigned</option>
+                                                <option value="3">Cancel</option>
+                                                <option value="4">Complete</option>
+                                                <option value="5">OnHold</option>
+                                                <option value="6">Pending</option>
+                                                <option value="7">Unknown</option>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th style="width:10%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_6" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:5%;">
+                                        <select id="col_7" class="selectpicker">
+                                            <option value="">None</option>
+                                            <option value="true">Chargeble</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    </th>
+                                    <th style="width:2%;">
+                                        <select id="col_8" class="selectpicker" multiple data-selected-text-format="count">
+                                            <option value="1">High</option>
+                                            <option value="2">Medium</option>
+                                            <option value="3">Low</option>
+                                            <option value="4">Important</option>
+                                            <option value="5">Urgent</option>
+                                        </select>
+
+                                    </th>
+                                    <th style="width:2%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_9" class="form-control" type="text" name="datefilter" value="" />
+                                        </div>
+                                    </th>
+                                    <th style="width:7%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_10" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                    {
+                                        <th style="width:5%;display:none;"></th>
+                                        <th style="width:5%;display:none;"></th>
+                                    }
+                                </tr>
+                            </tfoot>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+        $('#col_9').daterangepicker({
+            autoUpdateInput: false,
+            ranges: {
+                'None': [null, null],
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+
+        $('#col_9').on('apply.daterangepicker', function (ev, picker) {
+            if (picker.startDate._isValid && picker.endDate._isValid) {
+                $(this).val(picker.startDate.format('DD/MM/YYYY') + '-' + picker.endDate.format('DD/MM/YYYY'));
+                $(this).prop('title', picker.startDate.format('DD/MM/YYYY') + '-' + picker.endDate.format('DD/MM/YYYY'));
+            }
+            else {
+                $(this).val('');
+                $(this).prop('title', '');
+            }
+           
+        });
+
+        $('#col_9').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            $(this).prop('title', '');
+        });
+
+        $('#col_4').daterangepicker({
+            autoUpdateInput: false,
+            ranges: {
+                'None': [null, null],
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'Next 7 Days': [moment().add(6, 'days'), moment()],
+                'Next 30 Days': [moment().add(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Next Month': [moment().add(1, 'month').startOf('month'), moment().add(1, 'month').endOf('month')]
+            },
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+
+        $('#col_4').on('apply.daterangepicker', function (ev, picker) {
+            if (picker.startDate._isValid && picker.endDate._isValid) {
+                $(this).val(picker.startDate.format('DD/MM/YYYY') + '-' + picker.endDate.format('DD/MM/YYYY'));
+                $(this).prop('title', picker.startDate.format('DD/MM/YYYY') + '-' + picker.endDate.format('DD/MM/YYYY'));
+            }
+            else {
+                $(this).val('');
+                $(this).prop('title', '');
+            }
+        });
+
+        $('#col_4').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            $(this).prop('title', '');
+        });
+    </script>
+
+    <script>
+
+    $(document).ready(function () {
+
+        $("#liHome").removeClass("active");
+        $("#liTask2").addClass("active");
+        table = $('#tblUsers').DataTable({
+            autoWidth: true,
+            processing: true,
+            serverSide: true,
+            searching: true,
+            ordering: true,
+            "ajax": {
+                "url": "/TaskPreview/LoadTask",
+                "type": "POST",
+                "datatype":"json"
+            },
+           "language": {
+                "emptyTable": "No tasks found"
+            },
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    title: 'Excel',
+                    text: 'Export to excel'
+                }
+            ],
+            "columns": [
+                { "data": "TaskName" , "name":"TaskName"},
+                { "data": "UserName", "name":"UserName" },
+                { "data": "ClientName", "name": "ClientName" },
+                { "data": "Description", "name": "Description" },
+                { "data": "DueDateString", "name": "DueDate"},
+                 {
+                    "orderable": false,
+                     "name": "Status",
+                     "data": null,
+                     "render": function (data, type, full) {
+                        if(data.StatusString ==="Assigned")
+                            return '<button class="btn btn-info notika-btn-danger waves-effect">'+data.StatusString+'</button>';
+                        else if (data.StatusString === "InProgress")
+                            return '<button class="btn btn-warning notika-btn-danger waves-effect">' + data.StatusString + '</button>';
+                        else if (data.StatusString === "Cancel")
+                            return '<button class="btn btn-danger notika-btn-danger waves-effect">' + data.StatusString + '</button>';
+                        else if (data.StatusString === "OnHold")
+                            return '<button class="btn btn-purple notika-btn-danger waves-effect">' + data.StatusString + '</button>';
+                        else if (data.StatusString === "Pending")
+                            return '<button class="btn btn-deeppurple notika-btn-danger waves-effect">' + data.StatusString + '</button>';
+                        else if (data.StatusString === "Unknown")
+                            return '<button class="btn btn-black notika-btn-danger waves-effect">' + data.StatusString + '</button>';
+                        else
+                            return '<button class="btn btn-success notika-btn-danger waves-effect">'+data.StatusString+'</button>';
+                    }
+                },
+                { "data": "UserComment", "name":"UserComment" },
+                {
+                    "orderable": false,
+                    "name": "IsChargeble",
+                    "data": null,
+                    "render": function (data, type, full) {
+                        if (data.IsChargeble) {
+                            return 'Chargeble';
+                        }
+                        else {
+                             return 'No';
+                        }
+                    }
+                },
+                { "data": "PrioritiesString", "name": "Priorities" },
+                { "data": "CreatedOnString", "name": "CreatedOn"  },
+                { "data": "CreatedByString", "name": "CreatedBy" }
+                 @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                 {
+           @:                          ,{
+           @:                              "orderable": false,
+           @:         "data": null,
+           @:         "render": function(data, type, full) {
+           @:                                  return '<button class="btn waves-effect " onclick="AddUpdateTask(' + data.TaskId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
+           @:                              }
+           @:                          },
+           @:     {
+           @:                              "orderable": false,
+           @:         "data": null,
+           @:         "render": function(data, type, full) {
+           @:                                  if (data.CreatedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) ) {
+           @:                      return '<div class="dialog-pro dialog">' +
+           @:                          '<button class="btn btn-info" onclick="DeleteTask(' + data.TaskId + ')" id="sa-warning">' +
+           @:                          '<i class="fa fa-trash" aria-hidden="true"></i>' +
+           @:                          '</button> </div>';
+           @:                  }
+           @:             else {
+           @:                      return "";
+           @:                  }
+           @:              }
+           @:          }
+
+                 }
+           ],
+           "order": [],
+            initComplete: function () {
+                this.api().columns().every(function () {
+                    var that = this;
+                    $('input', this.footer()).on('keyup', function (e) {
+                        if (e.keyCode == 13) {
+                            applyFilter();
+                        }
+                    });
+                });
+            }
+        });
+
+        function applyFilter() {
+            table
+                .column(0).search($("#col_0").val())
+                .column(1).search($("#col_1").val())
+                .column(2).search($("#col_2").val())
+                .column(3).search($("#col_3").val())
+                .column(4).search($("#col_4").val())
+                .column(5).search($("#col_5").val())
+                .column(6).search($("#col_6").val())
+                .column(7).search($("#col_7").val())
+                .column(8).search($("#col_8").val())
+                .column(9).search($("#col_9").val())
+                .column(10).search($("#col_10").val())
+                .draw();
+        }
+
+         $("#btnFilterGrid").click(function () {
+            table.ajax.reload();
+         });
+
+        $('#btn_search').click(function () {
+            applyFilter();
+        });
+
+        $('#btn_reset').click(function () {
+            $("#col_1").val('');
+            $("#col_2").val('');
+            $("#col_3").val('');
+            $("#col_4").val('');
+            $("#col_5").val('');
+            $("#col_6").val('');
+            $("#col_7").val('');
+            $("#col_0").val('');
+            $("#col_8").val('');
+            $("#col_9").val('');
+            $("#col_10").val('');
+            $('.selectpicker').selectpicker('deselectAll');
+            applyFilter();
+        });
+       });
+
+
+    </script>
+    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+    {
+
+        <script>
+        function AddUpdateTask(id) {
+            $("#loading").show();
+
+            $.ajax({
+                url: '@Url.Action("AddUpdateTask", "TaskPreview")',
+                dataType: "html",
+                type: "GET",
+                data: { id: id },
+                cache: false,
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    $("#loading").hide();
+                    $("#modelTask .modal-body").html(response);
+                    $("body .summernote").summernote();
+                    $("#modelTask").modal('toggle');
+                },
+                error: function (error) {
+                    $("#loading").hide();
+                    Notification('', 'Something went wrong, Please try again', 'danger');
+                }
+            });
+        }
+
+         function DeleteTask(taskId) {
+            swal({
+			title: "Are you sure?",
+			text: "You will not be able to recover this task",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonText: "Delete",
+            }).then(function () {
+                $("#loading").show();
+                $.ajax({
+                    url: '@Url.Action("DeleteTask", "TaskPreview")',
+                    type: "POST",
+                    data: { taskId: taskId },
+                    cache: false,
+                    success: function (response) {
+                        table.ajax.reload();
+                        $("#loading").hide();
+			            swal("Deleted!", "Task has been deleted.", "success");
+                    },
+                    error: function (error) {
+                        $("#loading").hide();
+                        Notification('', 'Internal error occured, Please try again', 'danger');
+                    }
+                });
+		});
+
+        }
+        </script>
+    }
+}

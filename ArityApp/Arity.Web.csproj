@@ -219,6 +219,7 @@
     <Compile Include="Controllers\MasterController.cs" />
     <Compile Include="Controllers\ParticularController.cs" />
     <Compile Include="Controllers\TaskController.cs" />
+    <Compile Include="Controllers\TaskPreviewController.cs" />
     <Compile Include="Extensions\LinqExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -238,6 +239,7 @@
     <Content Include="Content\css\chosen\chosen-sprite.png" />
     <Content Include="Content\css\chosen\chosen.css" />
     <Content Include="Content\css\datapicker\datepicker3.css" />
+    <Content Include="Content\css\daterangepicker.css" />
     <Content Include="Content\css\dialog\dialog.css" />
     <Content Include="Content\css\dialog\sweetalert2.min.css" />
     <Content Include="Content\css\dropzone.css" />
@@ -320,9 +322,12 @@
     <Content Include="Content\js\data-map\datamaps.all.min.js" />
     <Content Include="Content\js\data-map\topojson.js" />
     <Content Include="Content\js\data-table\data-table-act.js" />
+    <Content Include="Content\js\data-table\fnMultiFilter.js" />
     <Content Include="Content\js\data-table\jquery.dataTables.min.js" />
     <Content Include="Content\js\datapicker\bootstrap-datepicker.js" />
     <Content Include="Content\js\datapicker\datepicker-active.js" />
+    <Content Include="Content\js\datapicker\daterangepicker.min.js" />
+    <Content Include="Content\js\datapicker\moment.min.js" />
     <Content Include="Content\js\dialog\dialog-active.js" />
     <Content Include="Content\js\dialog\sweetalert2.min.js" />
     <Content Include="Content\js\dropzone\dropzone.js" />
@@ -490,6 +495,8 @@
     <Content Include="Views\Master\BusinessType.cshtml" />
     <Content Include="Views\Master\_BusinessTypeWizard.cshtml" />
     <Content Include="Views\Master\LedgerReport.cshtml" />
+    <Content Include="Views\TaskPreview\Index.cshtml" />
+    <Content Include="Views\TaskPreview\_TaskWizard.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

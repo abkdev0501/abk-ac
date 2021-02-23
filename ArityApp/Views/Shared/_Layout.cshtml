@@ -79,14 +79,17 @@
     <link href="/Content/css/dialog/sweetalert2.min.css" rel="stylesheet" />
     <link href="/Content/css/dialog/dialog.css" rel="stylesheet" />
     <link href="/Content/css/dropzone.css" rel="stylesheet" />
+    <link href="~/Content/css/daterangepicker.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet" />
     <style>
         .no-rights {
             pointer-events: none;
         }
+
+        ul.notika-menu-wrap li a {
+            padding: 10px 21px !important;
+        }
     </style>
-
-
 </head>
 
 <body>
@@ -188,6 +191,9 @@
                                     <a href="/task">Task</a>
                                 </li>
                                 <li>
+                                    <a href="/taskpreview">Task*</a>
+                                </li>
+                                <li>
                                     <a href="/Document/Index">Document</a>
                                 </li>
                                 @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.Admin || Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
@@ -249,6 +255,9 @@
                         }
                         <li id="liTask">
                             <a href="/task"><i class="notika-icon notika-form"></i> Task</a>
+                        </li>
+                        <li id="liTask2">
+                            <a href="/taskpreview"><i class="notika-icon notika-form"></i>Task*</a>
                         </li>
                         <li id="liDoc">
                             <a href="/Document/Index"><i class="notika-icon notika-windows"></i>Document</a>
@@ -419,6 +428,7 @@
 
     <script src="/Content/js/data-table/jquery.dataTables.min.js"></script>
     <script src="/Content/js/data-table/data-table-act.js"></script>
+    <script src="~/Content/js/data-table/fnMultiFilter.js"></script>
 
     <!--  chosen JS
        ============================================ -->
@@ -432,6 +442,8 @@
     <script src="/Scripts/jquery.easy-ticker.js"></script>
     <script src="/Content/js/dropzone/dropzone.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+    <script src="~/Content/js/datapicker/moment.min.js"></script>
+    <script src="~/Content/js/datapicker/daterangepicker.min.js"></script>
     @RenderSection("scripts", required: false)
     <script>
         $(document).ready(function ()
@@ -495,13 +507,13 @@
 
     @if (SessionHelper.IsKeepMeSignedIn)
     {
-    <script>
+        <script>
             var pingCall = function () {
                   $.ajax({url: '@Url.Action("Ping", "Account")', type: "GET", cache: false });
             };
             var interval = 1000 * 60;
             setInterval(pingCall, interval);
-    </script>
+        </script>
     }
 </body>
 </html>
