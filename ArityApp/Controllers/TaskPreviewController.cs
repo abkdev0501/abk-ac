@@ -56,14 +56,22 @@ namespace ArityApp.Controllers
 
                 var result = await _taskService.GetAll();
 
+                //Apply filter
                 var columnFilter = dtParameters.Columns.Where(x => !string.IsNullOrWhiteSpace(x.Search.Value)).ToDictionary(x => x.Name, x => x.Search.Value);
                 if (columnFilter.Count > 0)
                 {
                     result = ApplyFilter(columnFilter, result);
                 }
+                else
+                {
+                    var fromDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")).Date;
+                    var toDate = fromDate.AddDays(1).AddMilliseconds(-1);
+                    result = result.Where(x => x.DueDate >= fromDate && x.DueDate <= toDate);
+                }
 
                 var totalResultsCount = result.Count();
                 result = orderAscendingDirection ? result.OrderByDynamic(orderCriteria.Replace("String", ""), DtOrderDir.Asc) : result.OrderByDynamic(orderCriteria.Replace("String", ""), DtOrderDir.Desc);
+
                 // now just get the count of items (without the skip and take) - eg how many could be returned with filtering
                 var filteredResultsCount = result.Count();
 
@@ -139,15 +147,15 @@ namespace ArityApp.Controllers
                 taskDTOs = taskDTOs.Where(x => x.CreatedByString.ToUpper().Contains(createdBy));
             }
 
-            if(columnFilter.ContainsKey("CreatedOn") && !string.IsNullOrWhiteSpace(columnFilter["CreatedOn"]))
+            if (columnFilter.ContainsKey("CreatedOn") && !string.IsNullOrWhiteSpace(columnFilter["CreatedOn"]))
             {
                 var (fromDate, toDate) = GetDatesFromRange(columnFilter["CreatedOn"]);
-                if(fromDate != null)
+                if (fromDate != null)
                 {
                     taskDTOs = taskDTOs.Where(x => x.CreatedOn == null || x.CreatedOn >= fromDate);
                 }
 
-                if(toDate != null)
+                if (toDate != null)
                 {
                     taskDTOs = taskDTOs.Where(x => x.CreatedOn == null || x.CreatedOn <= toDate);
                 }

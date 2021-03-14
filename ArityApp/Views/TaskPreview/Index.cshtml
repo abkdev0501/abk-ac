@@ -246,7 +246,9 @@
         });
 
         $('#col_4').daterangepicker({
-            autoUpdateInput: false,
+            autoUpdateInput: true,
+            startDate: moment(),
+            endDate: moment(),
             ranges: {
                 'None': [null, null],
                 'Today': [moment(), moment()],
@@ -279,6 +281,10 @@
             $(this).val('');
             $(this).prop('title', '');
         });
+
+        $('#col_4').val(moment().format('DD/MM/YYYY') + '-' + moment().format('DD/MM/YYYY'));
+        $('#col_4').prop('title', moment().startDate.format('DD/MM/YYYY') + '-' + moment().format('DD/MM/YYYY'));
+
     </script>
 
     <script>
@@ -296,7 +302,7 @@
             "ajax": {
                 "url": "/TaskPreview/LoadTask",
                 "type": "POST",
-                "datatype":"json"
+                "datatype": "json"
             },
            "language": {
                 "emptyTable": "No tasks found"
