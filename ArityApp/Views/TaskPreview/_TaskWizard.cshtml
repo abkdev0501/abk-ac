@@ -191,26 +191,45 @@
 
 
     <div style="width:100%;text-align:center;padding: 25px 0 5px;">
-        <button id="btnAdd" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.TaskId > 0 ? "Update" : "Add")</button>
+        <button id="btnAdd" onclick="SaveTask()" class="btn btn-success notika-btn-success waves-effect" type="button" style="align-content:center">@(Model.TaskId > 0 ? "Update" : "Add")</button>
         <button id="btnCancel" class="btn btn-default notika-btn-default waves-effect" type="button" style="margin-left:10px;">Cancel</button>
     </div>
 </form>
 
-<script>
-    $(document).ready(function () {
+<script type='text/javascript'>
+    $(function () {
+        $(".choosen-drop").chosen();
+        $('#DueDate, #CompletedOn').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true,
+            format: "dd/mm/yyyy"
+        });
+    });
+</script>
 
-    $(".choosen-drop").chosen();
-    $('#DueDate, #CompletedOn').datepicker({
-        todayBtn: "linked",
-        keyboardNavigation: false,
-        forceParse: false,
-        calendarWeeks: true,
-        autoclose: true,
-        format:"dd/mm/yyyy"
+<script>
+
+    $(document).ready(function () {
+        LoadDatePicker();
     });
 
-    $("#btnAdd").click(function () {
-        var isValid = true;
+    function LoadDatePicker() {
+        $(".choosen-drop").chosen();
+        $('#DueDate, #CompletedOn').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true,
+            format: "dd/mm/yyyy"
+        });
+    }
+
+    function SaveTask() {
+         var isValid = true;
         if ($("#TaskName").val() == null || $("#TaskName").val() == "") {
             Notification('', 'Please enter task name', 'danger');
             isValid = false;
@@ -285,7 +304,6 @@
                 }
             });
         }
-    });
-        });
+    }
 </script>
 

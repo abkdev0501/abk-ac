@@ -456,6 +456,7 @@
                     $("#modelTask .modal-body").html(response);
                     $("body .summernote").summernote();
                     $("#modelTask").modal('toggle');
+                    LoadDatePicker();
                 },
                 error: function (error) {
                     $("#loading").hide();
