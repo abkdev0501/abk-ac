@@ -676,6 +676,14 @@
                 format: "dd/mm/yyyy"
             });
 
+            $('.date, .bk-date').change(function () {
+                var dateStr = $(`#${this.id}`).val();
+                var validDate = moment(dateStr, 'DD/MM/YYYY');
+                if (dateStr != '' && !validDate.isValid()) {
+                    $(`#${this.id}`).val('');
+                }
+            });
+
             @if (ViewBag.ErrorMsg != null)
             {
                 @:Notification('', 'Please fill up all required details or use different username', 'danger');
@@ -733,6 +741,14 @@
                     autoclose: true,
                     format: "dd/mm/yyyy"
                 });
+
+                $('.bk-date').change(function () {
+                    var dateStr = $(`#${this.id}`).val();
+                    var validDate = moment(dateStr, 'DD/MM/YYYY');
+                    if (dateStr != '' && !validDate.isValid()) {
+                        $(`#${this.id}`).val('');
+                    }
+                });
             });
 
             $(".add-new-bankDetail").on("click", function () {
@@ -768,6 +784,14 @@
                     calendarWeeks: true,
                     autoclose: true,
                     format: "dd/mm/yyyy"
+                });
+
+                $('.bk-date').change(function () {
+                    var dateStr = $(`#${this.id}`).val();
+                    var validDate = moment(dateStr, 'DD/MM/YYYY');
+                    if (dateStr != '' && !validDate.isValid()) {
+                        $(`#${this.id}`).val('');
+                    }
                 });
             });
 

@@ -75,16 +75,19 @@ namespace ArityApp.Controllers
                 // now just get the count of items (without the skip and take) - eg how many could be returned with filtering
                 var filteredResultsCount = result.Count();
 
-                return Json(new
+                var jsonResult = Json(new
                 {
                     draw = dtParameters.Draw,
                     recordsTotal = totalResultsCount,
                     recordsFiltered = filteredResultsCount,
-                    data = result
+                    data = dtParameters.Length == -1 ? result.ToList() : result
                         .Skip(dtParameters.Start)
                         .Take(dtParameters.Length)
                         .ToList()
                 });
+                jsonResult.MaxJsonLength = int.MaxValue;
+
+                return jsonResult;
             }
             catch (Exception ex)
             {

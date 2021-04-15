@@ -98,16 +98,25 @@
 
 <script>
     $(document).ready(function() {
-    
+
     $(".chosen").chosen();
-     $('.data-time').datepicker({
-        todayBtn: "linked",
-        keyboardNavigation: false,
-        forceParse: false,
-        calendarWeeks: true,
-         autoclose: true,
-        format:'dd/mm/yyyy'
+    $('.data-time').datepicker({
+       todayBtn: "linked",
+       keyboardNavigation: false,
+       forceParse: false,
+       calendarWeeks: true,
+        autoclose: true,
+       format:'dd/mm/yyyy'
     });
+
+    $('.data-time').change(function () {
+    var dateStr = $(`#${this.id}`).val();
+    var validDate = moment(dateStr, 'DD/MM/YYYY');
+    if (dateStr != '' && !validDate.isValid()) {
+        $(`#${this.id}`).val('');
+    }
+    });
+
     $('#btnGroup').on('click', function () {
         var isValid = true;
         if ($("#Message").val() == null || $("#Message").val() == "") {

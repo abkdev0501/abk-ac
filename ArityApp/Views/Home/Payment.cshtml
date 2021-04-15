@@ -120,14 +120,14 @@
                             <label>From</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="FromDate" class="form-control bk-date" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="FromDate" class="form-control bk-date" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))">
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
                             <label>To</label>
                             <div class="input-group date nk-int-st">
                                 <span class="input-group-addon"></span>
-                                <input type="text" id="ToDate" class="form-control bk-date" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
+                                <input type="text" id="ToDate" class="form-control bk-date" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))">
                             </div>
                         </div>
                         <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
@@ -377,6 +377,19 @@
          $("#btnFilterGrid").click(function () {
                 table.ajax.reload();
          });
+
+        $('.bk-date').change(function () {
+            var dateStr = $(`#${this.id}`).val();
+            var validDate = moment(dateStr, 'DD/MM/YYYY');
+            if (dateStr != '' && !validDate.isValid()) {
+                var date = moment().clone().startOf('month').format('DD/MM/YYYY');
+                if (this.id != "FromDate") {
+                    date = moment().clone().endOf('month').format('DD/MM/YYYY');
+                }
+                $(`#${this.id}`).val(date);
+               
+            }
+        });
 
          $(".chkSelectAll").change(function () {
 

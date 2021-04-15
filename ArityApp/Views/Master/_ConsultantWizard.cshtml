@@ -92,7 +92,16 @@
                 calendarWeeks: true,
                 autoclose: true,
                 format: "dd/mm/yyyy"
-            });
+    });
+
+    $('.date').change(function () {
+        var dateStr = $(`#${this.id}`).val();
+        var validDate = moment(dateStr, 'DD/MM/YYYY');
+        if (dateStr != '' && !validDate.isValid()) {
+            $(`#${this.id}`).val('');
+        }
+    });
+
     $('#btnConsultant').on('click', function () {
         var isValid = true;
         if ($("#Name").val() == null || $("#Name").val() == "") {

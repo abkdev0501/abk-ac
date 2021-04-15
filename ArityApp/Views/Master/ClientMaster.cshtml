@@ -3,7 +3,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Client";
 }
-
+<style>
+    tfoot {
+        display: table-header-group;
+    }
+    .dataTables_filter {
+        display: none;
+    }
+</style>
 <div class="breadcomb-area">
     <div class="container">
         <div class="row">
@@ -44,31 +51,14 @@
 
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="data-table-list">
-                    <div class="basic-tb-hd">
-                        <h2>Clients</h2>
-                        <p>Below are list of clients.</p>
-                    </div>
-
-                    <div class="date-filter">
-
-                        @*<div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
-                            <label>From</label>
-                            <div class="input-group date nk-int-st">
-                                <span class="input-group-addon"></span>
-                                <input type="text" id="FromDate" class="form-control bk-date" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
+                    <div class="row">
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10"></div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                            <div class="button-icon-btn">
+                                <button id="btn_search" class="btn btn-success success-icon-notika waves-effect"><i class="notika-icon notika-search"></i> Search</button>
+                                <button id="btn_reset" style="margin-left:4px" class="btn btn-success success-icon-notika waves-effect"><i class="notika-icon notika-refresh"></i> Reset</button>
                             </div>
                         </div>
-                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
-                            <label>To</label>
-                            <div class="input-group date nk-int-st">
-                                <span class="input-group-addon"></span>
-                                <input type="text" id="ToDate" class="form-control bk-date" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
-                            </div>
-                        </div>
-                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
-                            <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnFilterGrid">Search</button>
-                        </div>*@
-
                     </div>
 
                     <div class="table-responsive">
@@ -88,6 +78,61 @@
                                     <th style="width:5%;"></th>
                                 </tr>
                             </thead>
+                            <tfoot>
+                                <tr>
+                                    <th style="width:12%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_0" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:12%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_1" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:12%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_2" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:10%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_3" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:10%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_4" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:10%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_5" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:10%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_6" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:10%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_7" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:10%;">
+                                        <div class="nk-int-st">
+                                            <select id="col_8" class="selectpicker">
+                                                <option value="">All</option>
+                                                <option value="true">TRUE</option>
+                                                <option value="false">FALSE</option>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th style="width:9%;"></th>
+                                    <th style="width:5%;"></th>
+                                </tr>
+                            </tfoot>
                             <tbody></tbody>
                         </table>
                     </div>
@@ -108,7 +153,16 @@
                 @:Notification('', '@TempData["Success"]', 'sucess');
         }
         table = $('#tblClient').DataTable({
-            "ajax": function (data, callback, settings) {
+            processing: true,
+            serverSide: true,
+            searching: true,
+            ordering: true,
+            "ajax": {
+                "url": "/Master/LoadClient",
+                "type": "POST",
+                "datatype": "json"
+            },
+            @*"ajax": function (data, callback, settings) {
                 $.ajax({
                     url: '@Url.Action("LoadClient","Master")',
                     type: "GET",
@@ -126,7 +180,7 @@
                     .always(function (data, textStatus, jqXHR) {
                         $("#loading").hide();
                     });
-            },
+            },*@
             "language": {
                 "emptyTable": "No clients found"
             },
@@ -140,14 +194,14 @@
                 }
             ],
             "columns": [
-                { "data": "FullName" },
-                { "data": "Username" },
-                { "data": "Address" },
-                { "data": "City" },
-                { "data": "PhoneNumber" },
-                { "data": "Pincode" },
-                { "data": "UserType" },
-                { "data": "AccountantName" },
+                { "data": "FullName", "name": "FullName" },
+                { "data": "Username", "name": "UserName"  },
+                { "data": "Address", "name": "Address"  },
+                { "data": "City", "name": "City"  },
+                { "data": "PhoneNumber", "name": "PhoneNumber"  },
+                { "data": "Pincode", "name": "Pincode"  },
+                { "data": "GroupName", "name": "GroupName"  },
+                { "data": "AccountantName", "name": "AccountantName"  },
                 {
                     "orderable": false,
                     "data": null,
@@ -156,7 +210,8 @@
                             return 'TRUE';
                         else
                             return 'FALSE';
-                    }
+                    },
+                    "name": "Status"
                 },
                 {
                     "orderable": false,
@@ -184,12 +239,59 @@
                     }
                 }
             ],
-            "order": [[0,"asc"]]
+            "order": [],
+            initComplete: function () {
+                this.api().columns().every(function () {
+                    var that = this;
+                    $('input', this.footer()).on('keyup', function (e) {
+                        if (e.keyCode == 13) {
+                            applyFilter();
+                        }
+                    });
+                });
+            },
+            "preDrawCallback": function (settings) {
+                $("#loading").show();
+            },
+            "drawCallback": function (settings) {
+                $("#loading").hide();
+            }
        });
 
-         $("#btnFilterGrid").click(function () {
-    table.ajax.reload();
-});
+       $("#btnFilterGrid").click(function () {
+          table.ajax.reload();
+       });
+
+       $('#btn_search').click(function () {
+           applyFilter();
+       });
+
+        $('#btn_reset').click(function () {
+            $("#col_0").val('');
+            $("#col_1").val('');
+            $("#col_2").val('');
+            $("#col_3").val('');
+            $("#col_4").val('');
+            $("#col_5").val('');
+            $("#col_6").val('');
+            $("#col_7").val('');
+            $("#col_8").val('');
+            applyFilter();
+        });
+
+         function applyFilter() {
+             table
+                 .column(0).search($("#col_0").val())
+                 .column(1).search($("#col_1").val())
+                 .column(2).search($("#col_2").val())
+                 .column(3).search($("#col_3").val())
+                 .column(4).search($("#col_4").val())
+                 .column(5).search($("#col_5").val())
+                 .column(6).search($("#col_6").val())
+                 .column(7).search($("#col_7").val())
+                 .column(8).search($("#col_8").val())
+                 .draw();
+         }
        });
 
         function AddUpdateClient(id) {

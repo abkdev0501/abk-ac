@@ -200,6 +200,40 @@ namespace Arity.Service
         }
 
         /// <summary>
+        /// Get all clients
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
+        public async Task<IQueryable<UsersDto>> GetAllClientAsQuerable()
+        {
+            return (from user in _dbContext.Users
+                    join type in _dbContext.UserTypes on user.UserTypeId equals type.Id
+                    join groups in _dbContext.GroupMasters on user.GroupId equals groups.GroupId into grps
+                    from grouName in grps.DefaultIfEmpty()
+                    where SessionHelper.UserTypeId == (int)EnumHelper.UserType.Consultant ?
+                     user.UserTypeId == (int)Core.UserType.User && user.ConsultantId == SessionHelper.UserId
+                    : user.UserTypeId == (int)Core.UserType.User
+                    select new UsersDto
+                    {
+                        Id = user.Id,
+                        Address = user.Address,
+                        City = user.City,
+                        Pincode = user.Pincode,
+                        FullName = user.FullName,
+                        PhoneNumber = user.PhoneNumber,
+                        Username = user.Username,
+                        UserType = type.UserTypeName,
+                        Email = user.Email,
+                        Active = user.Active,
+                        UserTypeId = user.UserTypeId,
+                        CreatedBy = user.CreatedBy,
+                        AccountantName = user.AccountantName,
+                        GroupName = grouName.Name
+                    }).AsQueryable();
+        }
+
+        /// <summary>
         /// Get client by Id
         /// </summary>
         /// <param name="id"></param>

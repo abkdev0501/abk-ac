@@ -17,6 +17,7 @@ namespace Arity.Service.Contract
         Task<GroupMasterDTO> GetGroupById(int id);
         Task AddUpdateGroup(GroupMasterDTO groupMaster);
         Task<List<UsersDto>> GetAllClient();
+        Task<IQueryable<UsersDto>> GetAllClientAsQuerable();
         Task<UsersDto> GetClientById(int id);
         Task<List<UsersDto>> GetAllConsultant();
         Task<List<GroupMasterDTO>> GetAllGroups();

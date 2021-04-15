@@ -1168,7 +1168,7 @@ namespace ArityApp.Controllers
             var htmlToPdf = new NReco.PdfGenerator.HtmlToPdfConverter();
 
             var fileData = htmlToPdf.GeneratePdf(invoiceTemplate.ToString());
-            return File(fileData, "application/octet-stream", "Invoide.pdf");
+            return File(fileData, "application/octet-stream", "Invoice.pdf");
         }
 
 

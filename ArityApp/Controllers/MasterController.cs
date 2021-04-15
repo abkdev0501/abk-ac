@@ -190,17 +190,108 @@ namespace ArityApp.Controllers
         /// Get all clients
         /// </summary>
         /// <returns></returns>
-        public async Task<ActionResult> LoadClient(string from, string to)
+        public async Task<ActionResult> LoadClient(DtParameters dtParameters)
         {
             try
             {
-                var users = await _masterService.GetAllClient();
-                return Json(new { data = users }, JsonRequestBehavior.AllowGet);
+                var orderCriteria = "Id";
+                var orderAscendingDirection = false;
+
+                if (dtParameters.Order != null)
+                {
+                    // in this example we just default sort on the 1st column
+                    orderCriteria = dtParameters.Columns[dtParameters.Order[0].Column].Data;
+                    orderAscendingDirection = dtParameters.Order[0].Dir.ToString().ToLower() == "asc";
+                }
+
+                var result  = await _masterService.GetAllClientAsQuerable();
+
+                //Apply filter
+                var columnFilter = dtParameters.Columns.Where(x => !string.IsNullOrWhiteSpace(x.Search.Value)).ToDictionary(x => x.Name, x => x.Search.Value);
+                if (columnFilter.Count > 0)
+                {
+                    result = ApplyClientFilter(columnFilter, result);
+                }
+
+                var totalResultsCount = result.Count();
+                result = orderAscendingDirection ? result.OrderByDynamic(orderCriteria.Replace("String", ""), DtOrderDir.Asc) : result.OrderByDynamic(orderCriteria.Replace("String", ""), DtOrderDir.Desc);
+
+                // now just get the count of items (without the skip and take) - eg how many could be returned with filtering
+                var filteredResultsCount = result.Count();
+
+                return Json(new
+                {
+                    draw = dtParameters.Draw,
+                    recordsTotal = totalResultsCount,
+                    recordsFiltered = filteredResultsCount,
+                    data = dtParameters.Length == - 1 ? result.ToList() : result
+                     .Skip(dtParameters.Start)
+                     .Take(dtParameters.Length)
+                     .ToList()
+                });
             }
             catch
             {
                 throw;
             }
+        }
+
+        public IQueryable<UsersDto> ApplyClientFilter(Dictionary<string, string> columnFilter, IQueryable<UsersDto> result)
+        {
+            if (columnFilter.ContainsKey("FullName") && !string.IsNullOrWhiteSpace(columnFilter["FullName"]))
+            {
+                var fullName = columnFilter["FullName"].ToUpper();
+                result = result.Where(x => x.FullName.ToUpper().Contains(fullName));
+            }
+
+            if (columnFilter.ContainsKey("UserName") && !string.IsNullOrWhiteSpace(columnFilter["UserName"]))
+            {
+                var userName = columnFilter["UserName"].ToUpper();
+                result = result.Where(x => x.Username.ToUpper().Contains(userName));
+            }
+
+            if (columnFilter.ContainsKey("Address") && !string.IsNullOrWhiteSpace(columnFilter["Address"]))
+            {
+                var address = columnFilter["Address"].ToUpper();
+                result = result.Where(x => x.Address.ToUpper().Contains(address));
+            }
+
+            if (columnFilter.ContainsKey("City") && !string.IsNullOrWhiteSpace(columnFilter["City"]))
+            {
+                var city = columnFilter["City"].ToUpper();
+                result = result.Where(x => x.City.ToUpper().Contains(city));
+            }
+
+            if (columnFilter.ContainsKey("PhoneNumber") && !string.IsNullOrWhiteSpace(columnFilter["PhoneNumber"]))
+            {
+                var phoneNumber = columnFilter["PhoneNumber"].ToUpper();
+                result = result.Where(x => x.PhoneNumber.ToUpper().Contains(phoneNumber));
+            }
+
+            if (columnFilter.ContainsKey("Pincode") && !string.IsNullOrWhiteSpace(columnFilter["Pincode"]))
+            {
+                var pinCode = columnFilter["Pincode"].ToUpper();
+                result = result.Where(x => x.Pincode.ToUpper().Contains(pinCode));
+            }
+
+            if (columnFilter.ContainsKey("GroupName") && !string.IsNullOrWhiteSpace(columnFilter["GroupName"]))
+            {
+                var groupName = columnFilter["GroupName"].ToUpper();
+                result = result.Where(x => x.GroupName.ToUpper().Contains(groupName));
+            }
+
+            if (columnFilter.ContainsKey("AccountantName") && !string.IsNullOrWhiteSpace(columnFilter["AccountantName"]))
+            {
+                var accountantName = columnFilter["AccountantName"].ToUpper();
+                result = result.Where(x => x.AccountantName.ToUpper().Contains(accountantName));
+            }
+
+            if (columnFilter.ContainsKey("Status") && bool.TryParse(columnFilter["Status"], out var status))
+            {
+                result = result.Where(x => x.Active == status);
+            }
+
+            return result;
         }
 
         /// <summary>

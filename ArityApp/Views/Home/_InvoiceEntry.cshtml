@@ -112,14 +112,23 @@
 </form>
 
 <script>
-     $('.bk-date').datepicker({
-                    todayBtn: "linked",
-                    keyboardNavigation: false,
-                    forceParse: false,
-                    calendarWeeks: true,
-                    autoclose: true,
-                    format: "dd/mm/yyyy"
-     });
+    $('.bk-date').datepicker({
+                   todayBtn: "linked",
+                   keyboardNavigation: false,
+                   forceParse: false,
+                   calendarWeeks: true,
+                   autoclose: true,
+                   format: "dd/mm/yyyy"
+    });
+
+    $('.bk-date').change(function () {
+        var dateStr = $(`#${this.id}`).val();
+        var validDate = moment(dateStr, 'DD/MM/YYYY');
+        if (dateStr != '' && !validDate.isValid()) {
+            $(`#${this.id}`).val('');
+        }
+    });
+
     $(".bk-choosen").chosen();
     $("#btnAdd").click(function () {
         var isValid = true;

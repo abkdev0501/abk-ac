@@ -144,7 +144,7 @@
                                     </th>
                                     <th style="width:5%;">
                                         <div class="nk-int-st">
-                                            <input id="col_4" class="form-control" type="text" name="datefilter" value="" />
+                                            <input id="col_4" class="form-control" type="text" name="datefilter" value="" autocomplete = "off"  />
                                         </div>
                                     </th>
                                     <th style="width:5%;">
@@ -184,7 +184,7 @@
                                     </th>
                                     <th style="width:2%;">
                                         <div class="nk-int-st">
-                                            <input id="col_9" class="form-control" type="text" name="datefilter" value="" />
+                                            <input id="col_9" class="form-control" type="text" name="datefilter" value="" autocomplete = "off" />
                                         </div>
                                     </th>
                                     <th style="width:7%;">
@@ -283,7 +283,7 @@
         });
 
         $('#col_4').val(moment().format('DD/MM/YYYY') + '-' + moment().format('DD/MM/YYYY'));
-        $('#col_4').prop('title', moment().startDate.format('DD/MM/YYYY') + '-' + moment().format('DD/MM/YYYY'));
+        $('#col_4').prop('title', moment().format('DD/MM/YYYY') + '-' + moment().format('DD/MM/YYYY'));
 
     </script>
 
@@ -397,6 +397,12 @@
                         }
                     });
                 });
+            },
+            "preDrawCallback": function (settings) {
+                $("#loading").show();
+            },
+            "drawCallback": function (settings) {
+                $("#loading").hide();
             }
         });
 

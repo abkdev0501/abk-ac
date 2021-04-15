@@ -195,6 +195,14 @@ else if (Model != null && Model.ReceiptId > 0 && Model.InvoiceIds != null)
                 format: "dd/mm/yyyy"
         });
 
+        $('.bk-date').change(function () {
+            var dateStr = $(`#${this.id}`).val();
+            var validDate = moment(dateStr, 'DD/MM/YYYY');
+            if (dateStr != '' && !validDate.isValid()) {
+                $(`#${this.id}`).val('');
+            }
+        });
+
     $("#IsWithoutInvoice").change(function(){
         if ($(this).is(":checked")) {
             $("#TotalAmount").removeAttr("disabled");

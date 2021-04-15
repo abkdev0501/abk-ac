@@ -22,6 +22,7 @@ namespace Arity.Data.Dto
         public bool Active { get; set; }
         public int CreatedBy { get; set; }
         public int? GroupId { get; set; }
+        public string GroupName { get; set; }
         public string MasterMobile { get; set; }
         public string AccountantName { get; set; }
         public string AccountantMobile { get; set; }
