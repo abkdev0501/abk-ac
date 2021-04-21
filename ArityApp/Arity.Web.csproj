@@ -226,6 +226,7 @@
     </Compile>
     <Compile Include="Models\Account\LoginModel.cs" />
     <Compile Include="Models\AuxiliaryModels\DatatableModels.cs" />
+    <Compile Include="Models\Reports\ViewLedgerReport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -497,6 +498,7 @@
     <Content Include="Views\Master\LedgerReport.cshtml" />
     <Content Include="Views\TaskPreview\Index.cshtml" />
     <Content Include="Views\TaskPreview\_TaskWizard.cshtml" />
+    <Content Include="Views\Master\_LedgerReportWizard.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -49,5 +49,7 @@ namespace Arity.Service.Contract
         Task<BusinessTypes> GetBusinessTypeById(int id);
         Task AddUpdateBusinessTypes(BusinessTypes businessTypes);
         Task DeleteBusinessTypes(int businessTypesId);
+        Task<List<UserLookup>> GetUserLookup(int? userTypeId = null);
+        Task<List<GroupMasterLookup>> GetGroupLookup();
     }
 }

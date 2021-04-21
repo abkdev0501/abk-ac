@@ -187,11 +187,11 @@
                                         <a href="/client">Client</a>
                                     </li>
                                 }
+                                @*<li>
+            <a href="/task">Task</a>
+        </li>*@
                                 <li>
-                                    <a href="/task">Task</a>
-                                </li>
-                                <li>
-                                    <a href="/taskpreview">Task*</a>
+                                    <a href="/taskpreview">Task</a>
                                 </li>
                                 <li>
                                     <a href="/Document/Index">Document</a>
@@ -206,6 +206,12 @@
                                 {
                                     <li>
                                         <a href="/notes">Notes</a>
+                                    </li>
+                                }
+                                @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                                {
+                                    <li>
+                                        <a href="/ledgerReport">Reports</a>
                                     </li>
                                 }
                             </ul>
@@ -253,11 +259,11 @@
                                 <a href="/client"><i class="notika-icon notika-support"></i> Client</a>
                             </li>
                         }
-                        <li id="liTask">
-                            <a href="/task"><i class="notika-icon notika-form"></i> Task</a>
-                        </li>
+                        @*<li id="liTask">
+            <a href="/task"><i class="notika-icon notika-form"></i> Task</a>
+        </li>*@
                         <li id="liTask2">
-                            <a href="/taskpreview"><i class="notika-icon notika-form"></i>Task*</a>
+                            <a href="/taskpreview"><i class="notika-icon notika-form"></i>Task</a>
                         </li>
                         <li id="liDoc">
                             <a href="/Document/Index"><i class="notika-icon notika-windows"></i>Document</a>
@@ -268,11 +274,15 @@
                             <li id="liNotes">
                                 <a href="/notification"><i class="notika-icon notika-form"></i>Notes</a>
                             </li>
+                        }
 
+                        @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                        {
                             <li>
                                 <a href="/ledgerReport"><i class="notika-icon notika-form"></i>Reports</a>
                             </li>
                         }
+
                         @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
                         {
                             <li id="liNotes">

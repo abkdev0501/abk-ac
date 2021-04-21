@@ -191,7 +191,7 @@ namespace ArityApp.Controllers
         {
             try
             {
-                return Json(await _invoiceService.GetClient(companyId), JsonRequestBehavior.AllowGet);
+                return Json(await _invoiceService.GetClientByCompanyId(companyId), JsonRequestBehavior.AllowGet);
             }
             catch
             {

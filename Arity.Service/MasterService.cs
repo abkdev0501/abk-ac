@@ -864,6 +864,43 @@ namespace Arity.Service
             await _dbContext.SaveChangesAsync();
         }
         #endregion
+
+        #region Lookup
+
+        public async Task<List<UserLookup>> GetUserLookup(int? userTypeId = null)
+        {
+            if(userTypeId == null)
+            {
+                return await (from cd in _dbContext.Users
+                              select new UserLookup()
+                              {
+                                  FullName = cd.FullName,
+                                  Id = cd.Id
+                              }).ToListAsync();
+            }
+            else
+            {
+                return await (from cd in _dbContext.Users
+                              where cd.UserTypeId == userTypeId
+                              select new UserLookup()
+                              {
+                                  FullName = cd.FullName,
+                                  Id = cd.Id
+                              }).ToListAsync();
+            }
+        }
+
+        public async Task<List<GroupMasterLookup>> GetGroupLookup()
+        {
+            return await (from gm in _dbContext.GroupMasters
+                          select new GroupMasterLookup
+                          {
+                              GroupId = gm.GroupId,
+                              Name = gm.Name
+                          }).ToListAsync();
+        }
+
+        #endregion
     }
 }
 

@@ -15,4 +15,10 @@ namespace Arity.Data.Dto
         public string AddedByName { get; set; }
         public bool IsAsociatedWithClient { get; set; }
     }
+
+    public class GroupMasterLookup
+    {
+        public int GroupId { get; set; }
+        public string Name { get; set; }
+    }
 }

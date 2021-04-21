@@ -1,0 +1,125 @@
+﻿@model ArityApp.Models.Reports.ViewLedgerReport
+@{ int snNo = 0; }
+@if (Model.Data != null && Model.Data.Count > 0)
+{
+    <div class="invoice-hds-pro">
+        @if (Model.IsGroup)
+        {
+            <div class="row">
+                <div style="text-align:center"><h2>Group Name : @Model.GroupName</h2></div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div style="text-align:center"><h2>Client Name : @Model.ClientName</h2></div>
+            </div>
+        }
+    </div>
+
+    <div class="row">
+        <div class="col-lg-1 col-md-1 col-sm-3 col-xs-12"></div>
+        <div class="col-lg-4 col-md-4 col-sm-3 col-xs-12">
+            <div class="invoice-hs">
+                <span>Period</span>
+                <h2>@Model.Period</h2>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12">
+            <div class="invoice-hs date-inv sm-res-mg-t-30 tb-res-mg-t-30 tb-res-mg-t-0">
+                <span>Total Debit</span>
+                <h2>@Model.TotalDebit</h2>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12">
+            <div class="invoice-hs wt-inv sm-res-mg-t-30 tb-res-mg-t-30 tb-res-mg-t-0">
+                <span>Total Credit</span>
+                <h2>@Model.TotalCredit</h2>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12">
+            <div class="invoice-hs gdt-inv sm-res-mg-t-30 tb-res-mg-t-30 tb-res-mg-t-0">
+                <span>Closing Balance</span>
+                <h2>@Model.ClosingBalance</h2>
+            </div>
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-3 col-xs-12"></div>
+    </div>
+}
+
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="invoice-sp">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Particular</th>
+                        <th>Company</th>
+                        <th>Invoice/Receipt No</th>
+                        <th>Year</th>
+                        <th>Debit</th>
+                        <th>Credit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Data != null && Model.Data.Count > 0)
+                    {
+                        foreach (var item in Model.Data)
+                        {
+                            snNo = snNo + 1;
+                            <tr>
+                                <td>@snNo</td>
+                                <td>@item.Date.ToShortDateString()</td>
+                                <td><b>@item.Particular</b></td>
+                                <td>@item.CompanyName</td>
+                                <td>@item.InvoiceId</td>
+                                <td>@item.Year</td>
+                                <td style="text-align:right"><b>@item.Debit</b></td>
+                                <td style="text-align:right"><b>@item.Credit</b></td>
+                            </tr>
+                        }
+                        <tr style="border-top: 3px solid #ddd;">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="text-align:right"><b>@Model.TotalDebit</b></td>
+                            <td style="text-align:right"><b>@Model.TotalCredit</b></td>
+                        </tr>
+                        <tr style="border-top: 3px solid #ddd;">
+                            <td></td>
+                            <td><b>Closing Balance</b></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="text-align:right"><b>@Model.ClosingBalance</b></td>
+                        </tr>
+                        <tr style="border-top: 3px solid #ddd;">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="text-align:right"><b>@Model.TotalDebit</b></td>
+                            <td style="text-align:right"><b>@Model.TotalDebit</b></td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center"><b>No Data Found</b></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

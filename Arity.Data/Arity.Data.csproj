@@ -75,6 +75,7 @@
     <Compile Include="Dto\DocumentMasterDto.cs" />
     <Compile Include="Dto\UserDTO.cs" />
     <Compile Include="Dto\NotificationDTO.cs" />
+    <Compile Include="Dto\UserLookup.cs" />
     <Compile Include="Dto\UsersDto.cs" />
     <Compile Include="Entity\BusinessStatus.cs" />
     <Compile Include="Entity\BusinessTypes.cs" />

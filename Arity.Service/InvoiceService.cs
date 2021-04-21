@@ -46,6 +46,23 @@ namespace Arity.Service
                           m.CompanyId == id
                           select cd).ToListAsync();
         }
+
+        public async Task<List<UserLookup>> GetClientByCompanyId(int id)
+        {
+            return await (from cd in _dbContext.Users
+                          join m in _dbContext.Company_Client_Mapping on cd.Id equals (m.UserId ?? 0)
+                          where SessionHelper.UserTypeId == (int)EnumHelper.UserType.Consultant ?
+                          m.CompanyId == id && cd.ConsultantId == (int)SessionHelper.UserId :
+                          m.CompanyId == id
+                          select new UserLookup() 
+                          {
+                              FullName = cd.FullName,
+                              Id = cd.Id
+                          }).ToListAsync();
+        }
+
+      
+
         public async Task<List<Particular>> GetParticular()
         {
             return await _dbContext.Particulars.ToListAsync();
@@ -550,12 +567,13 @@ namespace Arity.Service
             return await _dbContext.Company_Client_Mapping.Where(_ => _.UserId == clientId).Select(_ => (_.CompanyId ?? 0)).FirstAsync();
         }
 
-        public async Task<List<LedgerReportDto>> GetLedgerReportData(int client, string fromDate, string toDate)
+        public async Task<List<LedgerReportDto>> GetLedgerReportData(int client, string fromDate, string toDate, int group)
         {
-            return _dbContext.Database.SqlQuery<LedgerReportDto>("exec LedgerReportDetails @UserId,@FromDate,@ToDate ",
+            return _dbContext.Database.SqlQuery<LedgerReportDto>("exec LedgerReportDetails_2 @UserId,@FromDate,@ToDate,@GroupId",
                 new SqlParameter("UserId", client),
                 new SqlParameter("FromDate", Convert.ToDateTime(fromDate)),
-                new SqlParameter("ToDate", Convert.ToDateTime(toDate))).OrderBy(_ => _.Date).ToList<LedgerReportDto>();
+                new SqlParameter("ToDate", Convert.ToDateTime(toDate)),
+                new SqlParameter("GroupId", group)).ToList<LedgerReportDto>();
 
         }
         #endregion

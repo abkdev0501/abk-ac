@@ -11,6 +11,7 @@ namespace Arity.Service.Contract
     {
         Task<List<Company_master>> GetCompany();
         Task<List<User>> GetClient(int companyId);
+        Task<List<UserLookup>> GetClientByCompanyId(int id);
         Task<List<Particular>> GetParticular();
         Task<int> AddUpdateInvoiceEntry(int CompanyId, InvoiceEntry invoiceEntry);
         Task<List<InvoiceEntry>> GetAllInvoice();
@@ -30,6 +31,6 @@ namespace Arity.Service.Contract
         Task<bool> DeleteInvoiceById(int invoiceId);
         Task<List<CompanyClientList>> GetAllCompanyWithClients();
         Task<int> GetCompanyByClientId(int clientId);
-        Task<List<LedgerReportDto>> GetLedgerReportData(int client, string from, string to);
+        Task<List<LedgerReportDto>> GetLedgerReportData(int client, string from, string to, int group);
     }
 }
