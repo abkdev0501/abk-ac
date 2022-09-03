@@ -1,6 +1,5 @@
 ﻿using Arity.Data.Dto;
-using Arity.Data.Entity;
-using System;
+using Arity.Data.Models.AuxiliaryModels;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +8,7 @@ namespace Arity.Service.Contract
 {
     public interface ITaskService
     {
+        Task<List<TaskDTO>> GetAllTaskDetail(DtParameters dtParameters);
         Task<IQueryable<TaskDTO>> GetAll();
         Task<TaskDTO> GetTask(int id);
         Task AddUpdateTask(TaskDTO task);

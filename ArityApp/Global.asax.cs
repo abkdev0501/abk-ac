@@ -1,4 +1,7 @@
 ﻿using Arity.Data;
+using Arity.Infra;
+using Arity.Infra.Factory;
+using Arity.Infra.Interface;
 using Arity.Service;
 using Arity.Service.Contract;
 using Autofac;
@@ -32,7 +35,12 @@ namespace ArityApp
             builder.RegisterType<LoggerService>().As<ILoggerService>();
             builder.RegisterType<TaskService>().As<ITaskService>();
             builder.RegisterType<RMNEntities>().InstancePerLifetimeScope();
+            builder.RegisterType<ConnectionFactory>().As<IConnectionFactory>().InstancePerLifetimeScope();
 
+            #region Repositories 
+            builder.RegisterType<TaskRepository>().As<ITaskRepository>();
+            builder.RegisterType<MasterRepository>().As<IMasterRepository>();
+            #endregion
 
             var container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));

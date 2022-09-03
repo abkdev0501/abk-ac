@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.705
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32802.440
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arity.Web", "ArityApp\Arity.Web.csproj", "{9FB89459-FA4A-40B6-B1A9-B978F59604B6}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arity.Service", "Arity.Service\Arity.Service.csproj", "{D4BB6ADE-94D5-4DAA-9689-1EDFD03F7681}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arity.AutoMapper", "Arity.AutoMapper\Arity.AutoMapper.csproj", "{C8AF9EFB-1C14-463F-8591-DFDECE90FC28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arity.Infra", "Arity.Infra\Arity.Infra.csproj", "{B7D84ABD-22A8-4DCC-A6E7-49432D161F5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{C8AF9EFB-1C14-463F-8591-DFDECE90FC28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8AF9EFB-1C14-463F-8591-DFDECE90FC28}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8AF9EFB-1C14-463F-8591-DFDECE90FC28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7D84ABD-22A8-4DCC-A6E7-49432D161F5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7D84ABD-22A8-4DCC-A6E7-49432D161F5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7D84ABD-22A8-4DCC-A6E7-49432D161F5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7D84ABD-22A8-4DCC-A6E7-49432D161F5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

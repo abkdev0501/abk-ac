@@ -1,0 +1,40 @@
+and (@SearchBy = '' or (@SearchBy != '' and 
+		(
+			ut.Comment like '%'+@SearchBy+'%' or 
+			t.[Description] like '%'+@SearchBy+'%' or 
+			t.[Name] like '%'+@SearchBy+'%' or 
+			un.FullName like '%'+@SearchBy+'%' or 
+			tat.FullName like '%'+@SearchBy+'%' or 
+			str(t.ChargeAmount) like '%'+@SearchBy+'%' or 
+			(case t.IsChargeble when 1 then 'false' else 'true' end) like  '%'+@SearchBy+'%' 
+)))
+----------------------------------------------------------------------------------------
+
+USE [rmncolxw]
+GO
+
+DECLARE	@return_value int
+
+EXEC	@return_value = [dbo].[GetAllTaskDetail]
+		@UserTypeId = 2,
+		@UserId = 4,
+		@RecordFrom = 0,
+		@PageSize = 10,
+		@TaskName = NULL,
+		@UserName = NULL,
+		@ClientName = NULL,
+		@Description = NULL,
+		@Status = NULL,
+		@UserComment = NULL,
+		@IsChargeble = NULL,
+		@Priorities = NULL,
+		@CreatedBy = NULL,
+		@CreatedOnFrom = NULL,
+		@CreatedOnTo = NULL,
+		@DueDateFrom = NULL,
+		@DueDateTo = NULL
+
+SELECT	'Return Value' = @return_value
+
+GO
+---------------------------------------------------------------------------------------------

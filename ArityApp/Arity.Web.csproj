@@ -225,7 +225,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Account\LoginModel.cs" />
-    <Compile Include="Models\AuxiliaryModels\DatatableModels.cs" />
     <Compile Include="Models\Reports\ViewLedgerReport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -502,6 +501,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Models\AuxiliaryModels\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -524,6 +524,10 @@
     <ProjectReference Include="..\Arity.Data\Arity.Data.csproj">
       <Project>{a9784b16-fc7b-4456-8b34-8a89913f7c5d}</Project>
       <Name>Arity.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Arity.Infra\Arity.Infra.csproj">
+      <Project>{B7D84ABD-22A8-4DCC-A6E7-49432D161F5B}</Project>
+      <Name>Arity.Infra</Name>
     </ProjectReference>
     <ProjectReference Include="..\Arity.Service\Arity.Service.csproj">
       <Project>{d4bb6ade-94d5-4daa-9689-1edfd03f7681}</Project>

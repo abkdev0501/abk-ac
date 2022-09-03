@@ -7,6 +7,7 @@ using Arity.Data;
 using Arity.Data.Dto;
 using Arity.Data.Entity;
 using Arity.Data.Helpers;
+using Arity.Infra.Interface;
 using Arity.Service.Contract;
 using Newtonsoft.Json;
 
@@ -15,9 +16,11 @@ namespace Arity.Service
     public class MasterService : IMasterService
     {
         private readonly RMNEntities _dbContext;
-        public MasterService(RMNEntities rmnEntities)
+        private readonly IMasterRepository _masterRepository;
+        public MasterService(RMNEntities rmnEntities, IMasterRepository masterRepository)
         {
             _dbContext = rmnEntities;
+            _masterRepository = masterRepository;
         }
 
         #region Company
@@ -519,46 +522,7 @@ namespace Arity.Service
 
         public async Task<List<NotificationDTO>> GetAllNotification(int userId, int userType, int type)
         {
-            var dd = _dbContext.Notifications.ToList();
-            if (userType == (int)EnumHelper.UserType.User)
-            {
-                return (from n in _dbContext.Notifications.ToList()
-                        where (n.ClientId == 0 || n.ClientId == userId)
-                        && (n.IsComplete ?? false) == false
-                        && DateTime.Now >= n.OnBroadcastDateTime
-                        && DateTime.Now <= n.OffBroadcastDateTime
-                        && n.Type == type
-                        select new NotificationDTO
-                        {
-                            NotificationId = n.NotificationId,
-                            ClientId = n.ClientId,
-                            CreatedBy = n.CreatedBy,
-                            IsComplete = n.IsComplete ?? false,
-                            Message = n.Message,
-                            OffBroadcastDateTime = n.OffBroadcastDateTime,
-                            OnBroadcastDateTime = n.OnBroadcastDateTime,
-                        }).OrderBy(_ => _.ClientId).ToList();
-            }
-            else
-            {
-                var tt = (from n in _dbContext.Notifications.ToList()
-                          where n.Type == (int)EnumHelper.NotificationType.Notification
-                          && (n.IsComplete ?? false) == false
-                          && DateTime.Now >= n.OnBroadcastDateTime
-                          && DateTime.Now <= n.OffBroadcastDateTime
-                          && n.Type == type
-                          select new NotificationDTO
-                          {
-                              NotificationId = n.NotificationId,
-                              ClientId = n.ClientId,
-                              CreatedBy = n.CreatedBy,
-                              IsComplete = n.IsComplete ?? false,
-                              Message = n.Message,
-                              OffBroadcastDateTime = n.OffBroadcastDateTime,
-                              OnBroadcastDateTime = n.OnBroadcastDateTime,
-                          }).AsQueryable();
-                return tt.OrderBy(_ => _.ClientId).ToList();
-            }
+            return await _masterRepository.GetAllNotification(userId, userType, type);
         }
 
         public async Task<IQueryable<NotificationDTO>> GetAllNotes(int userId, int userType)

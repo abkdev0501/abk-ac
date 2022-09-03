@@ -37,5 +37,6 @@ namespace Arity.Data.Dto
         public string CreatedByString { get; set; }
         public decimal? ChargeAmount { get; set; }
         public string PrioritiesString { get { return Priorities != null ? Enum.GetName(typeof(EnumHelper.TaskPrioritis), Priorities) : string.Empty; } }
+        public int TotalRecords { get;set; }
     }
 }

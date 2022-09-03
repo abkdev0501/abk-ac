@@ -1,9 +1,8 @@
 ﻿using Arity.Data.Dto;
 using Arity.Data.Entity;
 using Arity.Data.Helpers;
+using Arity.Data.Models.AuxiliaryModels;
 using Arity.Service.Contract;
-using Arity.Web.Extensions;
-using Arity.Web.Models.AuxiliaryModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -43,34 +42,9 @@ namespace ArityApp.Controllers
         {
             try
             {
-                var orderCriteria = "TaskId";
-                var orderAscendingDirection = false;
+                var result = await _taskService.GetAllTaskDetail(dtParameters);
 
-                if (dtParameters.Order != null)
-                {
-                    // in this example we just default sort on the 1st column
-                    orderCriteria = dtParameters.Columns[dtParameters.Order[0].Column].Data;
-                    orderAscendingDirection = dtParameters.Order[0].Dir.ToString().ToLower() == "asc";
-                }
-
-
-                var result = await _taskService.GetAll();
-
-                //Apply filter
-                var columnFilter = dtParameters.Columns.Where(x => !string.IsNullOrWhiteSpace(x.Search.Value)).ToDictionary(x => x.Name, x => x.Search.Value);
-                if (columnFilter.Count > 0)
-                {
-                    result = ApplyFilter(columnFilter, result);
-                }
-                else
-                {
-                    var fromDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")).Date;
-                    var toDate = fromDate.AddDays(1).AddMilliseconds(-1);
-                    result = result.Where(x => x.DueDate >= fromDate && x.DueDate <= toDate);
-                }
-
-                var totalResultsCount = result.Count();
-                result = orderAscendingDirection ? result.OrderByDynamic(orderCriteria.Replace("String", ""), DtOrderDir.Asc) : result.OrderByDynamic(orderCriteria.Replace("String", ""), DtOrderDir.Desc);
+                var totalResultsCount = result.FirstOrDefault()?.TotalRecords ?? 0;
 
                 // now just get the count of items (without the skip and take) - eg how many could be returned with filtering
                 var filteredResultsCount = result.Count();
@@ -85,16 +59,18 @@ namespace ArityApp.Controllers
                         .Take(dtParameters.Length)
                         .ToList()
                 });
+
                 jsonResult.MaxJsonLength = int.MaxValue;
 
                 return jsonResult;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json(new { draw = 0, recordsTotal = 0, recordsFiltered = 0, data = new List<Tasks>() }, JsonRequestBehavior.AllowGet);
             }
         }
 
+      
         public IQueryable<TaskDTO> ApplyFilter(Dictionary<string, string> columnFilter, IQueryable<TaskDTO> taskDTOs)
         {
             if (columnFilter.ContainsKey("TaskName") && !string.IsNullOrWhiteSpace(columnFilter["TaskName"]))

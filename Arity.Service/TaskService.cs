@@ -3,12 +3,15 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Arity.Data;
 using Arity.Data.Dto;
 using Arity.Data.Entity;
 using Arity.Data.Helpers;
+using Arity.Data.Models.AuxiliaryModels;
+using Arity.Infra.Interface;
 using Arity.Service.Contract;
 
 namespace Arity.Service
@@ -17,11 +20,44 @@ namespace Arity.Service
     {
         private readonly RMNEntities _dbContext;
         private readonly IInvoiceService _invoiceService;
+        private readonly ITaskRepository _taskRepository;
 
-        public TaskService(RMNEntities rmnEntities, IInvoiceService invoiceService)
+        public TaskService(RMNEntities rmnEntities, IInvoiceService invoiceService, ITaskRepository taskRepository)
         {
             _dbContext = rmnEntities;
             _invoiceService = invoiceService;
+            _taskRepository = taskRepository;
+        }
+
+
+        public async Task<List<TaskDTO>> GetAllTaskDetail(DtParameters dtParameters)
+        {
+            var sortColumn = string.Empty;
+            var sortOrder = string.Empty;
+
+            if (dtParameters.Order != null)
+            {
+                // in this example we just default sort on the 1st column
+                sortColumn = dtParameters.Columns[dtParameters.Order[0].Column].Data;
+                sortOrder = dtParameters.Order[0].Dir.ToString();
+            }
+
+            Dictionary<string, object> filterParams;
+            var columnFilter = dtParameters.Columns.Where(x => !string.IsNullOrWhiteSpace(x.Search.Value)).ToDictionary(x => x.Name, x => x.Search.Value);
+            if (columnFilter.Count > 0)
+            {
+                filterParams = GetDynamicParamsForFilter(columnFilter);
+            }
+            else
+            {
+                var fromDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")).Date;
+                var toDate = fromDate.AddDays(1).AddMilliseconds(-1);
+                filterParams = new Dictionary<string, object>();
+                filterParams.Add("DueDateFrom", fromDate);
+                filterParams.Add("DueDateTo", toDate);
+            }
+
+            return await _taskRepository.GetAllTaskDetail(SessionHelper.UserId, SessionHelper.UserTypeId, dtParameters.Start, dtParameters.Length, sortColumn, sortOrder, filterParams);
         }
 
         public async Task<IQueryable<TaskDTO>> GetAll()
@@ -250,57 +286,7 @@ namespace Arity.Service
 
         public async Task<List<TaskDTO>> GetAll(int userId, int typeId)
         {
-            if (typeId == (int)Arity.Service.Core.UserType.User)
-                return (from task in _dbContext.Tasks.ToList()
-                        join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
-                        join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
-                        join client in _dbContext.Users.ToList() on (task.ClientId ?? 0) equals client.Id
-                        where task.ClientId == userId
-                        && task.Status != (int)EnumHelper.TaskStatus.OnHold
-                        && task.Status != (int)EnumHelper.TaskStatus.Cancel
-                        select new TaskDTO
-                        {
-                            TaskId = task.Id,
-                            TaskUserId = userTask.Id,
-                            UserComment = userTask.Comment,
-                            UserId = userTask.UserId,
-                            Description = task.Description,
-                            TaskName = task.Name,
-                            DueDate = userTask.DueDate,
-                            CreatedBy = userTask.CreatedBy,
-                            CreatedOn = userTask.CreatedOn,
-                            UserName = user.FullName,
-                            ClientName = client.FullName,
-                            Remarks = task.Remarks,
-                            StatusId = userTask.Status,
-                            ChargeAmount = task.ChargeAmount
-                        }).OrderBy(_ => _.StatusId).ToList();
-            else
-                return (from task in _dbContext.Tasks.ToList()
-                        join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
-                        join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
-                        join client in _dbContext.Users.ToList() on (task.ClientId ?? 0) equals client.Id
-                        where userTask.UserId == userId
-                        && task.Status != (int)EnumHelper.TaskStatus.Complete
-                        && task.Status != (int)EnumHelper.TaskStatus.Cancel
-                        && task.Status != (int)EnumHelper.TaskStatus.OnHold
-                        select new TaskDTO
-                        {
-                            TaskId = task.Id,
-                            TaskUserId = userTask.Id,
-                            UserComment = userTask.Comment,
-                            UserId = userTask.UserId,
-                            Description = task.Description,
-                            TaskName = task.Name,
-                            DueDate = userTask.DueDate,
-                            CreatedBy = userTask.CreatedBy,
-                            CreatedOn = userTask.CreatedOn,
-                            UserName = user.FullName,
-                            ClientName = client.FullName,
-                            Remarks = task.Remarks,
-                            StatusId = userTask.Status,
-                            ChargeAmount = task.ChargeAmount
-                        }).OrderBy(_ => _.StatusId).ToList();
+            return await _taskRepository.GetAll(userId, typeId);
         }
 
         public async Task DeleteTask(int taskId)
@@ -309,6 +295,84 @@ namespace Arity.Service
             _dbContext.Tasks.RemoveRange(_dbContext.Tasks.Where(_ => _.Id == taskId).ToList());
             await _dbContext.SaveChangesAsync();
         }
+
+        #region Private Methods
+       
+        private Dictionary<string, object> GetDynamicParamsForFilter(Dictionary<string, string> columnFilter)
+        {
+            Dictionary<string, object> filterParams = new Dictionary<string, object>();
+
+            if (columnFilter.ContainsKey("TaskName") && !string.IsNullOrWhiteSpace(columnFilter["TaskName"]))
+                filterParams.Add("TaskName", columnFilter["TaskName"]);
+
+            if (columnFilter.ContainsKey("UserName") && !string.IsNullOrWhiteSpace(columnFilter["UserName"]))
+                filterParams.Add("UserName", columnFilter["UserName"]);
+
+            if (columnFilter.ContainsKey("ClientName") && !string.IsNullOrWhiteSpace(columnFilter["ClientName"]))
+                filterParams.Add("ClientName", columnFilter["ClientName"]);
+
+            if (columnFilter.ContainsKey("Description") && !string.IsNullOrWhiteSpace(columnFilter["Description"]))
+                filterParams.Add("Description", columnFilter["Description"]);
+
+            if (columnFilter.ContainsKey("Status") && !string.IsNullOrWhiteSpace(columnFilter["Status"]) && columnFilter["Status"] != "null")
+                filterParams.Add("Status", columnFilter["Status"]);
+
+            if (columnFilter.ContainsKey("UserComment") && !string.IsNullOrWhiteSpace(columnFilter["UserComment"]))
+                filterParams.Add("UserComment", columnFilter["UserComment"]);
+
+            if (columnFilter.ContainsKey("IsChargeble") && bool.TryParse(columnFilter["IsChargeble"], out var isChargable))
+                filterParams.Add("IsChargeble", isChargable);
+
+            if (columnFilter.ContainsKey("Priorities") && !string.IsNullOrWhiteSpace(columnFilter["Priorities"]) && columnFilter["Priorities"] != "null")
+                filterParams.Add("Priorities", columnFilter["Priorities"]);
+
+            if (columnFilter.ContainsKey("CreatedBy") && !string.IsNullOrWhiteSpace(columnFilter["CreatedBy"]))
+                filterParams.Add("CreatedBy", columnFilter["CreatedBy"]);
+
+            if (columnFilter.ContainsKey("CreatedOn") && !string.IsNullOrWhiteSpace(columnFilter["CreatedOn"]))
+            {
+                var dates = GetDatesFromRange(columnFilter["CreatedOn"]);
+                if (dates.Item1 != null)
+                    filterParams.Add("CreatedOnFrom", dates.Item1);
+
+                if (dates.Item2 != null)
+                    filterParams.Add("CreatedOnTo", dates.Item2);
+            }
+
+            if (columnFilter.ContainsKey("DueDate") && !string.IsNullOrWhiteSpace(columnFilter["DueDate"]))
+            {
+                var dates = GetDatesFromRange(columnFilter["DueDate"]);
+                if (dates.Item1 != null)
+                    filterParams.Add("DueDateFrom", dates.Item1);
+
+                if (dates.Item2 != null)
+                    filterParams.Add("DueDateTo", dates.Item2);
+            }
+
+            return filterParams;
+        }
+
+        private Tuple<DateTime?, DateTime?> GetDatesFromRange(string range)
+        {
+            DateTime? fromDate = null;
+            DateTime? toDate = null;
+            if (!string.IsNullOrWhiteSpace(range))
+            {
+                var dates = range.Split('-');
+                if (!string.IsNullOrWhiteSpace(dates[0]))
+                {
+                    fromDate = DateTime.ParseExact(dates[0], "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                }
+
+                if (!string.IsNullOrWhiteSpace(dates[1]))
+                {
+                    toDate = DateTime.ParseExact(dates[1], "dd/MM/yyyy", CultureInfo.InvariantCulture).AddDays(1).AddMilliseconds(-1);
+                }
+            }
+            return Tuple.Create(fromDate, toDate);
+        }
+
+        #endregion
     }
 }
 

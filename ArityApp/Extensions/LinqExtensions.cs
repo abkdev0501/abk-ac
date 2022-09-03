@@ -1,4 +1,4 @@
-﻿using Arity.Web.Models.AuxiliaryModels;
+﻿using Arity.Data.Models.AuxiliaryModels;
 using System;
 using System.Linq;
 using System.Linq.Expressions;

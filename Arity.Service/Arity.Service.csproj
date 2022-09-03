@@ -85,6 +85,10 @@
       <Project>{a9784b16-fc7b-4456-8b34-8a89913f7c5d}</Project>
       <Name>Arity.Data</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Arity.Infra\Arity.Infra.csproj">
+      <Project>{b7d84abd-22a8-4dcc-a6e7-49432d161f5b}</Project>
+      <Name>Arity.Infra</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

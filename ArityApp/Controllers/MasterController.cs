@@ -4,7 +4,7 @@ using Arity.Data.Helpers;
 using Arity.Service;
 using Arity.Service.Contract;
 using Arity.Web.Extensions;
-using Arity.Web.Models.AuxiliaryModels;
+using Arity.Data.Models.AuxiliaryModels;
 using ArityApp.Models.Reports;
 using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;

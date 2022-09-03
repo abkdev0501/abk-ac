@@ -4,7 +4,7 @@ using Arity.Data.Helpers;
 using Arity.Service;
 using Arity.Service.Contract;
 using Arity.Web.Extensions;
-using Arity.Web.Models.AuxiliaryModels;
+using Arity.Data.Models.AuxiliaryModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
