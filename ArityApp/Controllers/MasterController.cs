@@ -460,7 +460,8 @@ namespace ArityApp.Controllers
         /// Get all notifications
         /// </summary>
         /// <returns></returns>
-        public async Task<ActionResult> LoadNotification()
+        [HttpPost]
+        public async Task<ActionResult> LoadNotification(DtParameters dtParameters)
         {
             try
             {

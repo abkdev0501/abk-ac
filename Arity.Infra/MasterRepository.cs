@@ -26,5 +26,20 @@ namespace Arity.Infra
             var result = await _dbConnection.QueryAsync<NotificationDTO>("GetAllNotification", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
             return result.ToList();
         }
+
+        public async Task<List<NotificationDTO>> GetAllNotificationList()
+        {
+            var parameters = new DynamicParameters();
+            var result = await _dbConnection.QueryAsync<NotificationDTO>("GetAllNotificationList", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
+            return result.ToList();
+        }
+
+        public async Task<NotificationDTO> GetNotification(int id)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@Id", id);
+            var result = await _dbConnection.QueryAsync<NotificationDTO>("GetAllNotificationList", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
+            return result.FirstOrDefault();
+        }
     }
 }

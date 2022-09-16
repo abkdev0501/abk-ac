@@ -451,6 +451,17 @@ namespace Arity.Service
 
         public async Task<List<NotificationDTO>> GetAllNotification()
         {
+            //var notifications = await _masterRepository.GetAllNotificationList();
+
+            //foreach (var notification in notifications)
+            //{
+            //    notification.OffBroadcastDateTimeString = notification.OffBroadcastDateTime.ToString("dd/MM/yyyy");
+            //    notification.OnBroadcastDateTimeString = notification.OnBroadcastDateTime.ToString("dd/MM/yyyy");
+            //    notification.TypeString = ((EnumHelper.NotificationType)notification.Type).ToString();
+            //}
+
+            //return notifications;
+
             var users = await _dbContext.Users.ToListAsync();
 
             return (from n in _dbContext.Notifications.ToList()
@@ -474,19 +485,20 @@ namespace Arity.Service
 
         public async Task<NotificationDTO> GetNotificationById(int id)
         {
-            return (from n in _dbContext.Notifications
-                    where n.NotificationId == id
-                    select new NotificationDTO
-                    {
-                        NotificationId = n.NotificationId,
-                        ClientId = n.ClientId,
-                        CreatedBy = n.CreatedBy,
-                        IsComplete = n.IsComplete ?? false,
-                        Message = n.Message,
-                        OffBroadcastDateTime = n.OffBroadcastDateTime,
-                        OnBroadcastDateTime = n.OnBroadcastDateTime,
-                        Type = n.Type
-                    }).FirstOrDefault();
+            return await _masterRepository.GetNotification(id);
+            //return (from n in _dbContext.Notifications
+            //        where n.NotificationId == id
+            //        select new NotificationDTO
+            //        {
+            //            NotificationId = n.NotificationId,
+            //            ClientId = n.ClientId,
+            //            CreatedBy = n.CreatedBy,
+            //            IsComplete = n.IsComplete ?? false,
+            //            Message = n.Message,
+            //            OffBroadcastDateTime = n.OffBroadcastDateTime,
+            //            OnBroadcastDateTime = n.OnBroadcastDateTime,
+            //            Type = n.Type
+            //        }).FirstOrDefault();
         }
 
         public async Task AddUpdateNotification(NotificationDTO notification)
@@ -833,7 +845,7 @@ namespace Arity.Service
 
         public async Task<List<UserLookup>> GetUserLookup(int? userTypeId = null)
         {
-            if(userTypeId == null)
+            if (userTypeId == null)
             {
                 return await (from cd in _dbContext.Users
                               select new UserLookup()
