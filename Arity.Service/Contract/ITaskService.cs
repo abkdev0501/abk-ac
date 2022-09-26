@@ -9,7 +9,6 @@ namespace Arity.Service.Contract
     public interface ITaskService
     {
         Task<List<TaskDTO>> GetAllTaskDetail(DtParameters dtParameters);
-        Task<IQueryable<TaskDTO>> GetAll();
         Task<TaskDTO> GetTask(int id);
         Task AddUpdateTask(TaskDTO task);
         Task<List<TaskDTO>> GetAll(int userId, int typeId);

@@ -4,6 +4,27 @@
     ViewBag.Title = "Notification";
 
 }
+<style>
+    tfoot {
+        display: table-header-group;
+    }
+
+    .table.table-striped > tbody > tr > td, .table.table-striped > tbody > tr > th, .table.table-striped > tfoot > tr > td, .table.table-striped > tfoot > tr > th, .table.table-striped > thead > tr > td, .table.table-striped > thead > tr > th {
+        border-top: 0px solid #F5F5F5;
+        font-size: 14px;
+        color: #333;
+        padding: 8px;
+    }
+
+    .daterangepicker > .ranges > .active {
+        color: red !important;
+    }
+
+    .dataTables_filter {
+        display: none;
+    }
+</style>
+
 <div class="breadcomb-area">
     <div class="container">
         <div class="row">
@@ -43,11 +64,14 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="data-table-list">
-                    <div class="basic-tb-hd">
-                        <h2>Notifications List</h2>
-                        <p>Below are List of Notifications.</p>
-                    </div>
-                    <div class="date-filter">
+                    <div class="row">
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10"></div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                            <div class="button-icon-btn">
+                                <button id="btn_search" class="btn btn-success success-icon-notika waves-effect"><i class="notika-icon notika-search"></i> Search</button>
+                                <button id="btn_reset" style="margin-left:4px" class="btn btn-success success-icon-notika waves-effect"><i class="notika-icon notika-refresh"></i> Reset</button>
+                            </div>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table id="tblCompany" class="table table-striped">
@@ -64,6 +88,55 @@
                                     <th style="width:5%;"></th>
                                 </tr>
                             </thead>
+                            <tfoot>
+                                <tr>
+                                    <th style="width:12%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_0" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:10%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_1" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:8%;">
+                                        <div class="nk-int-st">
+                                            <select id="col_2" class="selectpicker" multiple data-selected-text-format="count">
+                                                <option value="1">Notification</option>
+                                                <option value="2">Notes</option>
+                                                <option value="3">News</option>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th style="width:8%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_3" class="form-control" type="text" name="datefilter" value="" autocomplete="off" />
+                                        </div>
+                                    </th>
+                                    <th style="width:5%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_4" class="form-control" type="text" name="datefilter" value="" autocomplete="off" />
+                                        </div>
+                                    </th>
+                                    <th style="width:8%;">
+                                        <div class="nk-int-st">
+                                            <select id="col_5" class="selectpicker">
+                                                <option value="">None</option>
+                                                <option value="true">Yes</option>
+                                                <option value="false">No</option>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th style="width:8%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_6" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:5%;display:none;"></th>
+                                    <th style="width:5%;display:none;"></th>
+                                </tr>
+                            </tfoot>
                             <tbody></tbody>
                         </table>
                     </div>
@@ -79,7 +152,7 @@
                     <h3>Add/Update Notification</h3>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" id="modalNotificationBody">
 
                 </div>
                 <div class="modal-footer">
@@ -91,6 +164,76 @@
 </div>
 @section Scripts {
     <script>
+
+    $('#col_3').daterangepicker({
+        autoUpdateInput: false,
+        ranges: {
+            'None': [null, null],
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'Next 7 Days': [moment().add(6, 'days'), moment()],
+            'Next 30 Days': [moment().add(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            'Next Month': [moment().add(1, 'month').startOf('month'), moment().add(1, 'month').endOf('month')]
+        },
+        locale: {
+            cancelLabel: 'Clear'
+        }
+    });
+
+    $('#col_3').on('apply.daterangepicker', function (ev, picker) {
+        if (picker.startDate._isValid && picker.endDate._isValid) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + '-' + picker.endDate.format('DD/MM/YYYY'));
+            $(this).prop('title', picker.startDate.format('DD/MM/YYYY') + '-' + picker.endDate.format('DD/MM/YYYY'));
+        }
+        else {
+            $(this).val('');
+            $(this).prop('title', '');
+        }
+    });
+
+    $('#col_3').on('cancel.daterangepicker', function (ev, picker) {
+        $(this).val('');
+        $(this).prop('title', '');
+    });
+
+    $('#col_4').daterangepicker({
+        autoUpdateInput: false,
+        ranges: {
+            'None': [null, null],
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'Next 7 Days': [moment().add(6, 'days'), moment()],
+            'Next 30 Days': [moment().add(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            'Next Month': [moment().add(1, 'month').startOf('month'), moment().add(1, 'month').endOf('month')]
+        },
+        locale: {
+            cancelLabel: 'Clear'
+        }
+    });
+
+    $('#col_4').on('apply.daterangepicker', function (ev, picker) {
+        if (picker.startDate._isValid && picker.endDate._isValid) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + '-' + picker.endDate.format('DD/MM/YYYY'));
+            $(this).prop('title', picker.startDate.format('DD/MM/YYYY') + '-' + picker.endDate.format('DD/MM/YYYY'));
+        }
+        else {
+            $(this).val('');
+            $(this).prop('title', '');
+        }
+    });
+
+    $('#col_4').on('cancel.daterangepicker', function (ev, picker) {
+        $(this).val('');
+        $(this).prop('title', '');
+    });
 
     $(document).ready(function () {
             $("#liNotes").addClass("active");
@@ -118,28 +261,28 @@
                     text: 'Export to excel'
                 }],
                 "columns": [
-                    { "data": "Message" },
-                    { "data": "ClientName" },
-                    { "data": "TypeString" },
-                    { "data": "OnBroadcastDateTimeString" },
-                    { "data": "OffBroadcastDateTimeString" },
+                    { "data": "Message", "name": "Message" },
+                    { "data": "ClientName", "name": "ClientName" },
+                    { "data": "TypeString", "name": "Type" },
+                    { "data": "OnBroadcastDateTimeString", "name": "OnBroadcastDateTime" },
+                    { "data": "OffBroadcastDateTimeString", "name": "OffBroadcastDateTime" },
                     {
                         "orderable": false,
                         "data": null,
+                        "name": "IsCompleted",
                         "render": function (data, type, full) {
                         if(data.IsComplete)
                             return 'TRUE';
                         else
                             return 'FALSE';
                     }},
-                    { "data": "CreatedByName" },
+                    { "data": "CreatedByName", "name": "CreatedBy" },
                     {
                         "orderable": false,
                         "data": null,
                         "render": function (data, type, full) {
                             return '<button class="btn waves-effect" onclick="AddEditNotification(' + data.NotificationId + ')"><i class="fa fa-edit" aria-hidden="true"></i></button>';
-                    }
-                    },
+                    }},
                     {
                         "orderable": false,
                         "data": null,
@@ -149,23 +292,66 @@
                             '<i class="fa fa-trash" aria-hidden="true"></i>' +
                             '</button> </div>';
                     }}],
-                "order": [[0]]
+                "order": [[0]],
+                initComplete: function () {
+                    this.api().columns().every(function () {
+                        var that = this;
+                        $('input', this.footer()).on('keyup', function (e) {
+                            if (e.keyCode == 13) {
+                                applyFilter();
+                            }
+                        });
+                    });
+                },
+                "preDrawCallback": function (settings) {
+                    $("#loading").show();
+                },
+                "drawCallback": function (settings) {
+                    $("#loading").hide();
+                }
         });
 
          $("#btnFilterGrid").click(function () {
                  table.ajax.reload();
+         });
+
+        function applyFilter() {
+            table
+                .column(0).search($("#col_0").val())
+                .column(1).search($("#col_1").val())
+                .column(2).search($("#col_2").val())
+                .column(3).search($("#col_3").val())
+                .column(4).search($("#col_4").val())
+                .column(5).search($("#col_5").val())
+                .column(6).search($("#col_6").val())
+                .draw();
+        }
+
+        $('#btn_search').click(function () {
+            applyFilter();
+        });
+
+        $('#btn_reset').click(function () {
+            $("#col_1").val('');
+            $("#col_2").val('');
+            $("#col_3").val('');
+            $("#col_4").val('');
+            $("#col_5").val('');
+            $("#col_6").val('');
+            $('.selectpicker').selectpicker('deselectAll');
+            applyFilter();
         });
     });
 
       function AddEditNotification(Id) {
           $("#loading").show();
-            $.ajax({
-                url: '@Url.Action("AddNotification","Master")',
+          $.ajax({
+                url : '@Url.Content("~/Master/AddNotification")',
                 data: { id: Id},
                 type: 'GET',
                 dataType: 'Html',
                 success: function (response) {
-                    $('#modalNotification .modal-body').html(response);
+                    $('#modalNotificationBody').html(response);
                     $("body .summernote").summernote();
                     $('#modalNotification').modal('show');
                      $("#loading").hide();

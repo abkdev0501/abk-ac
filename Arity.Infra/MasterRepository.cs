@@ -27,10 +27,35 @@ namespace Arity.Infra
             return result.ToList();
         }
 
-        public async Task<List<NotificationDTO>> GetAllNotificationList()
+        public async Task<List<NotificationDTO>> GetAllNotificationList(int recordFrom, int pageSize, string sortColumn, string sortOrder, Dictionary<string, object> filterParams)
         {
             var parameters = new DynamicParameters();
+            parameters.Add("@RecordFrom", recordFrom);
+            parameters.Add("@PageSize", pageSize);
+            parameters.Add("@SortOrder", sortOrder);
+            parameters.Add("@SortColumn", sortColumn);
+
+            foreach (var filterParam in filterParams)
+                parameters.Add($"@{filterParam.Key}", filterParam.Value);
+
             var result = await _dbConnection.QueryAsync<NotificationDTO>("GetAllNotificationList", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
+            return result.ToList();
+        }
+
+        public async Task<List<UsersDto>> GetClientList(int userId, int userTypeId, int recordFrom, int pageSize, string sortColumn, string sortOrder, Dictionary<string, object> filterParams)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@UserId", userId);
+            parameters.Add("@UserTypeId ", userTypeId);
+            parameters.Add("@RecordFrom", recordFrom);
+            parameters.Add("@PageSize", pageSize);
+            parameters.Add("@SortOrder", sortOrder);
+            parameters.Add("@SortColumn", sortColumn);
+
+            foreach (var filterParam in filterParams)
+                parameters.Add($"@{filterParam.Key}", filterParam.Value);
+
+            var result = await _dbConnection.QueryAsync<UsersDto>("GetClientList", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
             return result.ToList();
         }
 
@@ -38,7 +63,7 @@ namespace Arity.Infra
         {
             var parameters = new DynamicParameters();
             parameters.Add("@Id", id);
-            var result = await _dbConnection.QueryAsync<NotificationDTO>("GetAllNotificationList", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
+            var result = await _dbConnection.QueryAsync<NotificationDTO>("GetNotificationById", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
             return result.FirstOrDefault();
         }
     }

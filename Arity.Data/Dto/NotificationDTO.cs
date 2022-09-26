@@ -21,5 +21,6 @@ namespace Arity.Data.Dto
         public string TypeString { get; set; }
         public string CreatedOn { get; set; }
         public string CompletedOn { get; set; }
+        public int TotalRecords { get; set; }
     }
 }

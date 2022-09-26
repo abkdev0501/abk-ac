@@ -8,6 +8,7 @@ using Arity.Data;
 using Arity.Data.Dto;
 using Arity.Data.Entity;
 using Arity.Data.Helpers;
+using Arity.Infra.Interface;
 using Arity.Service.Contract;
 
 namespace Arity.Service
@@ -15,10 +16,12 @@ namespace Arity.Service
     public class AccountService : IAccountService
     {
         private readonly RMNEntities _dbContext;
+        private readonly IAccountRepository _accountRepository;
 
-        public AccountService(RMNEntities rMNEntities)
+        public AccountService(RMNEntities rMNEntities, IAccountRepository accountRepository)
         {
             _dbContext = rMNEntities;
+            _accountRepository = accountRepository;
         }
 
         public async Task AddUpadate(UsersDto user)
@@ -141,23 +144,24 @@ namespace Arity.Service
 
         public async Task<List<UsersDto>> GetAllUsers()
         {
-            return await (from user in _dbContext.Users
-                    join type in _dbContext.UserTypes on user.UserTypeId equals type.Id
-                    select new UsersDto
-                    {
-                        Id = user.Id,
-                        Address = user.Address,
-                        City = user.City,
-                        Pincode = user.Pincode,
-                        FullName = user.FullName,
-                        PhoneNumber = user.PhoneNumber,
-                        Username = user.Username,
-                        UserType = type.UserTypeName,
-                        Email = user.Email,
-                        Active = user.Active,
-                        UserTypeId = user.UserTypeId,
-                        CreatedBy = user.CreatedBy
-                    }).ToListAsync();
+            return await _accountRepository.GetAllUsers();
+            //return await (from user in _dbContext.Users
+            //        join type in _dbContext.UserTypes on user.UserTypeId equals type.Id
+            //        select new UsersDto
+            //        {
+            //            Id = user.Id,
+            //            Address = user.Address,
+            //            City = user.City,
+            //            Pincode = user.Pincode,
+            //            FullName = user.FullName,
+            //            PhoneNumber = user.PhoneNumber,
+            //            Username = user.Username,
+            //            UserType = type.UserTypeName,
+            //            Email = user.Email,
+            //            Active = user.Active,
+            //            UserTypeId = user.UserTypeId,
+            //            CreatedBy = user.CreatedBy
+            //        }).ToListAsync();
         }
 
         public async Task RemoveUser(int userId)

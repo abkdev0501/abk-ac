@@ -63,7 +63,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountRepository.cs" />
+    <Compile Include="DocumentRepository.cs" />
     <Compile Include="Factory\ConnectionFactory.cs" />
+    <Compile Include="Interface\IAccountRepository.cs" />
+    <Compile Include="Interface\IDocumentRepository.cs" />
     <Compile Include="MasterRepository.cs" />
     <Compile Include="Interface\IMasterRepository.cs" />
     <Compile Include="Interface\ITaskRepository.cs" />

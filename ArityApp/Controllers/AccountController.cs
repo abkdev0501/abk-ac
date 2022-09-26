@@ -1,6 +1,7 @@
 ﻿using Arity.Data.Helpers;
 using Arity.Service;
 using Arity.Service.Contract;
+using ArityApp.Helpers;
 using ArityApp.Models;
 using Newtonsoft.Json;
 using System;
@@ -15,12 +16,14 @@ namespace ArityApp.Controllers
     {
         private readonly IAccountService _accountService;
         private readonly ILoggerService _loggerService;
+        private readonly IDbHelper _dbHelper;
 
 
-        public AccountController(IAccountService accountService, ILoggerService loggerService)
+        public AccountController(IAccountService accountService, ILoggerService loggerService, IDbHelper dbHelper)
         {
             _accountService = accountService;
             _loggerService = loggerService;
+            _dbHelper = dbHelper;
         }
 
         // GET: Account
@@ -54,7 +57,7 @@ namespace ArityApp.Controllers
                         SessionHelper.UserTypeId = validUser.UserTypeId;
                         SessionHelper.UserName = validUser.Username;
                         SessionHelper.IsKeepMeSignedIn = user.KeepSignedIn;
-                   
+
                         // Logging user details
                         Task.Run(() =>
                         {
@@ -99,6 +102,20 @@ namespace ArityApp.Controllers
                 details.Password = string.Empty;
 
             return PartialView("_UserProfile", details);
+        }
+
+        /// <summary>
+        /// Db Backup
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult DbBackup()
+        {
+            string path = Server.MapPath($"~/Content/DbBackup/{DateTime.Now.ToString("dd-MM-yyyy")}");
+            System.IO.Directory.CreateDirectory(path);
+            _dbHelper.DoBackup(path);
+            
+            return Json(true, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>

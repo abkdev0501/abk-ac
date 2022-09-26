@@ -4,6 +4,8 @@ using Arity.Infra.Factory;
 using Arity.Infra.Interface;
 using Arity.Service;
 using Arity.Service.Contract;
+using Arity.Service.Helpers;
+using ArityApp.Helpers;
 using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
@@ -37,9 +39,16 @@ namespace ArityApp
             builder.RegisterType<RMNEntities>().InstancePerLifetimeScope();
             builder.RegisterType<ConnectionFactory>().As<IConnectionFactory>().InstancePerLifetimeScope();
 
+            #region Helpers
+            builder.RegisterType<EmailSender>().As<IEmailSender>();
+            builder.RegisterType<DbHelper>().As<IDbHelper>();
+            #endregion
+
             #region Repositories 
             builder.RegisterType<TaskRepository>().As<ITaskRepository>();
             builder.RegisterType<MasterRepository>().As<IMasterRepository>();
+            builder.RegisterType<AccountRepository>().As<IAccountRepository>();
+            builder.RegisterType<DocumentRepository>().As<IDocumentRepository>();
             #endregion
 
             var container = builder.Build();

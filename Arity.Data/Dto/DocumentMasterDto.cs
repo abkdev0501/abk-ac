@@ -28,6 +28,7 @@ namespace Arity.Data.Dto
         public string CreatedByString { get; set; }
         public int AddedBy { get; set; }
         public string UserName { get; set; }
+        public int TotalRecords { get; set; }
     }
 }
  

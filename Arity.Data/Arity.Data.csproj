@@ -74,6 +74,7 @@
     <Compile Include="Dto\ReceiptDto.cs" />
     <Compile Include="Dto\ServiceTypes.cs" />
     <Compile Include="Dto\TaskDTO.cs" />
+    <Compile Include="Dto\TaskResult.cs" />
     <Compile Include="Dto\TrackingInformation.cs" />
     <Compile Include="Dto\DocumentMasterDto.cs" />
     <Compile Include="Dto\UserDTO.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Entity\UserTask.cs" />
     <Compile Include="Entity\UserType.cs" />
     <Compile Include="Entity\User_Role.cs" />
+    <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Helpers\CurrencyToWord.cs" />
     <Compile Include="Helpers\EnumHelper.cs" />
     <Compile Include="Helpers\Funtion.cs" />

@@ -7,6 +7,7 @@ using Arity.Data.Entity;
 using System.Web.Mvc;
 using Arity.Data.Dto;
 using System.IO;
+using Arity.Data.Models.AuxiliaryModels;
 
 namespace ArityApp.Controllers
 {
@@ -133,17 +134,26 @@ namespace ArityApp.Controllers
             }
             return RedirectToAction("Index");
         }
-
-        public async Task<JsonResult> LoadDocuments()
+        
+        [HttpPost]
+        public async Task<JsonResult> LoadDocuments(DtParameters dtParameters)
         {
-            //public async Task<JsonResult> LoadDocuments(string from, string to)
-            //DateTime fromDate = Convert.ToDateTime(from);
-            //DateTime toDate = Convert.ToDateTime(to);
-            //toDate = toDate + new TimeSpan(23, 59, 59);
-            //fromDate = fromDate + new TimeSpan(00, 00, 1);
-            //var List = await _documentService.FetchDocuments(toDate, fromDate);
-            var List = await _documentService.FetchDocuments();
-            return Json(new { data = List }, JsonRequestBehavior.AllowGet);
+            var result = await _documentService.FetchDocuments(dtParameters);
+            var totalResultsCount = result.FirstOrDefault()?.TotalRecords ?? 0;
+
+            var jsonResult = Json(new
+            {
+                draw = dtParameters.Draw,
+                recordsTotal = totalResultsCount,
+                recordsFiltered = totalResultsCount,
+                data = result
+
+            }, JsonRequestBehavior.AllowGet);
+
+            jsonResult.MaxJsonLength = int.MaxValue;
+            return jsonResult; 
+            //var List = await _documentService.FetchDocuments(dtParameters);
+            //return Json(new { data = List }, JsonRequestBehavior.AllowGet);
         }
     }
 }

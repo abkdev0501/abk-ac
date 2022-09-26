@@ -4,7 +4,7 @@
     {
         <script>location.href = "/account/login";</script>
     }
-   
+
 }
 <!doctype html>
 <html class="no-js" lang="">
@@ -107,6 +107,12 @@
                 </div>
 
                 <ul class="nav navbar-nav notika-top-nav">
+                    @if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.MasterAdmin)
+                    {
+                        <li>
+                            <a href="#" id="backup" class="nav-link"><span>Backup <i class="fa fa-upload" aria-hidden="false"></i></span></a>
+                        </li>
+                    }
                     <li>
                         <a href="#" class="nav-link" style="font-size:14px;">Welcome @SessionHelper.UserName</a>
                     </li>
@@ -187,9 +193,6 @@
                                         <a href="/client">Client</a>
                                     </li>
                                 }
-                                @*<li>
-            <a href="/task">Task</a>
-        </li>*@
                                 <li>
                                     <a href="/taskpreview">Task</a>
                                 </li>
@@ -260,8 +263,8 @@
                             </li>
                         }
                         @*<li id="liTask">
-            <a href="/task"><i class="notika-icon notika-form"></i> Task</a>
-        </li>*@
+                                <a href="/task"><i class="notika-icon notika-form"></i> Task</a>
+                            </li>*@
                         <li id="liTask2">
                             <a href="/taskpreview"><i class="notika-icon notika-form"></i>Task</a>
                         </li>
@@ -487,7 +490,8 @@
                 }
                });
         });
-             $("#btnProfile").click(function () {
+
+        $("#btnProfile").click(function () {
                $.ajax({
                 url: '@Url.Action("GetUserProfiles", "account")',
                 dataType: "HTML",
@@ -501,6 +505,21 @@
                     Notification('', 'Something went wrong', 'danger');
                 }
             });
+        });
+
+        $("#backup").click(function () {
+               $.ajax({
+                url: '@Url.Action("DbBackup", "account")',
+                dataType: "json",
+                type: "GET",
+                contentType: 'application/json; charset=utf-8',
+                   success: function (response) {
+                       Notification('', 'Database backup process initiated', 'success');
+                },
+                error: function (error) {
+                    Notification('', 'Something went wrong', 'danger');
+                }
+               });
         });
 
         $("body").on("click","#btnCancel",function () {

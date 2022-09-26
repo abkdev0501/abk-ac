@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Arity.Data;
 using Arity.Data.Dto;
 using Arity.Data.Entity;
+using Arity.Data.Extensions;
 using Arity.Data.Helpers;
+using Arity.Data.Models.AuxiliaryModels;
 using Arity.Infra.Interface;
 using Arity.Service.Contract;
 using Newtonsoft.Json;
@@ -200,6 +202,33 @@ namespace Arity.Service
                         CreatedBy = user.CreatedBy,
                         AccountantName = user.AccountantName
                     }).ToList();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dtParameters"></param>
+        /// <returns></returns>
+        public async Task<List<UsersDto>> GetClientList(DtParameters dtParameters)
+        {
+            var sortColumn = string.Empty;
+            var sortOrder = string.Empty;
+
+            if (dtParameters.Order != null)
+            {
+                // in this example we just default sort on the 1st column
+                sortColumn = dtParameters.Columns[dtParameters.Order[0].Column].Data;
+                sortOrder = dtParameters.Order[0].Dir.ToString();
+            }
+
+            Dictionary<string, object> filterParams = new Dictionary<string, object>();
+            var columnFilter = dtParameters.Columns.Where(x => !string.IsNullOrWhiteSpace(x.Search.Value)).ToDictionary(x => x.Name, x => x.Search.Value);
+            if (columnFilter.Count > 0)
+            {
+                filterParams = GetDynamicParamsForClientFilter(columnFilter);
+            }
+
+            return await _masterRepository.GetClientList((int)SessionHelper.UserId, (int)SessionHelper.UserTypeId, dtParameters.Start, dtParameters.Length, sortColumn, sortOrder, filterParams);
         }
 
         /// <summary>
@@ -449,37 +478,54 @@ namespace Arity.Service
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<List<NotificationDTO>> GetAllNotification()
+        public async Task<List<NotificationDTO>> GetAllNotification(DtParameters dtParameters)
         {
-            //var notifications = await _masterRepository.GetAllNotificationList();
+            var sortColumn = string.Empty;
+            var sortOrder = string.Empty;
 
-            //foreach (var notification in notifications)
-            //{
-            //    notification.OffBroadcastDateTimeString = notification.OffBroadcastDateTime.ToString("dd/MM/yyyy");
-            //    notification.OnBroadcastDateTimeString = notification.OnBroadcastDateTime.ToString("dd/MM/yyyy");
-            //    notification.TypeString = ((EnumHelper.NotificationType)notification.Type).ToString();
-            //}
+            if (dtParameters.Order != null)
+            {
+                // in this example we just default sort on the 1st column
+                sortColumn = dtParameters.Columns[dtParameters.Order[0].Column].Data;
+                sortOrder = dtParameters.Order[0].Dir.ToString();
+            }
 
-            //return notifications;
+            Dictionary<string, object> filterParams = new Dictionary<string, object>();
+            var columnFilter = dtParameters.Columns.Where(x => !string.IsNullOrWhiteSpace(x.Search.Value)).ToDictionary(x => x.Name, x => x.Search.Value);
+            if (columnFilter.Count > 0)
+            {
+                filterParams = GetDynamicParamsForNotificationFilter(columnFilter);
+            }
 
-            var users = await _dbContext.Users.ToListAsync();
+            var notifications = await _masterRepository.GetAllNotificationList(dtParameters.Start, dtParameters.Length, sortColumn, sortOrder, filterParams);
 
-            return (from n in _dbContext.Notifications.ToList()
-                    select new NotificationDTO
-                    {
-                        NotificationId = n.NotificationId,
-                        ClientId = n.ClientId,
-                        ClientName = users.FirstOrDefault(_ => _.Id == (n.ClientId ?? 0))?.FullName ?? "All",
-                        CreatedBy = n.CreatedBy,
-                        CreatedByName = users.FirstOrDefault(_ => _.Id == n.CreatedBy)?.FullName,
-                        IsComplete = n.IsComplete ?? false,
-                        Message = n.Message,
-                        OffBroadcastDateTime = n.OffBroadcastDateTime,
-                        OnBroadcastDateTime = n.OnBroadcastDateTime,
-                        OffBroadcastDateTimeString = n.OffBroadcastDateTime.ToString("dd/MM/yyyy"),
-                        OnBroadcastDateTimeString = n.OnBroadcastDateTime.ToString("dd/MM/yyyy"),
-                        TypeString = ((EnumHelper.NotificationType)n.Type).ToString()
-                    }).ToList();
+            foreach (var notification in notifications)
+            {
+                notification.OffBroadcastDateTimeString = notification.OffBroadcastDateTime.ToString("dd/MM/yyyy");
+                notification.OnBroadcastDateTimeString = notification.OnBroadcastDateTime.ToString("dd/MM/yyyy");
+                notification.TypeString = ((EnumHelper.NotificationType)notification.Type).ToString();
+            }
+
+            return notifications;
+
+            //var users = await _dbContext.Users.ToListAsync();
+
+            //return (from n in _dbContext.Notifications.ToList()
+            //        select new NotificationDTO
+            //        {
+            //            NotificationId = n.NotificationId,
+            //            ClientId = n.ClientId,
+            //            ClientName = users.FirstOrDefault(_ => _.Id == (n.ClientId ?? 0))?.FullName ?? "All",
+            //            CreatedBy = n.CreatedBy,
+            //            CreatedByName = users.FirstOrDefault(_ => _.Id == n.CreatedBy)?.FullName,
+            //            IsComplete = n.IsComplete ?? false,
+            //            Message = n.Message,
+            //            OffBroadcastDateTime = n.OffBroadcastDateTime,
+            //            OnBroadcastDateTime = n.OnBroadcastDateTime,
+            //            OffBroadcastDateTimeString = n.OffBroadcastDateTime.ToString("dd/MM/yyyy"),
+            //            OnBroadcastDateTimeString = n.OnBroadcastDateTime.ToString("dd/MM/yyyy"),
+            //            TypeString = ((EnumHelper.NotificationType)n.Type).ToString()
+            //        }).ToList();
 
         }
 
@@ -876,6 +922,85 @@ namespace Arity.Service
                           }).ToListAsync();
         }
 
+        #endregion
+
+        #region
+
+        private Dictionary<string, object> GetDynamicParamsForClientFilter(Dictionary<string, string> columnFilter)
+        {
+            Dictionary<string, object> filterParams = new Dictionary<string, object>();
+
+            if (columnFilter.ContainsKey("FullName") && !string.IsNullOrWhiteSpace(columnFilter["FullName"]))
+                filterParams.Add("FullName", columnFilter["FullName"]);
+
+            if (columnFilter.ContainsKey("UserName") && !string.IsNullOrWhiteSpace(columnFilter["UserName"]))
+                filterParams.Add("UserName", columnFilter["UserName"]);
+
+            if (columnFilter.ContainsKey("Address") && !string.IsNullOrWhiteSpace(columnFilter["Address"]))
+                filterParams.Add("Address", columnFilter["Address"]);
+
+            if (columnFilter.ContainsKey("City") && !string.IsNullOrWhiteSpace(columnFilter["City"]))
+                filterParams.Add("City", columnFilter["City"]);
+
+            if (columnFilter.ContainsKey("PhoneNumber") && !string.IsNullOrWhiteSpace(columnFilter["PhoneNumber"]))
+                filterParams.Add("PhoneNumber", columnFilter["PhoneNumber"]);
+
+            if (columnFilter.ContainsKey("Pincode") && !string.IsNullOrWhiteSpace(columnFilter["Pincode"]))
+                filterParams.Add("Pincode", columnFilter["Pincode"]);
+
+            if (columnFilter.ContainsKey("GroupName") && !string.IsNullOrWhiteSpace(columnFilter["GroupName"]))
+                filterParams.Add("GroupName", columnFilter["GroupName"]);
+
+            if (columnFilter.ContainsKey("AccountantName") && !string.IsNullOrWhiteSpace(columnFilter["AccountantName"]))
+                filterParams.Add("AccountantName", columnFilter["AccountantName"]);
+
+            if (columnFilter.ContainsKey("Status") && bool.TryParse(columnFilter["Status"], out var status))
+                filterParams.Add("Status", status);
+
+            return filterParams;
+        }
+
+        private Dictionary<string, object> GetDynamicParamsForNotificationFilter(Dictionary<string, string> columnFilter)
+        {
+            Dictionary<string, object> filterParams = new Dictionary<string, object>();
+
+            if (columnFilter.ContainsKey("Message") && !string.IsNullOrWhiteSpace(columnFilter["Message"]))
+                filterParams.Add("Message", columnFilter["Message"]);
+
+            if (columnFilter.ContainsKey("ClientName") && !string.IsNullOrWhiteSpace(columnFilter["ClientName"]))
+                filterParams.Add("ClientName", columnFilter["ClientName"]);
+
+            if (columnFilter.ContainsKey("Type") && !string.IsNullOrWhiteSpace(columnFilter["Type"]) && columnFilter["Type"] != "null")
+                filterParams.Add("Type", columnFilter["Type"]);
+
+            if (columnFilter.ContainsKey("OnBroadcastDateTime") && !string.IsNullOrWhiteSpace(columnFilter["OnBroadcastDateTime"]))
+            {
+                var dates = columnFilter["OnBroadcastDateTime"].GetDatesFromRange();
+                if (dates.Item1 != null)
+                    filterParams.Add("OnBDTFrom", dates.Item1);
+
+                if (dates.Item2 != null)
+                    filterParams.Add("OnBDTTo", dates.Item2);
+            }
+
+            if (columnFilter.ContainsKey("OffBroadcastDateTime") && !string.IsNullOrWhiteSpace(columnFilter["OffBroadcastDateTime"]))
+            {
+                var dates = columnFilter["OffBroadcastDateTime"].GetDatesFromRange();
+                if (dates.Item1 != null)
+                    filterParams.Add("OffBDTFrom", dates.Item1);
+
+                if (dates.Item2 != null)
+                    filterParams.Add("OffBDTTo", dates.Item2);
+            }
+
+            if (columnFilter.ContainsKey("IsCompleted") && bool.TryParse(columnFilter["IsCompleted"], out var isChargable))
+                filterParams.Add("IsCompleted", isChargable);
+
+            if (columnFilter.ContainsKey("CreatedBy") && !string.IsNullOrWhiteSpace(columnFilter["CreatedBy"]))
+                filterParams.Add("CreatedBy", columnFilter["CreatedBy"]);
+
+            return filterParams;
+        }
         #endregion
     }
 }

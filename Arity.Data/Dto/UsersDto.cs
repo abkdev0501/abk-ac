@@ -51,5 +51,6 @@ namespace Arity.Data.Dto
         public List<ParticularDto> Particulars { get; set; }
         public List<GodownDetail> AdditionlPlaces { get; set; }
         public List<BankDetail> BankDetails { get; set; }
+        public int TotalRecords { get; set; }
     }
 }

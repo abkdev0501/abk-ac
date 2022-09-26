@@ -3,6 +3,27 @@
     ViewBag.Title = "Document";
 }
 
+<style>
+    tfoot {
+        display: table-header-group;
+    }
+
+    .table.table-striped > tbody > tr > td, .table.table-striped > tbody > tr > th, .table.table-striped > tfoot > tr > td, .table.table-striped > tfoot > tr > th, .table.table-striped > thead > tr > td, .table.table-striped > thead > tr > th {
+        border-top: 0px solid #F5F5F5;
+        font-size: 14px;
+        color: #333;
+        padding: 8px;
+    }
+
+    .daterangepicker > .ranges > .active {
+        color: red !important;
+    }
+
+    .dataTables_filter {
+        display: none;
+    }
+</style>
+
 <div class="breadcomb-area">
     <div class="container">
         <div class="row">
@@ -42,38 +63,19 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="data-table-list">
-                    <div class="basic-tb-hd">
-                        <h2>Document List</h2>
-                        <p>Below are List of Document.</p>
+                    <div class="row">
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10"></div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                            <div class="button-icon-btn">
+                                <button id="btn_search" class="btn btn-success success-icon-notika waves-effect"><i class="notika-icon notika-search"></i> Search</button>
+                                <button id="btn_reset" style="margin-left:4px" class="btn btn-success success-icon-notika waves-effect"><i class="notika-icon notika-refresh"></i> Reset</button>
+                            </div>
+                        </div>
                     </div>
-
-                    @*Datewise filter*@ 
-                    @*<div class="date-filter">
-
-                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
-                            <label>From</label>
-                            <div class="input-group date nk-int-st">
-                                <span class="input-group-addon"></span>
-                                <input type="text" id="FromDate" class="form-control bk-date" value="@(((DateTime)ViewBag.FromDate).ToString("dd/MM/yyyy"))" readonly>
-                            </div>
-                        </div>
-                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date" id="data_1">
-                            <label>To</label>
-                            <div class="input-group date nk-int-st">
-                                <span class="input-group-addon"></span>
-                                <input type="text" id="ToDate" class="form-control bk-date" value="@(((DateTime)ViewBag.ToDate).ToString("dd/MM/yyyy"))" readonly>
-                            </div>
-                        </div>
-                        <div class="form-group nk-datapk-ctm form-elet-mg filter-date-button" id="data_1">
-                            <button type="button" class="btn btn-success notika-btn-success waves-effect" id="btnFilterGrid">Search</button>
-                        </div>
-
-                    </div>*@
                     <div class="table-responsive">
                         <table id="tblDocument" class="table table-striped">
                             <thead>
                                 <tr>
-                                    @*<th style="width:0%,">documentID</th>*@
                                     <th style="width:20%;">Document Name</th>
                                     <th style="width:20%;">Client Name</th>
                                     <th style="width:10%;">User Name</th>
@@ -90,6 +92,61 @@
                                     <th style="width:10%;"></th>
                                 </tr>
                             </thead>
+                            <tfoot>
+                                <tr>
+                                    <th style="width:12%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_0" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:10%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_1" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:8%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_2" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:8%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_3" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    <th style="width:5%;">
+                                        <div class="nk-int-st">
+                                            <select id="col_4" class="selectpicker" multiple data-selected-text-format="count">
+                                                <option value="1">RECEIVED</option>
+                                                <option value="2">SENT</option>
+                                                <option value="3">SUBMITTED</option>
+                                                <option value="4">Other</option>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th style="width:5%;">
+                                        <div class="nk-int-st">
+                                            <select id="col_5" class="selectpicker">
+                                                <option value="">None</option>
+                                                <option value="true">Yes</option>
+                                                <option value="false">No</option>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th style="width:10%;">
+                                        <div class="nk-int-st">
+                                            <input id="col_6" class="form-control" type="text">
+                                        </div>
+                                    </th>
+                                    @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
+                                    {
+                                        <th id="col_7" style="width:5%;display:none;"></th>
+                                        <th id="col_8" style="width:5%;display:none;"></th>
+                                    }
+                                    <th id="col_9" style="width:5%;display:none;"></th>
+                                    <th id="col_10" style="width:5%;display:none;"></th>
+                                </tr>
+                            </tfoot>
                             <tbody></tbody>
                         </table>
                     </div>
@@ -136,39 +193,26 @@
 
     <script>
         $("#liDoc").addClass("active");
-       $("#liHome").removeClass("active");
+        $("#liHome").removeClass("active");
         //Load document List
         $(document).ready(function () {
             table = $('#tblDocument').DataTable({
-                "ajax": function (data, callback, settings) {
-                    $.ajax({
-                        url: '@Url.Action("LoadDocuments","Document")',
-                        type: "GET",
-                        dataType: "json",
-                        data: {
-                            //from: ""+$("#FromDate").val()+"",
-                            //to: ""+$("#ToDate").val()+""
-                        },
-                        beforeSend: function (xhrObj) {
-                            $("#loading").show();
-                        }
-                    })
-                        .done(function (data, textStatus, jqXHR) {
-                            callback(data);
-                        })
-                        .fail(function (jqXHR, textStatus, errorThrown) {
-                            Notification('Error! ', '' + errorThrown + '', 'danger');
-                        })
-                        .always(function (data, textStatus, jqXHR) {
-                            $("#loading").hide();
-                        });
+                autoWidth: true,
+                processing: true,
+                serverSide: true,
+                searching: true,
+                ordering: true,
+                "ajax": {
+                    "url": "/Document/LoadDocuments",
+                    "type": "POST",
+                    "datatype": "json"
                 },
                 "language": {
                     "emptyTable": "No document found"
                 },
                 "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
                 dom: 'Blfrtip',
-                 buttons: [
+                buttons: [
                     {
                         extend: 'excelHtml5',
                         title: 'Excel',
@@ -176,15 +220,15 @@
                     }
                 ],
                 "columns": [
-                    //{ "data": "DocumentId" },
-                    { "data": "Name" },
-                    { "data": "ClientName" },
-                    { "data": "UserName" },
-                    { "data": "DocumentTypeName" },
-                    { "data": "StatusName" },
+                    { "data": "Name", "name" : "Name" },
+                    { "data": "ClientName", "name": "ClientName"  },
+                    { "data": "UserName", "name": "UserName" },
+                    { "data": "DocumentTypeName", "name": "DocumentTypeName" },
+                    { "data": "StatusName", "name": "StatusName" },
                     {
                         "orderable": false,
                         "data": null,
+                        "name" : "Status",
                         "render": function (data, type, full) {
                             if (data.IsActive)
                                 return '<i class="notika-icon notika-checked" aria-hidden="true"></i>';
@@ -192,7 +236,7 @@
                                 return '<i class="notika-icon notika-close" aria-hidden="true"></i>';
                         }
                     },
-                    { "data": "CreatedByString" },
+                    { "data": "CreatedByString", "name": "CreatedBy" },
 
              @if (Convert.ToInt32(SessionHelper.UserTypeId) != (int)Arity.Service.Core.UserType.User)
                 {
@@ -207,7 +251,7 @@
                     @:{
                     @:"orderable": false,
                     @:"data": null,
-                    @:"render": function (data, type, full) { 
+                    @:"render": function (data, type, full) {
                     @:    if (data.AddedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) ) { return '<div class="dialog-pro dialog">' +
                     @:                    '<button class="btn btn-info" onclick="DeleteDocument(' + data.DocumentId + ')" id="sa-warning">'+
                     @:                    '<i class="fa fa-trash" aria-hidden="true"></i>' +
@@ -215,12 +259,12 @@
                     @:    else { return ''; }
                     @:      }
                     @:},
-                   
+
                     }
                  {
                     "orderable": false,
                     "data": null,
-                    "render": function (data, type, full) { 
+                    "render": function (data, type, full) {
                         if (data.AddedBy == @Convert.ToInt32(SessionHelper.UserTypeId) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.MasterAdmin) || @Convert.ToInt32(SessionHelper.UserTypeId) == @((int)Arity.Service.Core.UserType.User )) { return '' +
                                         '<button class="btn btn-info" onclick="DownloadDocument(' + data.DocumentId + ')" id="sa-warning">'+
                                         '<i class="notika-icon notika-down-arrow" aria-hidden="true"></i>' +
@@ -236,12 +280,58 @@
                         }
                     }
                 ],
-                "order": []
+                "order": [],
+                initComplete: function () {
+                    this.api().columns().every(function () {
+                        var that = this;
+                        $('input', this.footer()).on('keyup', function (e) {
+                            if (e.keyCode == 13) {
+                                applyFilter();
+                            }
+                        });
+                    });
+                },
+                "preDrawCallback": function (settings) {
+                    $("#loading").show();
+                },
+                "drawCallback": function (settings) {
+                    $("#loading").hide();
+                }
             });
 
          $("#btnFilterGrid").click(function () {
                  table.ajax.reload();
-        });
+         });
+
+            function applyFilter() {
+            table
+                .column(0).search($("#col_0").val())
+                .column(1).search($("#col_1").val())
+                .column(2).search($("#col_2").val())
+                .column(3).search($("#col_3").val())
+                .column(4).search($("#col_4").val())
+                .column(5).search($("#col_5").val())
+                .column(6).search($("#col_6").val())
+                .draw();
+            }
+
+            $("#btnFilterGrid").click(function () {
+                table.ajax.reload();
+            });
+
+            $('#btn_search').click(function () {
+                applyFilter();
+            });
+
+            $('#btn_reset').click(function () {
+                $("#col_1").val('');
+                $("#col_2").val('');
+                $("#col_3").val('');
+                $("#col_4").val('');
+                $("#col_5").val('');
+                $("#col_6").val('');
+                applyFilter();
+            });
     });
 
 

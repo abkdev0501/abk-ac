@@ -1,5 +1,6 @@
 ﻿using Arity.Data.Dto;
 using Arity.Data.Entity;
+using Arity.Data.Models.AuxiliaryModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,7 @@ namespace Arity.Service.Contract
 
         Task<List<User>> GetClient();
         Task<int> SaveDocument(DocumentMasterDto document);
-        Task<List<DocumentMasterDto>> FetchDocuments(DateTime toDate, DateTime fromDate);
-        Task<List<DocumentMasterDto>> FetchDocuments();
+        Task<List<DocumentMasterDto>> FetchDocuments(DtParameters dtParameters);
         Task<DocumentMasterDto> GetDocumentByID(int documentID);
         bool DeleteDocumentByID(int documentID);
         Task<List<DocumentMasterDto>> GetAllDocuments();

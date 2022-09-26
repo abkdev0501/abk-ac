@@ -1,5 +1,6 @@
 ﻿using Arity.Data.Dto;
 using Arity.Data.Entity;
+using Arity.Data.Models.AuxiliaryModels;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,11 +19,12 @@ namespace Arity.Service.Contract
         Task AddUpdateGroup(GroupMasterDTO groupMaster);
         Task<List<UsersDto>> GetAllClient();
         Task<IQueryable<UsersDto>> GetAllClientAsQuerable();
+        Task<List<UsersDto>> GetClientList(DtParameters dtParameters);
         Task<UsersDto> GetClientById(int id);
         Task<List<UsersDto>> GetAllConsultant();
         Task<List<GroupMasterDTO>> GetAllGroups();
         Task AddUpdateClient(UsersDto usersDto);
-        Task<List<NotificationDTO>> GetAllNotification();
+        Task<List<NotificationDTO>> GetAllNotification(DtParameters dtParameters);
         Task<NotificationDTO> GetNotificationById(int id);
         Task AddUpdateNotification(NotificationDTO notification);
         Task<List<NotificationDTO>> GetAllNotification(int userId, int userType,int type);

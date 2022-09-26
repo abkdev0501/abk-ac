@@ -2,6 +2,8 @@
 using Arity.Data.Dto;
 using Arity.Data.Entity;
 using Arity.Data.Helpers;
+using Arity.Data.Models.AuxiliaryModels;
+using Arity.Infra.Interface;
 using Arity.Service.Contract;
 using System;
 using System.Collections.Generic;
@@ -15,119 +17,87 @@ namespace Arity.Service
     public class DocumentService : IDocumentService
     {
         private readonly RMNEntities _dbContext;
+        private readonly IDocumentRepository _documentRepository;
 
-        public DocumentService(RMNEntities rMNEntities)
+        public DocumentService(RMNEntities rMNEntities, IDocumentRepository documentRepository)
         {
             _dbContext = rMNEntities;
+            _documentRepository = documentRepository;
         }
 
-
-
-        /// <summary> 
-        /// Fetch document list from database
-        /// </summary>
-        /// <param name="toDate"></param>
-        /// <param name="fromDate"></param>
-        /// <returns></returns>
-        public async Task<List<DocumentMasterDto>> FetchDocuments(DateTime toDate, DateTime fromDate)
+        public async Task<List<DocumentMasterDto>> FetchDocuments(DtParameters dtParameters)
         {
-            var documentTypes = await _dbContext.DocumentTypes.ToListAsync();
-            if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
+            var sortColumn = string.Empty;
+            var sortOrder = string.Empty;
+
+            if (dtParameters.Order != null)
             {
-                return (from data in _dbContext.DocumentMasters.ToList()
-                        join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
-                        join createdBy in _dbContext.Users.ToList() on data.CreatedBy equals createdBy.Id
-                        where data.CreatedOn >= fromDate && data.CreatedOn <= toDate && data.ClientId == Convert.ToInt32(SessionHelper.UserId)
-                        select new DocumentMasterDto()
-                        {
-                            DocumentId = data.DocumentId,
-                            Name = data.Name,
-                            ClientId = data.ClientId,
-                            DocumentTypeName = documentTypes.FirstOrDefault(_ => _.DocumnetTypeId == data.DocumentType)?.Name ?? string.Empty,
-                            IsActive = data.IsActive,
-                            CreatedBy = data.CreatedBy,
-                            CreatedOn = data.CreatedOn,
-                            CreatedByString = createdBy.FullName,
-                            AddedBy = Convert.ToInt32(createdBy.UserTypeId),
-                            StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
-                            ClientName = user.FullName,
-                            UserName = user.Username,
-                            FileName = data.FileName
-                        }).ToList();
+                // in this example we just default sort on the 1st column
+                sortColumn = dtParameters.Columns[dtParameters.Order[0].Column].Data;
+                sortOrder = dtParameters.Order[0].Dir.ToString();
             }
-            else
-                return (from data in _dbContext.DocumentMasters.ToList()
-                        join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
-                        join createdBy in _dbContext.Users.ToList() on data.CreatedBy equals createdBy.Id
-                        where data.CreatedOn >= fromDate && data.CreatedOn <= toDate
-                        select new DocumentMasterDto()
-                        {
-                            DocumentId = data.DocumentId,
-                            Name = data.Name,
-                            ClientId = data.ClientId,
-                            DocumentTypeName = documentTypes.FirstOrDefault(_ => _.DocumnetTypeId == data.DocumentType)?.Name ?? string.Empty,
-                            IsActive = data.IsActive,
-                            CreatedBy = data.CreatedBy,
-                            CreatedOn = data.CreatedOn,
-                            CreatedByString = createdBy.FullName,
-                            AddedBy = Convert.ToInt32(createdBy.UserTypeId),
-                            StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
-                            ClientName = user.FullName,
-                            UserName = user.Username,
-                            FileName = data.FileName
-                        }).ToList();
-        }
 
-        public async Task<List<DocumentMasterDto>> FetchDocuments()
-        {
-            var documentTypes = await _dbContext.DocumentTypes.ToListAsync();
-            if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
+            Dictionary<string, object> filterParams = new Dictionary<string, object>();
+            var columnFilter = dtParameters.Columns.Where(x => !string.IsNullOrWhiteSpace(x.Search.Value)).ToDictionary(x => x.Name, x => x.Search.Value);
+            if (columnFilter.Count > 0)
             {
-                return (from data in _dbContext.DocumentMasters.ToList()
-                        join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
-                        join createdBy in _dbContext.Users.ToList() on data.CreatedBy equals createdBy.Id
-                        where  data.ClientId == Convert.ToInt32(SessionHelper.UserId)
-                        select new DocumentMasterDto()
-                        {
-                            DocumentId = data.DocumentId,
-                            Name = data.Name,
-                            ClientId = data.ClientId,
-                            DocumentTypeName = documentTypes.FirstOrDefault(_ => _.DocumnetTypeId == data.DocumentType)?.Name ?? string.Empty,
-                            IsActive = data.IsActive,
-                            CreatedBy = data.CreatedBy,
-                            CreatedOn = data.CreatedOn,
-                            CreatedByString = createdBy.FullName,
-                            AddedBy = Convert.ToInt32(createdBy.UserTypeId),
-                            StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
-                            ClientName = user.FullName,
-                            UserName = user.Username,
-                            FileName = data.FileName
-                        }).ToList();
+                filterParams = GetDynamicParamsForFilter(columnFilter);
             }
-            else
-                return (from data in _dbContext.DocumentMasters.ToList()
-                        join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
-                        join createdBy in _dbContext.Users.ToList() on data.CreatedBy equals createdBy.Id
-                        select new DocumentMasterDto()
-                        {
-                            DocumentId = data.DocumentId,
-                            Name = data.Name,
-                            ClientId = data.ClientId,
-                            DocumentTypeName = documentTypes.FirstOrDefault(_ => _.DocumnetTypeId == data.DocumentType)?.Name ?? string.Empty,
-                            IsActive = data.IsActive,
-                            CreatedBy = data.CreatedBy,
-                            CreatedOn = data.CreatedOn,
-                            CreatedByString = createdBy.FullName,
-                            AddedBy = Convert.ToInt32(createdBy.UserTypeId),
-                            StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
-                            ClientName = user.FullName,
-                            UserName = user.Username,
-                            FileName = data.FileName
-                        }).ToList();
+
+            var result = await _documentRepository.GetDocumentList((int)SessionHelper.UserId, (int)SessionHelper.UserTypeId, dtParameters.Start, dtParameters.Length, sortColumn, sortOrder, filterParams);
+
+            foreach (var doc in result)
+            {
+                doc.StatusName = Enum.GetName(typeof(DocumentStatus), doc.Status);
+            }
+
+            return result;
+
+            //var documentTypes = await _dbContext.DocumentTypes.ToListAsync();
+            //if (Convert.ToInt32(SessionHelper.UserTypeId) == (int)Arity.Service.Core.UserType.User)
+            //{
+            //    return (from data in _dbContext.DocumentMasters.ToList()
+            //            join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
+            //            join createdBy in _dbContext.Users.ToList() on data.CreatedBy equals createdBy.Id
+            //            where  data.ClientId == Convert.ToInt32(SessionHelper.UserId)
+            //            select new DocumentMasterDto()
+            //            {
+            //                DocumentId = data.DocumentId,
+            //                Name = data.Name,
+            //                ClientId = data.ClientId,
+            //                DocumentTypeName = documentTypes.FirstOrDefault(_ => _.DocumnetTypeId == data.DocumentType)?.Name ?? string.Empty,
+            //                IsActive = data.IsActive,
+            //                CreatedBy = data.CreatedBy,
+            //                CreatedOn = data.CreatedOn,
+            //                CreatedByString = createdBy.FullName,
+            //                AddedBy = Convert.ToInt32(createdBy.UserTypeId),
+            //                StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
+            //                ClientName = user.FullName,
+            //                UserName = user.Username,
+            //                FileName = data.FileName
+            //            }).ToList();
+            //}
+            //else
+            //    return (from data in _dbContext.DocumentMasters.ToList()
+            //            join user in _dbContext.Users.ToList() on data.ClientId equals user.Id
+            //            join createdBy in _dbContext.Users.ToList() on data.CreatedBy equals createdBy.Id
+            //            select new DocumentMasterDto()
+            //            {
+            //                DocumentId = data.DocumentId,
+            //                Name = data.Name,
+            //                ClientId = data.ClientId,
+            //                DocumentTypeName = documentTypes.FirstOrDefault(_ => _.DocumnetTypeId == data.DocumentType)?.Name ?? string.Empty,
+            //                IsActive = data.IsActive,
+            //                CreatedBy = data.CreatedBy,
+            //                CreatedOn = data.CreatedOn,
+            //                CreatedByString = createdBy.FullName,
+            //                AddedBy = Convert.ToInt32(createdBy.UserTypeId),
+            //                StatusName = Enum.GetName(typeof(DocumentStatus), data.Status),
+            //                ClientName = user.FullName,
+            //                UserName = user.Username,
+            //                FileName = data.FileName
+            //            }).ToList();
         }
-
-
-
 
         /// <summary>
         /// Get client list from database
@@ -251,5 +221,35 @@ namespace Arity.Service
                         ClientName = user.FullName
                     }).ToList();
         }
+
+        #region
+        private Dictionary<string, object> GetDynamicParamsForFilter(Dictionary<string, string> columnFilter)
+        {
+            Dictionary<string, object> filterParams = new Dictionary<string, object>();
+
+            if (columnFilter.ContainsKey("Name") && !string.IsNullOrWhiteSpace(columnFilter["Name"]))
+                filterParams.Add("Name", columnFilter["Name"]);
+
+            if (columnFilter.ContainsKey("ClientName") && !string.IsNullOrWhiteSpace(columnFilter["ClientName"]))
+                filterParams.Add("ClientName", columnFilter["ClientName"]);
+
+            if (columnFilter.ContainsKey("UserName") && !string.IsNullOrWhiteSpace(columnFilter["UserName"]))
+                filterParams.Add("UserName", columnFilter["UserName"]);
+
+            if (columnFilter.ContainsKey("DocumentTypeName") && !string.IsNullOrWhiteSpace(columnFilter["DocumentTypeName"]))
+                filterParams.Add("DocumentTypeName", columnFilter["DocumentTypeName"]);
+
+            if (columnFilter.ContainsKey("StatusName") && !string.IsNullOrWhiteSpace(columnFilter["StatusName"]) && columnFilter["StatusName"] != "null")
+                filterParams.Add("StatusName", columnFilter["StatusName"]);
+
+            if (columnFilter.ContainsKey("CreatedBy") && !string.IsNullOrWhiteSpace(columnFilter["CreatedBy"]))
+                filterParams.Add("CreatedBy", columnFilter["CreatedBy"]);
+
+            if (columnFilter.ContainsKey("Status") && bool.TryParse(columnFilter["Status"], out var status))
+                filterParams.Add("Status", status);
+
+            return filterParams;
+        }
+        #endregion
     }
 }

@@ -1,18 +1,17 @@
-﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data.Entity;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using Arity.Data;
+﻿using Arity.Data;
 using Arity.Data.Dto;
 using Arity.Data.Entity;
+using Arity.Data.Extensions;
 using Arity.Data.Helpers;
 using Arity.Data.Models.AuxiliaryModels;
 using Arity.Infra.Interface;
 using Arity.Service.Contract;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data.Entity;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Arity.Service
 {
@@ -60,197 +59,114 @@ namespace Arity.Service
             return await _taskRepository.GetAllTaskDetail(SessionHelper.UserId, SessionHelper.UserTypeId, dtParameters.Start, dtParameters.Length, sortColumn, sortOrder, filterParams);
         }
 
-        public async Task<IQueryable<TaskDTO>> GetAll()
-        {
-            //var users = _dbContext.Users.ToList();
-            if (SessionHelper.UserTypeId == (int)Core.UserType.User)
-            {
-                return (from task in _dbContext.Tasks.AsQueryable()
-                        join userTask in _dbContext.UserTasks.AsQueryable() on task.Id equals userTask.TaskId
-                        join assignedTo in _dbContext.Users.AsQueryable() on task.ClientId ?? 0 equals assignedTo.Id
-                        join user in _dbContext.Users.AsQueryable() on userTask.AddedBy equals user.Id into users
-                        join userName in _dbContext.Users.AsQueryable() on userTask.UserId equals userName.Id into userN
-                        from addedBy in users.DefaultIfEmpty()
-                        from userByN in userN.DefaultIfEmpty()
-                        where assignedTo.Id == SessionHelper.UserId
-                        select new TaskDTO
-                        {
-                            TaskId = task.Id,
-                            TaskUserId = userTask.Id,
-                            UserComment = userTask.Comment,
-                            UserId = userTask.UserId,
-                            Description = task.Description,
-                            TaskName = task.Name,
-                            DueDate = userTask.DueDate,
-                            CreatedBy = userTask.CreatedBy,
-                            CreatedByString = addedBy != null ? addedBy.FullName : string.Empty,
-                            CreatedOn = userTask.CreatedOn,
-                            UserName = userByN != null ? userByN.FullName : string.Empty,
-                            Priorities = task.Priorities,
-                            StatusId = userTask.Status,
-                            ClientName = assignedTo.FullName,
-                            IsChargeble = task.IsChargeble ?? false,
-                            ChargeAmount = task.ChargeAmount
-                        }).OrderBy(_ => _.StatusId).AsQueryable();
-            }
-            else if (SessionHelper.UserTypeId == (int)Core.UserType.Admin)
-            {
-                return (from task in _dbContext.Tasks.AsQueryable()
-                        join userTask in _dbContext.UserTasks.AsQueryable() on task.Id equals userTask.TaskId
-                        join assignedTo in _dbContext.Users.AsQueryable() on task.ClientId ?? 0 equals assignedTo.Id
-                        join user in _dbContext.Users.AsQueryable() on userTask.AddedBy equals user.Id into users
-                        join userName in _dbContext.Users.AsQueryable() on userTask.UserId equals userName.Id into userN
-                        from addedBy in users.DefaultIfEmpty()
-                        from userByN in userN.DefaultIfEmpty()
-                        where assignedTo.Id == SessionHelper.UserId || userTask.UserId == SessionHelper.UserId || userTask.AddedBy ==SessionHelper.UserId
-                        select new TaskDTO
-                        {
-                            TaskId = task.Id,
-                            TaskUserId = userTask.Id,
-                            UserComment = userTask.Comment,
-                            UserId = userTask.UserId,
-                            Description = task.Description,
-                            TaskName = task.Name,
-                            DueDate = userTask.DueDate,
-                            CreatedBy = userTask.CreatedBy,
-                            CreatedByString = addedBy != null ? addedBy.FullName : string.Empty,
-                            CreatedOn = userTask.CreatedOn,
-                            UserName = userByN != null ? userByN.FullName : string.Empty,
-                            Priorities = task.Priorities,
-                            StatusId = userTask.Status,
-                            ClientName = assignedTo.FullName,
-                            IsChargeble = task.IsChargeble ?? false,
-                            ChargeAmount = task.ChargeAmount
-                        }).OrderBy(_ => _.StatusId).AsQueryable();
-            }
-            else
-            {
-
-                return (from task in _dbContext.Tasks.AsQueryable()
-                        join userTask in _dbContext.UserTasks.AsQueryable() on task.Id equals userTask.TaskId
-                        join user in _dbContext.Users.AsQueryable() on userTask.AddedBy equals user.Id into users
-                        join userName in _dbContext.Users.AsQueryable() on userTask.UserId equals userName.Id into userN
-                        join client in _dbContext.Users.AsQueryable() on (task.ClientId ?? 0) equals client.Id into clientN
-                        from addedBy in users.DefaultIfEmpty()
-                        from userByN in userN.DefaultIfEmpty()
-                        from clientByN in clientN.DefaultIfEmpty()
-                        select new TaskDTO
-                        {
-                            TaskId = task.Id,
-                            TaskUserId = userTask.Id,
-                            UserComment = userTask.Comment,
-                            UserId = userTask.UserId,
-                            Description = task.Description,
-                            TaskName = task.Name,
-                            DueDate = userTask.DueDate,
-                            CreatedBy = userTask.CreatedBy,
-                            CreatedByString = addedBy != null ? addedBy.FullName : string.Empty,
-                            CreatedOn = userTask.CreatedOn,
-                            UserName = userByN != null ? userByN.FullName : string.Empty,
-                            Priorities = task.Priorities,
-                            StatusId = userTask.Status,
-                            ClientName = clientByN != null ? clientByN.FullName : string.Empty,
-                            IsChargeble = task.IsChargeble ?? false,
-                            ChargeAmount = task.ChargeAmount
-                        }).OrderBy(_ => _.StatusId).AsQueryable();
-            }
-        }
-
         public async Task<TaskDTO> GetTask(int id)
         {
-            return (from task in _dbContext.Tasks.ToList()
-                    join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
-                    join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
-                    where task.Id == id
-                    select new TaskDTO
-                    {
-                        TaskId = task.Id,
-                        TaskUserId = userTask.Id,
-                        UserComment = userTask.Comment,
-                        UserId = userTask.UserId,
-                        Description = task.Description,
-                        TaskName = task.Name,
-                        DueDate = userTask.DueDate,
-                        CreatedBy = userTask.CreatedBy,
-                        CreatedOn = userTask.CreatedOn,
-                        StatusId = userTask.Status,
-                        Active = task.Active,
-                        ClientId = task.ClientId,
-                        CompletedOn = task.CompletedOn,
-                        Priorities = task.Priorities,
-                        Remarks = task.Remarks,
-                        IsChargeble = task.IsChargeble ?? false,
-                        ChargeAmount = task.ChargeAmount
-                    }).FirstOrDefault();
+            return await _taskRepository.GetTask(id);
+            //return (from task in _dbContext.Tasks.ToList()
+            //        join userTask in _dbContext.UserTasks.ToList() on task.Id equals userTask.TaskId
+            //        join user in _dbContext.Users.ToList() on userTask.UserId equals user.Id
+            //        where task.Id == id
+            //        select new TaskDTO
+            //        {
+            //            TaskId = task.Id,
+            //            TaskUserId = userTask.Id,
+            //            UserComment = userTask.Comment,
+            //            UserId = userTask.UserId,
+            //            Description = task.Description,
+            //            TaskName = task.Name,
+            //            DueDate = userTask.DueDate,
+            //            CreatedBy = userTask.CreatedBy,
+            //            CreatedOn = userTask.CreatedOn,
+            //            StatusId = userTask.Status,
+            //            Active = task.Active,
+            //            ClientId = task.ClientId,
+            //            CompletedOn = task.CompletedOn,
+            //            Priorities = task.Priorities,
+            //            Remarks = task.Remarks,
+            //            IsChargeble = task.IsChargeble ?? false,
+            //            ChargeAmount = task.ChargeAmount
+            //        }).FirstOrDefault();
         }
 
         public async Task AddUpdateTask(TaskDTO task)
         {
             if (task.TaskId > 0)
             {
-
-                var existingTask = await _dbContext.Tasks.FirstOrDefaultAsync(_ => _.Id == task.TaskId);
-                existingTask.Name = task.TaskName;
-                existingTask.Active = task.Active;
-                existingTask.Status = task.StatusId;
-                existingTask.Description = task.Description;
-                existingTask.ClientId = task.ClientId;
-                existingTask.Priorities = task.Priorities;
-                existingTask.Remarks = task.Remarks;
-                existingTask.IsChargeble = task.IsChargeble;
-                existingTask.CompletedOn = task.CompletedOn;
-                existingTask.ModifiedOn = DateTime.Now;
-                existingTask.ChargeAmount = task.ChargeAmount;
-
-
-                var existingUserTask = await _dbContext.UserTasks.FirstOrDefaultAsync(_ => _.Id == task.TaskUserId);
-                existingUserTask.Status = task.StatusId;
-                existingUserTask.Comment = task.UserComment;
-                existingUserTask.UserId = task.UserId;
-                existingUserTask.ModifiedOn = DateTime.Now;
-                existingUserTask.DueDate = task.DueDate;
-
-                if (task.IsChargeble && existingUserTask.Active != task.Active && task.Active)
+                var updateResult = await _taskRepository.UpdateTask(task);
+                if (updateResult.InvoiceCreate)
+                {
                     await CreateInvoice(task);
+                }
 
-                await _dbContext.SaveChangesAsync();
+                //var existingTask = await _dbContext.Tasks.FirstOrDefaultAsync(_ => _.Id == task.TaskId);
+                //existingTask.Name = task.TaskName;
+                //existingTask.Active = task.Active;
+                //existingTask.Status = task.StatusId;
+                //existingTask.Description = task.Description;
+                //existingTask.ClientId = task.ClientId;
+                //existingTask.Priorities = task.Priorities;
+                //existingTask.Remarks = task.Remarks;
+                //existingTask.IsChargeble = task.IsChargeble;
+                //existingTask.CompletedOn = task.CompletedOn;
+                //existingTask.ModifiedOn = DateTime.Now;
+                //existingTask.ChargeAmount = task.ChargeAmount;
+
+
+                //var existingUserTask = await _dbContext.UserTasks.FirstOrDefaultAsync(_ => _.Id == task.TaskUserId);
+                //existingUserTask.Status = task.StatusId;
+                //existingUserTask.Comment = task.UserComment;
+                //existingUserTask.UserId = task.UserId;
+                //existingUserTask.ModifiedOn = DateTime.Now;
+                //existingUserTask.DueDate = task.DueDate;
+
+                //if (task.IsChargeble && existingUserTask.Active != task.Active && task.Active)
+                //    await CreateInvoice(task);
+
+                //await _dbContext.SaveChangesAsync();
 
             }
             else
             {
-                var taskDetail = new Tasks();
-                taskDetail.CreatedBy = Convert.ToInt32(SessionHelper.UserTypeId);
-                taskDetail.AddedBy = Convert.ToInt32(SessionHelper.UserId);
-                taskDetail.Name = task.TaskName;
-                taskDetail.Description = task.Description;
-                taskDetail.Status = task.StatusId;
-                taskDetail.Active = task.Active;
-                taskDetail.CreatedOn = DateTime.Now;
-                taskDetail.ClientId = task.ClientId;
-                taskDetail.Priorities = task.Priorities;
-                taskDetail.Remarks = task.Remarks;
-                taskDetail.IsChargeble = task.IsChargeble;
-                taskDetail.CompletedOn = task.CompletedOn;
-                taskDetail.ChargeAmount = task.ChargeAmount;
-                _dbContext.Tasks.Add(taskDetail);
-                await _dbContext.SaveChangesAsync();
+                var createResult = await _taskRepository.CreateTask(Convert.ToInt32(SessionHelper.UserId), Convert.ToInt32(SessionHelper.UserTypeId), task);
 
-                _dbContext.UserTasks.Add(new UserTask
+                if (createResult.InvoiceCreate)
                 {
-                    Active = task.Active,
-                    Comment = task.UserComment,
-                    TaskId = taskDetail.Id,
-                    UserId = task.UserId,
-                    Status = task.StatusId,
-                    DueDate = task.DueDate,
-                    CreatedOn = DateTime.Now,
-                    CreatedBy = Convert.ToInt32(SessionHelper.UserTypeId),
-                    AddedBy = Convert.ToInt32(SessionHelper.UserId)
-                });
-                await _dbContext.SaveChangesAsync();
-
-                if (task.IsChargeble && task.Active)
                     await CreateInvoice(task);
+                }
+
+                //var taskDetail = new Tasks();
+                //taskDetail.CreatedBy = Convert.ToInt32(SessionHelper.UserTypeId);
+                //taskDetail.AddedBy = Convert.ToInt32(SessionHelper.UserId);
+                //taskDetail.Name = task.TaskName;
+                //taskDetail.Description = task.Description;
+                //taskDetail.Status = task.StatusId;
+                //taskDetail.Active = task.Active;
+                //taskDetail.CreatedOn = DateTime.Now;
+                //taskDetail.ClientId = task.ClientId;
+                //taskDetail.Priorities = task.Priorities;
+                //taskDetail.Remarks = task.Remarks;
+                //taskDetail.IsChargeble = task.IsChargeble;
+                //taskDetail.CompletedOn = task.CompletedOn;
+                //taskDetail.ChargeAmount = task.ChargeAmount;
+                //_dbContext.Tasks.Add(taskDetail);
+                //await _dbContext.SaveChangesAsync();
+
+                //_dbContext.UserTasks.Add(new UserTask
+                //{
+                //    Active = task.Active,
+                //    Comment = task.UserComment,
+                //    TaskId = taskDetail.Id,
+                //    UserId = task.UserId,
+                //    Status = task.StatusId,
+                //    DueDate = task.DueDate,
+                //    CreatedOn = DateTime.Now,
+                //    CreatedBy = Convert.ToInt32(SessionHelper.UserTypeId),
+                //    AddedBy = Convert.ToInt32(SessionHelper.UserId)
+                //});
+                //await _dbContext.SaveChangesAsync();
+
+                //if (task.IsChargeble && task.Active)
+                //    await CreateInvoice(task);
             }
         }
 
@@ -291,13 +207,14 @@ namespace Arity.Service
 
         public async Task DeleteTask(int taskId)
         {
-            _dbContext.UserTasks.RemoveRange(_dbContext.UserTasks.Where(_ => _.TaskId == taskId).ToList());
-            _dbContext.Tasks.RemoveRange(_dbContext.Tasks.Where(_ => _.Id == taskId).ToList());
-            await _dbContext.SaveChangesAsync();
+            await _taskRepository.DeleteTask(taskId);
+            //_dbContext.UserTasks.RemoveRange(_dbContext.UserTasks.Where(_ => _.TaskId == taskId).ToList());
+            //_dbContext.Tasks.RemoveRange(_dbContext.Tasks.Where(_ => _.Id == taskId).ToList());
+            //await _dbContext.SaveChangesAsync();
         }
 
         #region Private Methods
-       
+
         private Dictionary<string, object> GetDynamicParamsForFilter(Dictionary<string, string> columnFilter)
         {
             Dictionary<string, object> filterParams = new Dictionary<string, object>();
@@ -331,7 +248,7 @@ namespace Arity.Service
 
             if (columnFilter.ContainsKey("CreatedOn") && !string.IsNullOrWhiteSpace(columnFilter["CreatedOn"]))
             {
-                var dates = GetDatesFromRange(columnFilter["CreatedOn"]);
+                var dates = columnFilter["CreatedOn"].GetDatesFromRange();
                 if (dates.Item1 != null)
                     filterParams.Add("CreatedOnFrom", dates.Item1);
 
@@ -341,7 +258,7 @@ namespace Arity.Service
 
             if (columnFilter.ContainsKey("DueDate") && !string.IsNullOrWhiteSpace(columnFilter["DueDate"]))
             {
-                var dates = GetDatesFromRange(columnFilter["DueDate"]);
+                var dates = columnFilter["DueDate"].GetDatesFromRange();
                 if (dates.Item1 != null)
                     filterParams.Add("DueDateFrom", dates.Item1);
 
@@ -350,26 +267,6 @@ namespace Arity.Service
             }
 
             return filterParams;
-        }
-
-        private Tuple<DateTime?, DateTime?> GetDatesFromRange(string range)
-        {
-            DateTime? fromDate = null;
-            DateTime? toDate = null;
-            if (!string.IsNullOrWhiteSpace(range))
-            {
-                var dates = range.Split('-');
-                if (!string.IsNullOrWhiteSpace(dates[0]))
-                {
-                    fromDate = DateTime.ParseExact(dates[0], "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                }
-
-                if (!string.IsNullOrWhiteSpace(dates[1]))
-                {
-                    toDate = DateTime.ParseExact(dates[1], "dd/MM/yyyy", CultureInfo.InvariantCulture).AddDays(1).AddMilliseconds(-1);
-                }
-            }
-            return Tuple.Create(fromDate, toDate);
         }
 
         #endregion

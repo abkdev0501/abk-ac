@@ -195,40 +195,15 @@ namespace ArityApp.Controllers
         {
             try
             {
-                var orderCriteria = "Id";
-                var orderAscendingDirection = false;
-
-                if (dtParameters.Order != null)
-                {
-                    // in this example we just default sort on the 1st column
-                    orderCriteria = dtParameters.Columns[dtParameters.Order[0].Column].Data;
-                    orderAscendingDirection = dtParameters.Order[0].Dir.ToString().ToLower() == "asc";
-                }
-
-                var result  = await _masterService.GetAllClientAsQuerable();
-
-                //Apply filter
-                var columnFilter = dtParameters.Columns.Where(x => !string.IsNullOrWhiteSpace(x.Search.Value)).ToDictionary(x => x.Name, x => x.Search.Value);
-                if (columnFilter.Count > 0)
-                {
-                    result = ApplyClientFilter(columnFilter, result);
-                }
-
-                var totalResultsCount = result.Count();
-                result = orderAscendingDirection ? result.OrderByDynamic(orderCriteria.Replace("String", ""), DtOrderDir.Asc) : result.OrderByDynamic(orderCriteria.Replace("String", ""), DtOrderDir.Desc);
-
-                // now just get the count of items (without the skip and take) - eg how many could be returned with filtering
-                var filteredResultsCount = result.Count();
+                var result  = await _masterService.GetClientList(dtParameters);
+                var totalResultsCount = result.FirstOrDefault()?.TotalRecords ?? 0;
 
                 return Json(new
                 {
                     draw = dtParameters.Draw,
                     recordsTotal = totalResultsCount,
-                    recordsFiltered = filteredResultsCount,
-                    data = dtParameters.Length == - 1 ? result.ToList() : result
-                     .Skip(dtParameters.Start)
-                     .Take(dtParameters.Length)
-                     .ToList()
+                    recordsFiltered = totalResultsCount,
+                    data = result
                 });
             }
             catch
@@ -465,13 +440,24 @@ namespace ArityApp.Controllers
         {
             try
             {
+                var result = await _masterService.GetAllNotification(dtParameters);
+                var totalResultsCount = result.FirstOrDefault()?.TotalRecords ?? 0;
 
-                var notifications = await _masterService.GetAllNotification();
-                return Json(new { data = notifications }, JsonRequestBehavior.AllowGet);
+                var jsonResult = Json(new
+                {
+                    draw = dtParameters.Draw,
+                    recordsTotal = totalResultsCount,
+                    recordsFiltered = totalResultsCount,
+                    data = result
+
+                });
+
+                jsonResult.MaxJsonLength = int.MaxValue;
+                return jsonResult;
             }
-            catch
+            catch(Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 

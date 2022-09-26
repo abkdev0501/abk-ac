@@ -12,5 +12,13 @@ namespace Arity.Infra.Interface
         Task<List<TaskDTO>> GetAll(int userId, int typeId);
 
         Task<List<TaskDTO>> GetAllTaskDetail(long userId, long userTypeId, int recordFrom, int pageSize, string sortColumn, string sortOrder, Dictionary<string, object> filterParams);
+
+        Task<TaskDTO> GetTask(int id);
+
+        Task DeleteTask(int id);
+
+        Task<TaskResult> CreateTask(int currentUserId, int userTypeId, TaskDTO task);
+
+        Task<TaskResult> UpdateTask(TaskDTO task);
     }
 }

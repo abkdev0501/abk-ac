@@ -47,17 +47,15 @@ namespace ArityApp.Controllers
                 var totalResultsCount = result.FirstOrDefault()?.TotalRecords ?? 0;
 
                 // now just get the count of items (without the skip and take) - eg how many could be returned with filtering
-                var filteredResultsCount = result.Count();
+                var filteredResultsCount = totalResultsCount;
 
                 var jsonResult = Json(new
                 {
                     draw = dtParameters.Draw,
                     recordsTotal = totalResultsCount,
                     recordsFiltered = filteredResultsCount,
-                    data = dtParameters.Length == -1 ? result.ToList() : result
-                        .Skip(dtParameters.Start)
-                        .Take(dtParameters.Length)
-                        .ToList()
+                    data = result
+
                 });
 
                 jsonResult.MaxJsonLength = int.MaxValue;
@@ -70,7 +68,7 @@ namespace ArityApp.Controllers
             }
         }
 
-      
+
         public IQueryable<TaskDTO> ApplyFilter(Dictionary<string, string> columnFilter, IQueryable<TaskDTO> taskDTOs)
         {
             if (columnFilter.ContainsKey("TaskName") && !string.IsNullOrWhiteSpace(columnFilter["TaskName"]))
@@ -182,11 +180,14 @@ namespace ArityApp.Controllers
             try
             {
                 var users = await _accountService.GetAllUsers();
+
                 var task = await _taskService.GetTask(id);
                 if (task == null)
                     task = new TaskDTO();
+
                 ViewBag.Users = new SelectList(users.Where(_ => _.UserTypeId != (int)Arity.Service.Core.UserType.User), "Id", "FullName", task.UserId);
                 ViewBag.Clients = new SelectList(users.Where(_ => _.UserTypeId == (int)Arity.Service.Core.UserType.User), "Id", "FullName", task.ClientId);
+
                 ViewBag.Status = new SelectList(Enum.GetValues(typeof(EnumHelper.TaskStatus))
                .Cast<EnumHelper.TaskStatus>()
                .Select(t => new
