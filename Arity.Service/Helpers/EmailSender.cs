@@ -12,7 +12,7 @@ namespace Arity.Service.Helpers
     {
         public void SendEmail(string subject, string messageBody, string path)
         {
-            var apiKey = ConfigurationManager.AppSettings["SendGridKey"];
+            var apiKey = Environment.GetEnvironmentVariable("RMNKeySG"); //ConfigurationManager.AppSettings["SendGridKey"];
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress("ahir.prakash1992@outlook.com", "RMN Notification");
 

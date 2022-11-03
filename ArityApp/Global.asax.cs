@@ -37,7 +37,9 @@ namespace ArityApp
             builder.RegisterType<LoggerService>().As<ILoggerService>();
             builder.RegisterType<TaskService>().As<ITaskService>();
             builder.RegisterType<RMNEntities>().InstancePerLifetimeScope();
-            builder.RegisterType<ConnectionFactory>().As<IConnectionFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<DapperContext>().InstancePerLifetimeScope();
+
+            //builder.RegisterType<ConnectionFactory>().As<IConnectionFactory>().InstancePerLifetimeScope();
 
             #region Helpers
             builder.RegisterType<EmailSender>().As<IEmailSender>();

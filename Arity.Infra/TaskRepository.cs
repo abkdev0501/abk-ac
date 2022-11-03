@@ -11,10 +11,10 @@ namespace Arity.Infra
 {
     public class TaskRepository : ITaskRepository
     {
-        private readonly IDbConnection _dbConnection;
-        public TaskRepository(IConnectionFactory connectionFactory)
+        private readonly DapperContext _context;
+        public TaskRepository(DapperContext context)
         {
-            _dbConnection = connectionFactory.GetConnection;
+            _context = context;
         }
 
         public async Task<List<TaskDTO>> GetAll(int userId, int typeId)
@@ -22,8 +22,12 @@ namespace Arity.Infra
             var parameters = new DynamicParameters();
             parameters.Add("@UserId", userId);
             parameters.Add("@TypeId", typeId);
-            var result = await _dbConnection.QueryAsync<TaskDTO>("GetAllTask", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
-            return result.ToList();
+            
+            using (var dbConnection = _context.CreateConnection())
+            {
+                var result = await dbConnection.QueryAsync<TaskDTO>("GetAllTask", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
+                return result.ToList();
+            }
         }
 
         public async Task<List<TaskDTO>> GetAllTaskDetail(long userId, long userTypeId, int recordFrom, int pageSize, string sortColumn, string sortOrder, Dictionary<string, object> filterParams)
@@ -39,24 +43,35 @@ namespace Arity.Infra
             foreach (var filterParam in filterParams)
                 parameters.Add($"@{filterParam.Key}", filterParam.Value);
 
-            var result = await _dbConnection.QueryAsync<TaskDTO>("GetAllTaskDetail", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
-            return result.ToList();
+            using (var dbConnection = _context.CreateConnection())
+            {
+                var result = await dbConnection.QueryAsync<TaskDTO>("GetAllTaskDetail", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
+                return result.ToList();
+            }
         }
 
         public async Task<TaskDTO> GetTask(int id)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@Id", id);
-            var result = await _dbConnection.QueryAsync<TaskDTO>("GetTaskById", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
-            return result.FirstOrDefault();
+           
+            using (var dbConnection = _context.CreateConnection())
+            {
+                var result = await dbConnection.QueryAsync<TaskDTO>("GetTaskById", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
+                return result.FirstOrDefault();
+            }
         }
 
         public async Task DeleteTask(int id)
         {
             var parameters = new DynamicParameters();
             parameters.Add("@Id", id);
-            await _dbConnection.QueryAsync("DeleteTaskById", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
-            return;
+           
+            using (var dbConnection = _context.CreateConnection())
+            {
+                await dbConnection.QueryAsync("DeleteTaskById", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
+                return;
+            }
         }
 
         public async Task<TaskResult> CreateTask(int currentUserId, int userTypeId, TaskDTO task)
@@ -77,8 +92,12 @@ namespace Arity.Infra
             parameters.Add("@CompletedOn", task.CompletedOn);
             parameters.Add("@DueDate", task.DueDate);
             parameters.Add("@ChargeAmount", task.ChargeAmount);
-            var result = await _dbConnection.QueryAsync<TaskResult>("TaskCreate", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
-            return result.FirstOrDefault();
+
+            using (var dbConnection = _context.CreateConnection())
+            {
+                var result = await dbConnection.QueryAsync<TaskResult>("TaskCreate", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
+                return result.FirstOrDefault();
+            }
         }
 
         public async Task<TaskResult> UpdateTask(TaskDTO task)
@@ -98,8 +117,12 @@ namespace Arity.Infra
             parameters.Add("@CompletedOn", task.CompletedOn);
             parameters.Add("@DueDate", task.DueDate);
             parameters.Add("@ChargeAmount", task.ChargeAmount);
-            var result = await _dbConnection.QueryAsync<TaskResult>("TaskUpdate", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
-            return result.FirstOrDefault();
+
+            using (var dbConnection = _context.CreateConnection())
+            {
+                var result = await dbConnection.QueryAsync<TaskResult>("TaskUpdate", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
+                return result.FirstOrDefault();
+            }
         }
     }
 }

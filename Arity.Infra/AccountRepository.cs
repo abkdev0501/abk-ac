@@ -11,16 +11,19 @@ namespace Arity.Infra
 {
     public class AccountRepository : IAccountRepository
     {
-        private readonly IDbConnection _dbConnection;
-        public AccountRepository(IConnectionFactory connectionFactory)
+        private readonly DapperContext _context;
+        public AccountRepository(DapperContext context)
         {
-            _dbConnection = connectionFactory.GetConnection;
+            _context = context;
         }
         public async Task<List<UsersDto>> GetAllUsers()
         {
-            var parameters = new DynamicParameters();
-            var result = await _dbConnection.QueryAsync<UsersDto>("GetAllUsers", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
-            return result.ToList();
+            using (var dbConnection = _context.CreateConnection())
+            {
+                var parameters = new DynamicParameters();
+                var result = await dbConnection.QueryAsync<UsersDto>("GetAllUsers", parameters, commandType: CommandType.StoredProcedure).ConfigureAwait(false);
+                return result.ToList();
+            }
         }
     }
 }
